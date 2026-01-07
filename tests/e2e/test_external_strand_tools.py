@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from examples.external_tools import main as run_external_tools_example
+from examples.features.external_strand_tools import main as run_external_tools_example
 
 
 @pytest.mark.asyncio

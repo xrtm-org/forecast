@@ -39,10 +39,16 @@ nav:
   - Architecture: architecture.md
   - API Reference:
       - Overview: api/index.md
+      - Agents: api/agents.md
+      - Skills: api/skills.md
       - Orchestration: api/orchestration.md
       - Inference: api/inference.md
+      - Evaluation: api/evaluation.md
       - Memory: api/memory.md
       - Telemetry: api/telemetry.md
+  - Resources:
+      - Agents Registry: agents_registry.md
+      - Custom Designs: custom_designs.md
 
 markdown_extensions:
   - admonition

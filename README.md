@@ -6,8 +6,10 @@ Institutional-grade parallelized agentic reasoning engine.
 `xrtm-forecast` is the core intelligence engine originally developed for the CAFE (Computer-Aided Financial Engineering) platform. It provides a domain-agnostic framework for:
 - **Inference Layer**: Standardized provider interfaces for Gemini and OpenAI.
 - **Reasoning Graph**: A pluggable state-machine orchestrator for multi-agent workflows.
-- **Agent Core**: Standardized `BaseAgent` for structured reasoning and parsing.
-- **Utilities**: Distributed rate limiting (Redis) and real-time interaction telemetry.
+- **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
+- **Skill Protocol**: Composable behaviors (e.g., Search) that agents can dynamically equip.
+- **Observability**: OTel-native structured telemetry and institutional execution reports.
+- **Evaluation**: Built-in harness for backtesting and accuracy metrics (Brier Score).
 
 ## Architectural Design: "Engine vs. Specialists"
 
@@ -67,7 +69,10 @@ if __name__ == "__main__":
 
 - **Architecture**: [The "Lego" Design](docs/architecture.md)
 - **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
-- **Examples**: Check the `examples/` directory for full pipelines (Analyst, Custom Graphs, etc.)
+- **Examples**: Check the [examples/](examples/) directory for structured entry points:
+    - `core/`: Basic library usage.
+    - `features/`: Specialized modules (Skills, Eval, Telemetry).
+    - `pipelines/`: End-to-end multi-agent workflows.
 
 ## Contributing
 

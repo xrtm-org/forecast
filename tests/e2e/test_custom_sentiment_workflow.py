@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from examples.custom_graph import run_custom_pipeline
+from examples.pipelines.custom_sentiment_workflow import run_custom_pipeline
 
 
 @pytest.mark.asyncio

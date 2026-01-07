@@ -33,13 +33,18 @@ Our flagship analyst implementation.
 
 ---
 
-## Tool Registry (`src/forecast/tools/`)
+## Skill & Tool Registries
 
-The `tool_registry` centralizes external capabilities available to all agents.
+### 1. Skill Registry (`src/forecast/skills/`)
+The high-level behaviors available to agents.
+*   **Usage**: `agent.add_skill(MarketResearchSkill())`.
+*   **Contains**: Complex workflows (Search + RAG + Summarization).
 
-### Standard Tools
-- **`FunctionTool`**: Automatically wraps standard Python functions.
-- **Strand-Agents Integration**: Use `tool_registry.register_strand_tool(tool)` to ingest third-party SDK tools.
+### 2. Tool Registry (`src/forecast/tools/`)
+The low-level driver functions.
+*   **Usage**: Used by Skills, rarely by Agents directly.
+*   **Contains**: Atomic drivers (`GoogleSearchTool`, `CalculatorTool`).
+*   **Strand-Agents Integration**: Use `tool_registry.register_strand_tool(tool)` to ingest third-party SDK tools.
 
 ---
 
@@ -47,5 +52,5 @@ The `tool_registry` centralizes external capabilities available to all agents.
 
 1.  **If you want to build a new agent from scratch**: Start with `LLMAgent`.
 2.  **If you want to use the built-in forecasting logic**: Use `ForecastingAnalyst`.
-3.  **If you want to add a capability (like a Search engine)**: Register it in the `tool_registry`.
-4.  **If you want to discover what's available globally**: Use the `registry` (Agent Registry) or `tool_registry`.
+3.  **If you want to add a skill (like a Search engine)**: Register it in the `skill_registry`.
+4.  **If you want to discover what's available globally**: Use the `registry` (Agents), `skill_registry` (high-level), or `tool_registry` (low-level).

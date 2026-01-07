@@ -17,15 +17,28 @@ class ForecastingAnalyst(LLMAgent):
     """
     Agent specialized in analyzing events and providing probabilistic forecasts.
     Domain-agnostic reasoning engine.
+
+    Note: This is a Reference Implementation (Recipe). Users are encouraged to
+    fork and customize this persona for specific domains.
     """
     async def run(self, input_data: ForecastQuestion, **kwargs) -> ForecastOutput:
         """
         Processes a ForecastQuestion and returns a ForecastOutput.
+        Demonstrates how to use skills if they are present.
         """
+        context = input_data.content or "No additional context provided."
+
+        # Dynamic Skill Usage: If the agent has a 'web_search' skill, use it to gather more info.
+        search_skill = self.get_skill("web_search")
+        if search_skill:
+            logger.info(f"Analyst '{self.name}' is using web_search skill...")
+            skill_result = await search_skill.execute(query=input_data.title)
+            context = f"{context}\n\nSearch Findings:\n{skill_result}"
+
         prompt = f"""
         Analyze the following event and provide a probabilistic forecast:
         Title: {input_data.title}
-        Context: {input_data.content or 'No additional context provided.'}
+        Context: {context}
 
         Provide your response in JSON format matching this schema:
         - confidence: (float 0-1)

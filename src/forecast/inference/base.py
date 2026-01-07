@@ -16,7 +16,7 @@ class InferenceProvider(ABC):
     @property
     def supports_tools(self) -> bool:
         """
-        Capability flag: Does this provider support native tool/function calling?
+        Feature flag: Does this provider support native tool/function calling?
         Defaults to True for modern providers. Override if False.
         """
         return True

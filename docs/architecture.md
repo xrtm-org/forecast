@@ -26,7 +26,7 @@ These are the **Shapes**. They define mechanical behavior, not business logic.
 ### 2. Specialist Implementations (`src/forecast/agents/specialists/*.py`)
 These are the **Roles**. They are built by inheriting from the abstractions above.
 - **`ForecastingAnalyst`**: A pre-built persona that uses Bayesian reasoning to solve problems.
-- **`ResearcherAgent`** (Coming soon): Focused on web-search and data synthesis.
+- **`Generic Agent + Skills`**: We prefer equipping standard agents with skills over creating rigid subclasses.
 
 ---
 
@@ -38,10 +38,15 @@ The `Orchestrator` is the state machine. It doesn't "think"—it just moves the 
 ### 2. The Inference Layer (`src/forecast/inference/`)
 Standardizes LLM communication. Whether you use Gemini, OpenAI, or a local model, the agent only sees the `InferenceProvider` interface.
 
-### 3. The Capability Layer (`src/forecast/tools/`)
-Contains the **Tool Registry**. This is where external capabilities (like `strand-agents` tools) are ingested and made available to agents.
+### 3. The Skill Layer (`src/forecast/skills/`)
+Contains the **Skill Registry**.
 
----
+**Taxonomy: Skills vs. Tools**
+To keep the system modular, we strictly distinguish between:
+*   **The Tool** (`src/forecast/tools/`): An atomic, stateless function (e.g., `GoogleSearch.execute()`). It wraps a specific driver or API.
+*   **The Skill** (`src/forecast/skills/`): A high-level behavior that *uses* tools (e.g., `MarketResearchSkill`). It manages retries, error handling, and prompt logic.
+
+*Rule: Agents possess Skills. Skills control Tools.*
 
 ## Data Flow & Traceability
 
@@ -69,5 +74,9 @@ graph TD
 - `src/forecast/agents/specialists/`: Pre-built expert personas.
 - `src/forecast/graph/`: The flow engine (Orchestrator).
 - `src/forecast/inference/`: Model transport and rate limiting.
-- `src/forecast/tools/`: Extension points for external capabilities.
+- `src/forecast/skills/`: High-level behaviors (Strategy & Composition).
+- `src/forecast/tools/`: Atomic primitives (Drivers & APIs).
+- `src/forecast/memory/`: Unified vector store abstractions.
+- `src/forecast/telemetry/`: Observability and OTel tracing.
+- `src/forecast/pipelines/`: Standardized end-to-end flows.
 - `src/forecast/schemas/`: The shared language of the system.

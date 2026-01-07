@@ -24,10 +24,10 @@ class GenericAnalystPipeline:
         self.orchestrator.register_node("analysis", self._analyze_node)
 
     async def _ingest_node(self, state: BaseGraphState, on_progress: Callable) -> Optional[str]:
-        await on_progress(1, "Ingestion", "PROCESSING", f"Fetching market with ID: {state.subject_id}")
+        await on_progress(1, "Ingestion", "PROCESSING", f"Fetching subject with ID: {state.subject_id}")
         question = await self.data_source.get_question_by_id(state.subject_id)
         if not question:
-            await on_progress(1, "Ingestion", "ERROR", "Market not found")
+            await on_progress(1, "Ingestion", "ERROR", "Subject not found")
             return None
 
         state.context["question"] = question
@@ -44,7 +44,7 @@ class GenericAnalystPipeline:
         return None
 
     async def run(self, subject_id: str, on_progress: Optional[Callable] = None) -> BaseGraphState:
-        """Runs the pipeline for a specific subject (e.g. Polymarket slug/ID)."""
+        """Runs the pipeline for a specific subject (e.g. question slug/ID)."""
         state = BaseGraphState(subject_id=subject_id)
         final_state = await self.orchestrator.run(state, entry_node="ingestion", on_progress=on_progress)
 

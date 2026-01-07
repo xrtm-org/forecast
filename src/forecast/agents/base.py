@@ -16,6 +16,16 @@ class Agent(abc.ABC):
     """
     def __init__(self, name: Optional[str] = None):
         self.name = name or self.__class__.__name__
+        self.skills: Dict[str, Any] = {}
+
+    def add_skill(self, skill: Any) -> None:
+        """Equips the agent with a new skill."""
+        self.skills[skill.name] = skill
+        logger.debug(f"Agent {self.name} equipped with skill: {skill.name}")
+
+    def get_skill(self, name: str) -> Optional[Any]:
+        """Retrieves a skill by name."""
+        return self.skills.get(name)
 
     @abc.abstractmethod
     async def run(self, input_data: Any, **kwargs) -> Any:
@@ -30,5 +40,5 @@ class Agent(abc.ABC):
         return {
             "name": self.name,
             "type": self.__class__.__name__,
-            "version": "0.1.0" # Placeholder for versioning logic
+            "version": "0.1.1" # Placeholder for versioning logic
         }

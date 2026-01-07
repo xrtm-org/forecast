@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-01-07
+
+### Added
+- **Skill Protocol**: Introduced a new `forecast.skills` module for high-level, composable agent behaviors.
+- **Evaluation Harness**: Added `forecast.eval` featuring a `Backtester` and `BrierScoreEvaluator` for institutional-grade accuracy benchmarking.
+- **Structured Telemetry**: Global `TelemetryManager` and OTel-compatible `TelemetrySpan` hierarchy for deep observability.
+- **Reference Implementation**: Explicitly labeled `ForecastingAnalyst` as a "Recipe" starter kit.
+
+### Changed
+- **Symmetrical Repository Layout**: Reorganized `examples/` and `tests/` into identical `core`, `features`, and `pipelines` hierarchies.
+- **Generic Terminology**: Purged domain-specific terms like "market" and "capability" from core engine logic in favor of "subject" and "skill".
+- **Documentation Overhaul**: Complete refactor of API documentation with new dedicated sections for platform components.
+
+### Fixed
+- **Telemetry Isolation**: Resolved a context manager bug in `TelemetrySpan` that prevented proper trace isolation in local environments.
+
 ## [0.1.0] - 2026-01-07
 
 ### Added
