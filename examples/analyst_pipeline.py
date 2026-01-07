@@ -1,11 +1,13 @@
 import asyncio
-import os
 import logging
+import os
+
 from pydantic import SecretStr
-from forecast.inference.factory import ModelFactory
-from forecast.inference.config import GeminiConfig
-from forecast.data_sources.local import LocalDataSource
+
 from forecast.agents.specialists.analyst import ForecastingAnalyst
+from forecast.data_sources.local import LocalDataSource
+from forecast.inference.config import GeminiConfig
+from forecast.inference.factory import ModelFactory
 from forecast.pipelines.analyst import GenericAnalystPipeline
 
 # Configure logging
@@ -21,22 +23,22 @@ async def run_showcase():
         return
 
     config = GeminiConfig(
-        model_id="gemini-2.0-flash-lite", 
+        model_id="gemini-2.0-flash-lite",
         api_key=SecretStr(api_key),
         redis_url=os.getenv("REDIS_URL", "redis://redis:6379/0")
     )
     provider = ModelFactory.get_provider(config)
-    
+
     # 2. Setup Data Source (Local mode for stability)
     data_source = LocalDataSource("examples/data/polymarket_sample.json")
-    
+
     # 3. Setup Agent & Pipeline
     analyst = ForecastingAnalyst(model=provider)
     pipeline = GenericAnalystPipeline(data_source=data_source, analyst=analyst)
 
     # 4. Run for a specific market
     target_market_id = "fed-rates-mar-2026"
-    
+
     async def on_progress(p_id, phase, status, details, specialists=None):
         print(f"[{phase}] {status}: {details}")
 

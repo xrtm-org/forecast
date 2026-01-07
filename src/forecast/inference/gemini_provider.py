@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import logging
 import time
 from typing import Any, AsyncIterable, Dict, List, Optional, cast
@@ -416,7 +417,7 @@ class GeminiProvider(InferenceProvider):
                         spec["parameters"] = spec["parameters"]["json"]
                 processed.append(spec)
                 continue
-            
+
             f = getattr(t, "fn", getattr(t, "_tool_func", t))
             raw_name = getattr(f, "__name__", None)
             if not raw_name or "<" in raw_name or "(" in raw_name:

@@ -1,15 +1,17 @@
 import pytest
-from forecast.cognition.confidence import StandardHybridStrategy, ConfidenceEstimator
+
+from forecast.cognition.confidence import ConfidenceEstimator, StandardHybridStrategy
+
 
 def test_confidence_hybrid_strategy():
     strategy = StandardHybridStrategy(verbal_weight=0.5)
-    
+
     # Test case 1: High verbal, High logprob (approx 0) -> High hybrid
     # logprob 0 -> signal 1.0. verbal 1.0. hybrid = 0.5*1 + 0.5*1 = 1.0
     metrics = strategy.evaluate(verbal=1.0, logprobs=[{"logprob": 0.0}])
     assert metrics.hybrid_score == 1.0
     assert metrics.signal_strength == 1.0
-    
+
     # Test case 2: Low verbal, Low logprob (-100) -> Low hybrid
     # logprob -100 -> signal ~0. verbal 0. hybrid = 0.
     metrics = strategy.evaluate(verbal=0.0, logprobs=[{"logprob": -100.0}])
@@ -17,7 +19,7 @@ def test_confidence_hybrid_strategy():
 
 def test_confidence_aggregation_modes():
     logprobs = [{"logprob": -1.0}, {"logprob": -3.0}]
-    
+
     # Mean: -2.0 -> exp(-2) ~= 0.135
     strategy = StandardHybridStrategy(aggregation="mean")
     metrics = strategy.evaluate(verbal=0.5, logprobs=logprobs)

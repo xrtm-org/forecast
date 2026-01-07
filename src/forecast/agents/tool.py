@@ -1,6 +1,8 @@
 import inspect
 from typing import Any, Callable, Optional
+
 from forecast.agents.base import Agent
+
 
 class ToolAgent(Agent):
     """
@@ -13,7 +15,7 @@ class ToolAgent(Agent):
 
     async def run(self, input_data: Any, **kwargs) -> Any:
         """
-        Executes the wrapped function. 
+        Executes the wrapped function.
         If input_data is a Pydantic model, it passes it as kwargs or a single arg.
         """
         # Handling for both async and sync functions

@@ -57,10 +57,10 @@ class Orchestrator:
 
             # Nodes should return the name of the NEXT node, or None to terminate
             next_node = await node_func(state, report_progress)
-            
+
             # Structural Trace: Track the executed node
             state.execution_path.append(active_node)
-            
+
             active_node = next_node
             state.cycle_count += 1
 

@@ -93,10 +93,10 @@ class Audit:
             "\n## 1. Structural Trace (The 'How')",
             "Path through the reasoning graph:"
         ]
-        
+
         for i, node in enumerate(state.execution_path):
             report.append(f"{i+1}. **{node}**")
-            
+
         report.append("\n## 2. Logical Trace (The 'Why')")
         if hasattr(output, "logical_trace"):
             for entry in output.logical_trace:
@@ -104,11 +104,11 @@ class Audit:
                 report.append(f"- {entry.event}{prob_str}: *{entry.description or ''}*")
         else:
             report.append("No logical trace data provided by the analyst.")
-            
+
         report.append("\n## 3. Final Confidence")
         if hasattr(output, "confidence"):
             report.append(f"**Score: {output.confidence * 100:.1f}%**")
-            
+
         return "\n".join(report)
 
 # Global auditor for the library

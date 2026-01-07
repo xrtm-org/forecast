@@ -1,6 +1,8 @@
-import aiohttp
 import logging
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
+import aiohttp
+
 from forecast.data_sources.base import DataSource
 from forecast.schemas.forecast import ForecastQuestion, MetadataBase
 
@@ -16,14 +18,14 @@ class PolymarketSource(DataSource):
         url = f"{self.API_BASE}/events?active=true&closed=false&limit={limit}"
         if query:
             url += f"&search={query}"
-        
+
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     if resp.status != 200:
                         logger.error(f"Polymarket API returned status {resp.status}")
                         return []
-                    
+
                     data = await resp.json()
                     questions = []
                     for item in data:
@@ -50,7 +52,7 @@ class PolymarketSource(DataSource):
         """
         Normalizes Polymarket Gamma API event data into a ForecastQuestion.
         """
-        # Polymarket 'events' often have 'markets' inside. 
+        # Polymarket 'events' often have 'markets' inside.
         # For simplicity, we use the event title and description.
         return ForecastQuestion(
             id=str(item.get("id", "")),
@@ -61,6 +63,6 @@ class PolymarketSource(DataSource):
                 market_type="binary", # Default for demo
                 source_version="polymarket-gamma-v1",
                 # Pass through raw data for expert agents
-                raw_data=item 
+                raw_data=item
             )
         )

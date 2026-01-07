@@ -1,10 +1,12 @@
 import logging
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+
 from pydantic import BaseModel
+
 from forecast.agents.base import Agent
 from forecast.inference.base import InferenceProvider
-from forecast.utils.parser import parse_json_markdown
 from forecast.tools.registry import tool_registry
+from forecast.utils.parser import parse_json_markdown
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=BaseModel)
@@ -22,11 +24,10 @@ class LLMAgent(Agent):
         Retrieves tool instances from the global registry.
         If tool_names is None, returns all registered tools.
         """
-        from forecast.tools.registry import tool_registry
         if tool_names is None:
             # Return all wrapped tool objects
             return [tool_registry.get_tool(name) for name in tool_registry.list_tools()]
-        
+
         tools = []
         for name in tool_names:
             tool = tool_registry.get_tool(name)

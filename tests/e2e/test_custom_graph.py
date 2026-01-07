@@ -1,6 +1,9 @@
-import pytest
 import os
+
+import pytest
+
 from examples.custom_graph import run_custom_pipeline
+
 
 @pytest.mark.asyncio
 async def test_custom_graph_e2e(capsys):
@@ -12,7 +15,7 @@ async def test_custom_graph_e2e(capsys):
         pytest.skip("GEMINI_API_KEY not found. Skipping live custom graph integration test.")
 
     await run_custom_pipeline()
-    
+
     captured = capsys.readouterr()
     assert "--- ADVANCED CUSTOM REPORT ---" in captured.out
     assert "Detected Sentiment:" in captured.out

@@ -1,17 +1,22 @@
 import asyncio
 import os
+from typing import Any, cast
+
 from pydantic import SecretStr
-from forecast.inference.factory import ModelFactory
-from forecast.inference.config import GeminiConfig, OpenAIConfig
+
 from forecast.graph.orchestrator import Orchestrator
+from forecast.inference.config import GeminiConfig, OpenAIConfig
+from forecast.inference.factory import ModelFactory
 from forecast.schemas.graph import BaseGraphState
+
 
 def mock_tool(a: int, b: int) -> int:
     """Adds two numbers."""
     return a + b
 
 # Give it a tool_spec like the providers expect
-mock_tool.tool_spec = {
+mock_tool_any = cast(Any, mock_tool)
+mock_tool_any.tool_spec = {
     "name": "mock_tool",
     "description": "Adds two numbers.",
     "parameters": {
@@ -27,7 +32,7 @@ mock_tool.tool_spec = {
 async def run_complex_test(provider_name: str, config):
     print(f"\n🚀 Testing {provider_name} with Complex Features...")
     provider = ModelFactory.get_provider(config)
-    
+
     # 1. Test Logprobs
     print(f"📊 [{provider_name}] Testing Logprobs...")
     try:
@@ -62,15 +67,14 @@ async def run_complex_test(provider_name: str, config):
         print(f"❌ [{provider_name}] Tool call failed: {e}")
 
 async def test_orchestrator_live(openai_key):
-    print(f"\n🧠 Testing Orchestrator Live with OpenAI...")
-    from forecast.agents.base import Agent
+    print("\n🧠 Testing Orchestrator Live with OpenAI...")
     from forecast.inference.config import OpenAIConfig
 
     config = OpenAIConfig(model_id="gpt-4o-mini", api_key=SecretStr(openai_key))
     provider = ModelFactory.get_provider(config)
-    
+
     orchestrator = Orchestrator(max_cycles=3)
-    
+
     async def hello_node(state: BaseGraphState, on_progress) -> str:
         res = await provider.generate_content_async("Say 'Node 1 reached'.")
         state.context["node_1"] = res.text
@@ -81,10 +85,10 @@ async def test_orchestrator_live(openai_key):
 
     orchestrator.register_node("start", hello_node)
     orchestrator.register_node("end", end_node)
-    
+
     state = BaseGraphState(subject_id="live_orchestration_test")
     await orchestrator.run(state, entry_node="start")
-    
+
     if "Node 1" in state.context.get("node_1", ""):
         print(f"✅ Orchestrator successfully ran live node. Cycle count: {state.cycle_count}")
     else:
@@ -100,11 +104,11 @@ async def main():
         oa_config = OpenAIConfig(model_id="gpt-4o-mini", api_key=SecretStr(openai_key))
         await run_complex_test("OpenAI", oa_config)
         await test_orchestrator_live(openai_key)
-    
+
     if gemini_key:
         # Use flash for speed
         ge_config = GeminiConfig(
-            model_id="gemini-2.0-flash-lite", 
+            model_id="gemini-2.0-flash-lite",
             api_key=SecretStr(gemini_key),
             redis_url=redis_url
         )

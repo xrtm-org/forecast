@@ -2,7 +2,6 @@ from typing import Any, Callable, Dict, Optional
 
 import pytest
 
-from forecast.agents.base import Agent
 from forecast.agents.llm import LLMAgent
 from forecast.graph.orchestrator import Orchestrator
 from forecast.inference.base import InferenceProvider, ModelResponse
@@ -32,9 +31,9 @@ class MockProvider(InferenceProvider):
 
 # 2. Mock Agent
 class MockAgent(LLMAgent):
-    async def run(self, context: Any, **kwargs: Any) -> Dict[str, Any]:
-        response = await self.model.generate_content_async("test prompt")
-        return self.parse_output(response.text)
+    async def run(self, input_data: Any, **kwargs: Any) -> Dict[str, Any]:
+        result = await self.model.generate_content_async(str(input_data))
+        return self.parse_output(result.text)
 
 
 @pytest.mark.asyncio

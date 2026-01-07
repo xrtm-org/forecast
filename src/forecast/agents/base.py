@@ -1,9 +1,8 @@
 import abc
 import logging
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Optional, TypeVar
 
 from pydantic import BaseModel
-from forecast.utils.parser import parse_json_markdown
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +11,7 @@ T = TypeVar("T", bound=BaseModel)
 
 class Agent(abc.ABC):
     """
-    Fundamental Lego piece of the xrtm-forecast engine. 
+    Fundamental Lego piece of the xrtm-forecast engine.
     Everything (LLMs, Tools, Graphs) is an Agent.
     """
     def __init__(self, name: Optional[str] = None):

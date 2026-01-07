@@ -1,8 +1,7 @@
 import abc
 import inspect
 import logging
-from typing import Any, Callable, Dict, Optional, Type
-from pydantic import BaseModel
+from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +41,7 @@ class StrandToolWrapper(Tool):
         Expects the object to have .name, .description, and .spec/schema.
         """
         self._tool = strand_tool
-        
+
     @property
     def name(self) -> str:
         # Strands tools usually expose .name

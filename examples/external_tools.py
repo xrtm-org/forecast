@@ -1,16 +1,12 @@
 import asyncio
 import os
-from typing import Any, Dict
+
 from pydantic import SecretStr
 
 # Import core library components
-from forecast import (
-    LLMAgent, 
-    ModelFactory, 
-    tool_registry, 
-    BaseGraphState
-)
+from forecast import LLMAgent, ModelFactory, tool_registry
 from forecast.inference.config import GeminiConfig
+
 
 # --- SIMULATION OF EXTERNAL SDK ---
 # This part simulates how a third-party library like 'strand-agents' defines tools.
@@ -26,7 +22,7 @@ class ExternalStrandTool:
             },
             "required": ["ticker"]
         }
-    
+
     async def fn(self, ticker: str) -> str:
         # Business logic from the external library
         return f"Sentiment for {ticker} is moderately bullish (+0.65)."
@@ -49,19 +45,20 @@ async def main():
         return
 
     config = GeminiConfig(
-        model_id="gemini-2.0-flash-lite", 
+        model_id="gemini-2.0-flash-lite",
         api_key=SecretStr(api_key)
     )
     model = ModelFactory.get_provider(config)
 
     # We create a generic analyst that knows it can use registry tools
     class ResearchAgent(LLMAgent):
-        async def run(self, ticker: str):
+        async def run(self, input_data: str, **kwargs):
             # Fetch tools by name from the registry
+            ticker = input_data
             tools = self.get_tools(["get_market_sentiment"])
-            
+
             prompt = f"Using the available tools, analyze {ticker} and provide a summary."
-            
+
             print(f"[Agent] Running research mission for {ticker}...")
             # The model will automatically detect the tool schema and call it
             response = await self.model.generate_content_async(prompt, tools=tools)
@@ -70,7 +67,7 @@ async def main():
     # 4. Execute the reasoning mission
     agent = ResearchAgent(model=model, name="Researcher")
     result = await agent.run(ticker="ETH")
-    
+
     print("\n" + "="*50)
     print("FINAL AGENT REPORT (Using External Strand Tool):")
     print(result)

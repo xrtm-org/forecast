@@ -1,6 +1,8 @@
 import abc
 from typing import List, Optional
+
 from forecast.schemas.forecast import ForecastQuestion
+
 
 class DataSource(abc.ABC):
     """

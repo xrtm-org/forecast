@@ -1,5 +1,6 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
 from pydantic import SecretStr
 
 from forecast.inference.config import GeminiConfig, OpenAIConfig
@@ -34,7 +35,7 @@ async def test_openai_generate_mock():
         mock_response.usage.completion_tokens = 0
         mock_response.usage.total_tokens = 0
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
-        
+
         config = OpenAIConfig(model_id="gpt-4o", api_key=SecretStr("mock-key"))
         provider = ModelFactory.get_provider(config)
         response = await provider.generate_content_async("Hello")

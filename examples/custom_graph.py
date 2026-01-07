@@ -1,15 +1,16 @@
 import asyncio
-import os
 import logging
-from typing import Dict, Any, Callable, List
+import os
+from typing import Callable
+
 from pydantic import BaseModel, Field, SecretStr
 
 from forecast import (
-    Orchestrator, 
-    BaseGraphState, 
-    LLMAgent, 
-    ToolAgent,
+    BaseGraphState,
+    LLMAgent,
     ModelFactory,
+    Orchestrator,
+    ToolAgent,
 )
 from forecast.inference.config import GeminiConfig
 
@@ -26,10 +27,17 @@ class SentimentResult(BaseModel):
 # 2. Custom Specialized Agents
 class SentimentAgent(LLMAgent):
     """Analyzes text for directional sentiment using an LLM."""
-    async def run(self, text: str, **kwargs) -> SentimentResult:
-        prompt = f"Analyze the sentiment of the following news text for its impact on the subject. Return JSON with sentiment (BULLISH/BEARISH/NEUTRAL), confidence (0.0-1.0), and explanation.\n\nText: {text}"
+    async def run(self, input_data: str, **kwargs) -> SentimentResult:
+        """
+        Custom run method.
+        """
+        prompt = f"Analyze the sentiment of this text: {input_data}"
         response = await self.model.generate_content_async(prompt)
-        return self.parse_output(response.text, schema=SentimentResult)
+        parsed = self.parse_output(response.text, schema=SentimentResult)
+        if isinstance(parsed, SentimentResult):
+            return parsed
+        # Fallback
+        return SentimentResult(sentiment="NEUTRAL", confidence=0.0, explanation="Failed to parse")
 
 def get_trend_multiplier(sentiment: str) -> float:
     """A deterministic tool to calculate a trend multiplier."""
@@ -46,7 +54,7 @@ async def fetch_news_node(state: BaseGraphState, on_progress: Callable) -> str:
 async def analyze_node(state: BaseGraphState, on_progress: Callable) -> str:
     sentiment_agent = state.context["agents"]["sentiment"]
     await on_progress(2, "Analysis", "PROCESSING", "Running sentiment agent")
-    
+
     sentiment = await sentiment_agent.run(state.context["raw_news"])
     state.context["sentiment"] = sentiment
     return "calculate_trend"
@@ -54,7 +62,7 @@ async def analyze_node(state: BaseGraphState, on_progress: Callable) -> str:
 async def trend_node(state: BaseGraphState, on_progress: Callable) -> str:
     trend_agent = state.context["agents"]["trend_multiplier"]
     await on_progress(3, "Calculation", "PROCESSING", "Calculating trend multiplier")
-    
+
     sentiment_val = state.context["sentiment"].sentiment
     multiplier = await trend_agent.run(sentiment_val)
     state.context["multiplier"] = multiplier
@@ -63,9 +71,9 @@ async def trend_node(state: BaseGraphState, on_progress: Callable) -> str:
 async def report_node(state: BaseGraphState, on_progress: Callable) -> None:
     sentiment = state.context["sentiment"]
     multiplier = state.context["multiplier"]
-    
-    print(f"\n" + "="*40)
-    print(f"--- ADVANCED CUSTOM REPORT ---")
+
+    print("\n" + "="*40)
+    print("--- ADVANCED CUSTOM REPORT ---")
     print(f"Subject: {state.subject_id}")
     print(f"Detected Sentiment: {sentiment.sentiment} ({sentiment.confidence*100:.1f}%)")
     print(f"Trend Multiplier: {multiplier}x")
@@ -82,7 +90,7 @@ async def run_custom_pipeline():
         return
 
     config = GeminiConfig(
-        model_id="gemini-2.0-flash-lite", 
+        model_id="gemini-2.0-flash-lite",
         api_key=SecretStr(api_key),
         redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0")
     )

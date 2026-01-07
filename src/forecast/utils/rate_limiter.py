@@ -1,9 +1,8 @@
 import asyncio
 import logging
-import time
 import threading
+import time
 from typing import Optional
-
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ class TokenBucket:
         self.rate = rate
         self.capacity = capacity
         self.use_redis = False
-        
+
         # Unconditionally initialize In-Memory state as a fallback
         self._tokens = capacity
         self._last_ts = time.time()
@@ -78,10 +77,11 @@ class TokenBucket:
                 try:
                     now = time.time()
                     allowed = await self.script(
-                        keys=[f"{self.key}:tokens", f"{self.key}:ts"], 
+                        keys=[f"{self.key}:tokens", f"{self.key}:ts"],
                         args=[self.rate, self.capacity, now, tokens]
                     )
-                    if allowed: return
+                    if allowed:
+                        return
                 except Exception as e:
                     logger.error(f"[RATE-LIMITER] Redis error in acquire: {e}. Switching to In-Memory.")
                     self.use_redis = False

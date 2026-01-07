@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
+
 from forecast.agents.base import Agent
 
 logger = logging.getLogger(__name__)
@@ -10,12 +11,6 @@ class AgentRegistry:
     Handles explicit registration and discovery of specialist agents.
     Enables modular, multi-agent reasoning swarms.
     """
-
-class AgentRegistry:
-    """
-    Handles explicit registration and discovery of Lego-piece Agents.
-    Supports dependency-free discovery for graph assembly.
-    """
     def __init__(self):
         self._agents: Dict[str, Agent] = {}
 
@@ -25,9 +20,13 @@ class AgentRegistry:
             # If it's a class, we'll instantiate it if we can
             # but usually we want instances registered with specific configs
             agent = agent()
-        
-        name = name or agent.name
-        self._agents[name.lower()] = agent
+
+        # Mypy safe cast
+        from typing import cast
+        agent_instance = cast(Agent, agent)
+
+        name = name or agent_instance.name
+        self._agents[name.lower()] = agent_instance
         logger.info(f"[REGISTRY] Registered agent: {name.upper()}")
 
     def get_agent(self, name: str) -> Optional[Agent]:

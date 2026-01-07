@@ -1,9 +1,8 @@
-import asyncio
 import logging
-import json
-from typing import Any, AsyncIterable, Dict, List, Optional, Union
+from typing import Any, AsyncIterable, Dict, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
+
 from forecast.inference.base import InferenceProvider, ModelResponse
 from forecast.inference.config import OpenAIConfig
 
@@ -25,7 +24,7 @@ class OpenAIProvider(InferenceProvider):
         self.model_id = config.model_id
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
-        
+
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
         self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
@@ -35,15 +34,16 @@ class OpenAIProvider(InferenceProvider):
         return messages
 
     async def generate_content_async(
-        self, 
-        prompt: Any, 
-        output_logprobs: bool = False, 
+        self,
+        prompt: Any,
+        output_logprobs: bool = False,
         tools: Optional[List[Any]] = None,
         **kwargs
     ) -> ModelResponse:
         """Standardized async generation."""
-        messages = self._normalize_messages(prompt or kwargs.get("messages"))
-        
+        # Cast to Any to satisfy strict mypy checks on the Union definition
+        messages = cast(Any, self._normalize_messages(prompt or kwargs.get("messages")))
+
         openai_tools = None
         if tools:
             openai_tools = []
@@ -51,7 +51,6 @@ class OpenAIProvider(InferenceProvider):
                 if hasattr(t, "tool_spec"):
                     openai_tools.append({"type": "function", "function": t.tool_spec})
                 else:
-                    # Basic fallback for simple function objects
                     openai_tools.append({
                         "type": "function",
                         "function": {
@@ -63,7 +62,7 @@ class OpenAIProvider(InferenceProvider):
         response = await self.client.chat.completions.create(
             model=self.model_id,
             messages=messages,
-            tools=openai_tools,
+            tools=cast(Any, openai_tools),
             logprobs=output_logprobs,
             top_logprobs=5 if output_logprobs else None,
             **kwargs
@@ -71,8 +70,7 @@ class OpenAIProvider(InferenceProvider):
 
         choice = response.choices[0]
         text = choice.message.content or ""
-        
-        # Extract logprobs if available
+
         normalized_logprobs = None
         if output_logprobs and choice.logprobs and choice.logprobs.content:
             normalized_logprobs = []
@@ -82,17 +80,16 @@ class OpenAIProvider(InferenceProvider):
                     "logprob": lp.logprob,
                 })
 
-        # Handle Tool Calls
         if choice.message.tool_calls:
             logger.info(f"[OPENAI] Detected {len(choice.message.tool_calls)} tool calls.")
-            # In this base implementation, we return the tool calls in the raw response
-            # Orchestrator or higher-level agents would handle execution.
 
-        usage = {
-            "prompt_tokens": response.usage.prompt_tokens,
-            "completion_tokens": response.usage.completion_tokens,
-            "total_tokens": response.usage.total_tokens,
-        }
+        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        if response.usage:
+            usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens,
+            }
 
         return ModelResponse(
             text=text,
@@ -102,31 +99,35 @@ class OpenAIProvider(InferenceProvider):
         )
 
     def generate_content(
-        self, 
-        prompt: Any, 
-        output_logprobs: bool = False, 
+        self,
+        prompt: Any,
+        output_logprobs: bool = False,
         tools: Optional[List[Any]] = None,
         **kwargs
     ) -> ModelResponse:
         """Standardized sync generation."""
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
-        
+
         response = self.sync_client.chat.completions.create(
             model=self.model_id,
-            messages=messages,
+            messages=cast(Any, messages),
             logprobs=output_logprobs,
             **kwargs
         )
-        
+
         choice = response.choices[0]
-        return ModelResponse(
-            text=choice.message.content or "",
-            raw=response,
-            usage={
+        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        if response.usage:
+            usage = {
                 "prompt_tokens": response.usage.prompt_tokens,
                 "completion_tokens": response.usage.completion_tokens,
                 "total_tokens": response.usage.total_tokens,
             }
+
+        return ModelResponse(
+            text=choice.message.content or "",
+            raw=response,
+            usage=usage
         )
 
     async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
@@ -138,11 +139,11 @@ class OpenAIProvider(InferenceProvider):
             stream=True,
             **kwargs
         )
-        
+
         async for chunk in stream:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield {"contentBlockDelta": {"delta": {"text": chunk.choices[0].delta.content}}}
-        
+
         yield {"messageStop": {"stopReason": "end_turn"}}
 
     def stream(self, messages: Any, **kwargs) -> AsyncIterable[Any]:

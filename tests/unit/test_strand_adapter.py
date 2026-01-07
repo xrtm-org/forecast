@@ -1,7 +1,8 @@
+
 import pytest
-import asyncio
-from typing import Any, Dict
+
 from forecast.tools.base import StrandToolWrapper
+
 
 class MockStrandTool:
     """Simulates a tool from the strands-agents SDK."""
@@ -15,7 +16,7 @@ class MockStrandTool:
             },
             "required": ["city"]
         }
-    
+
     async def fn(self, city: str) -> str:
         return f"The weather in {city} is sunny."
 
@@ -27,15 +28,15 @@ async def test_strand_tool_wrapper_execution():
     """
     # 1. Create a tool using the 'external' protocol
     external_tool = MockStrandTool()
-    
+
     # 2. Wrap it with our adapter
     adapter = StrandToolWrapper(external_tool)
-    
+
     # 3. Verify metadata mapping
     assert adapter.name == "get_weather"
     assert adapter.description == "Returns the weather for a city."
     assert adapter.parameters_schema == external_tool.spec
-    
+
     # 4. Verify execution mapping
     result = await adapter.run(city="London")
     assert result == "The weather in London is sunny."
@@ -47,6 +48,6 @@ def test_strand_tool_metadata_variants():
             self.name = "test"
             self.parameters = {"type": "object", "properties": {}}
         def fn(self): return "ok"
-    
+
     adapter = StrandToolWrapper(VariantTool())
     assert adapter.parameters_schema == {"type": "object", "properties": {}}

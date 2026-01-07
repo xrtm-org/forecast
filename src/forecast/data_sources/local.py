@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import List, Optional
+
 from forecast.data_sources.base import DataSource
 from forecast.schemas.forecast import ForecastQuestion
 
@@ -17,13 +18,13 @@ class LocalDataSource(DataSource):
         try:
             with open(self.file_path, "r") as f:
                 data = json.load(f)
-            
+
             questions = []
             for item in data:
                 # Basic title-based search
                 if not query or query.lower() in item.get("title", "").lower():
                     questions.append(ForecastQuestion(**item))
-                
+
                 if len(questions) >= limit:
                     break
             return questions
@@ -35,7 +36,7 @@ class LocalDataSource(DataSource):
         try:
             with open(self.file_path, "r") as f:
                 data = json.load(f)
-            
+
             for item in data:
                 if item.get("id") == question_id:
                     return ForecastQuestion(**item)

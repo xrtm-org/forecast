@@ -1,7 +1,9 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
+
 from forecast.agents.base import Agent
 from forecast.graph.orchestrator import Orchestrator
 from forecast.schemas.graph import BaseGraphState
+
 
 class GraphAgent(Agent):
     """
@@ -15,14 +17,14 @@ class GraphAgent(Agent):
 
     async def run(self, input_data: Any, **kwargs) -> Any:
         """
-        Runs the internal orchestrator. 
+        Runs the internal orchestrator.
         Converts input_data into a BaseGraphState context.
         """
         # Create a fresh state for the sub-graph
         state = BaseGraphState(subject_id=f"subgraph_{self.name}")
         state.context = {"input": input_data, **kwargs}
-        
+
         await self.orchestrator.run(state, entry_node=self.entry_node)
-        
+
         # Return the final context or a specific output if defined in state
         return state.context.get("output", state.context)
