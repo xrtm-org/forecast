@@ -1,0 +1,32 @@
+name: forecast
+
+services:
+  forecast:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace/forecast:cached
+      - audit-logs:/workspace/forecast/logs/audit
+      - chroma-db:/workspace/forecast/.chroma_db
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    networks:
+      - forecast-net
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  redis:
+    image: redis:alpine
+    networks:
+      - forecast-net
+    volumes:
+      - redis-data:/data
+
+networks:
+  forecast-net:
+    driver: bridge
+
+volumes:
+  audit-logs:
+  chroma-db:
+  redis-data:

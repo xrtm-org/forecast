@@ -1,0 +1,26 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-01-07
+
+### Added
+- **Unified "Everything is an Agent" Architecture**: Introduced `LLMAgent`, `ToolAgent`, and `GraphAgent` as core structural abstractions.
+- **Institutional Specialist**: Created the `ForecastingAnalyst` persona in a new `specialists/` directory.
+- **Double-Trace Telemetry**: Implemented both Structural (Audit Trail) and Logical (Reasoning Chain) tracing for execution results.
+- **Universal Tool Calling**: Added a `ToolRegistry` with support for standard functions and `strand-agents` protocol adapters.
+- **Robust Ingestion Layer**: New `LocalDataSource` and `PolymarketSource` for flexible data loading.
+- **Production Infrastructure**: Integrated Redis-based distributed rate limiting and cryptographic signing for audit logs.
+- **Professional Test Hierarchy**: Reorganized the test suite into `unit`, `integration`, and `e2e` tiers for better quality control.
+
+### Changed
+- **Directory Restructure**: Separated core abstractions from specialist implementations for better maintainability.
+- **Professional Examples**: Renamed and upgraded examples to be high-fidelity, verified demonstrators.
+- **Naming Alignment**: Renamed `MarketAnalyst` to `ForecastingAnalyst` to better reflect domain-agnosticism.
+
+### Fixed
+- **Orchestrator Cycle Limit**: Fixed a bug where `max_cycles` was not being correctly respected during graph execution.
+- **Schema Validation**: Hardened the `LLMAgent` output parsing to handle malformed LLM responses and enforce Pydantic schemas.

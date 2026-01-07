@@ -1,0 +1,28 @@
+[
+    {
+        "id": "fed-rates-mar-2026",
+        "title": "Will the Fed cut interest rates in March 2026?",
+        "content": "This market resolves to 'Yes' if the FOMC announces a rate cut at its March meeting.",
+        "metadata": {
+            "tags": [
+                "economy",
+                "fed",
+                "finance"
+            ],
+            "market_type": "binary",
+            "priority": "high"
+        }
+    },
+    {
+        "id": "eth-ath-2026",
+        "title": "Will Ethereum reach a new ATH in 2026?",
+        "content": "Resolves to 'Yes' if the price of ETH exceeds its previous record on Binance and Coinbase.",
+        "metadata": {
+            "tags": [
+                "crypto",
+                "ethereum"
+            ],
+            "market_type": "binary"
+        }
+    }
+]
