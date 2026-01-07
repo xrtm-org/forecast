@@ -66,7 +66,7 @@ async def main():
 
     # 4. Execute the reasoning mission
     agent = ResearchAgent(model=model, name="Researcher")
-    result = await agent.run(ticker="ETH")
+    result = await agent.run("ETH")
 
     print("\n" + "="*50)
     print("FINAL AGENT REPORT (Using External Strand Tool):")

@@ -1,12 +1,14 @@
 import asyncio
 import os
 
+import pytest
 from pydantic import SecretStr
 
 from forecast.inference.config import GeminiConfig, OpenAIConfig
 from forecast.inference.factory import ModelFactory
 
 
+@pytest.mark.asyncio
 async def test_gemini_live():
     key = os.getenv("GEMINI_API_KEY")
     if not key:
@@ -27,6 +29,7 @@ async def test_gemini_live():
     except Exception as e:
         print(f"❌ Gemini Failed: {e}")
 
+@pytest.mark.asyncio
 async def test_openai_live():
     key = os.getenv("OPENAI_API_KEY")
     if not key:

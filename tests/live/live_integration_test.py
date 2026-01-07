@@ -2,6 +2,7 @@ import asyncio
 import os
 from typing import Any, cast
 
+import pytest
 from pydantic import SecretStr
 
 from forecast.graph.orchestrator import Orchestrator
@@ -66,7 +67,13 @@ async def run_complex_test(provider_name: str, config):
     except Exception as e:
         print(f"❌ [{provider_name}] Tool call failed: {e}")
 
-async def test_orchestrator_live(openai_key):
+@pytest.mark.asyncio
+async def test_orchestrator_live():
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        print("⏭️ Skipping Orchestrator live test (OPENAI_API_KEY not set)")
+        return
+
     print("\n🧠 Testing Orchestrator Live with OpenAI...")
     from forecast.inference.config import OpenAIConfig
 
