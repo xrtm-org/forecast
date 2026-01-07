@@ -167,3 +167,6 @@ cython_debug/
 .docker/
 *.dockerlog
 docker-compose.override.yml
+
+# Agent internals
+.agent/
