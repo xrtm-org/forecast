@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 from typing import Any, AsyncIterable, Dict, List, Optional, cast
 
@@ -10,9 +25,16 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIProvider(InferenceProvider):
-    """
-    Adapter for OpenAI and OAI-compatible APIs.
-    Decoupled from application-level settings.
+    r"""
+    Adapter for OpenAI and OpenAI-compatible APIs (e.g., Anthropic via proxy).
+
+    This provider implements the `InferenceProvider` interface for the OpenAI
+    Chat Completions API, supporting system instructions, tool calling, and
+    logprob extraction.
+
+    Args:
+        config (`OpenAIConfig`):
+            Configuration object containing the API key, model ID, and optional base URL.
     """
 
     def __init__(self, config: OpenAIConfig):
@@ -149,3 +171,4 @@ class OpenAIProvider(InferenceProvider):
     def stream(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
         """Streaming implementation wrapper."""
         return self._stream_generator(messages, **kwargs)
+__all__ = ['OpenAIProvider']

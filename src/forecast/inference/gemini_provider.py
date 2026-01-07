@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 import inspect
 import logging
@@ -16,9 +31,20 @@ logger = logging.getLogger(__name__)
 
 
 class GeminiProvider(InferenceProvider):
-    """
-    Native implementation for Google Gemini.
-    Decoupled from application-level settings.
+    r"""
+    Native implementation for Google Gemini models.
+
+    `GeminiProvider` leverages the `google-genai` SDK to provide high-performance
+    access to Gemini's reasoning and tool-calling capabilities. It includes
+    built-in support for tiered model selection, token-bucket rate limiting,
+    and automatic PII masking.
+
+    Args:
+        config (`GeminiConfig`):
+            Explicit configuration object containing the API key and model IDs.
+        tier (`str`, *optional*, defaults to `"SMART"`):
+            Performance tier selection. Available options are `"SMART"` (highest precision)
+            and `"FAST"` (lowest latency).
     """
 
     def __init__(self, config: GeminiConfig, tier: str = "SMART"):
@@ -508,3 +534,4 @@ class GeminiProvider(InferenceProvider):
 
     def stream(self, *args, **kwargs) -> AsyncIterable[Any]:
         return self._stream_generator(*args, **kwargs)
+__all__ = ['GeminiProvider']

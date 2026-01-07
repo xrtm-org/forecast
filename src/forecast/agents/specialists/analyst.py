@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 from typing import List
 
@@ -8,18 +23,27 @@ from forecast.schemas.forecast import CausalNode, ForecastOutput, ForecastQuesti
 
 logger = logging.getLogger(__name__)
 
+
 class AnalystOutput(BaseModel):
+    r"""
+    Internal schema for structured output from the Forecasting Analyst.
+    """
     confidence: float = Field(..., ge=0, le=1)
     reasoning: str
     causal_chain: List[CausalNode] = Field(default_factory=list)
 
-class ForecastingAnalyst(LLMAgent):
-    """
-    Agent specialized in analyzing events and providing probabilistic forecasts.
-    Domain-agnostic reasoning engine.
 
-    Note: This is a Reference Implementation (Recipe). Users are encouraged to
-    fork and customize this persona for specific domains.
+class ForecastingAnalyst(LLMAgent):
+    r"""
+    A specialized agent designed for probabilistic forecasting and event analysis.
+
+    The `ForecastingAnalyst` acts as a domain-agnostic reasoning engine. It can
+    automatically leverage available skills (like `WebSearchSkill`) to gather
+    evidence before producing a structured forecast with a causal reasoning trace.
+
+    Note: This is a **Reference Implementation**. Domain experts are encouraged
+    to fork and customize the persona, few-shot examples, and structural constraints
+    for specific forecasting niches.
     """
     async def run(self, input_data: ForecastQuestion, **kwargs) -> ForecastOutput:
         """
@@ -74,3 +98,4 @@ class ForecastingAnalyst(LLMAgent):
                 "token_usage": getattr(response, "usage", {})
             }
         )
+__all__ = ['ForecastingAnalyst']

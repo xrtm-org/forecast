@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 import time
 from typing import Any, Callable, Dict, Optional
@@ -8,9 +23,17 @@ logger = logging.getLogger(__name__)
 
 
 class Orchestrator:
-    """
-    Manages complex agent workflows using a state machine.
-    Domain-agnostic engine that processes a GraphState through a node registry.
+    r"""
+    A state-machine based engine for managing complex agent workflows.
+
+    The `Orchestrator` is a domain-agnostic reasoning engine that processes a
+    `BaseGraphState` through a series of registered "nodes" (functions). It allows
+    for iterative reasoning, conditional branching, and global usage tracking.
+
+    Args:
+        max_cycles (`int`, *optional*, defaults to `3`):
+            The maximum number of state-machine iterations allowed before
+            enforcing termination. Prevents infinite loops in autonomous graphs.
     """
 
     def __init__(self, max_cycles: int = 3):
@@ -19,8 +42,17 @@ class Orchestrator:
         # format: {"node_name": callable}
         self.nodes: Dict[str, Callable] = {}
 
-    def register_node(self, name: str, func: Callable):
-        """Registers a processing node in the graph."""
+    def register_node(self, name: str, func: Callable) -> None:
+        r"""
+        Registers a processing node in the graph registry.
+
+        Args:
+            name (`str`):
+                The unique identifier for the node.
+            func (`Callable`):
+                The function to execute for this node. Expected signature:
+                `async def node_func(state: BaseGraphState, report_progress: Callable) -> Optional[str]`
+        """
         self.nodes[name] = func
 
     async def run(
@@ -30,8 +62,25 @@ class Orchestrator:
         on_progress: Optional[Callable] = None,
         stopwatch: Optional[Any] = None,
     ) -> BaseGraphState:
-        """
-        Orchestrates the execution of the state-machine nodes.
+        r"""
+        Orchestrates the execution of the graph nodes starting from an entry point.
+
+        This method manages the control flow of the graph, tracking the execution path,
+        cycle count, and total latency. It terminates when a node returns `None`
+        or `max_cycles` is reached.
+
+        Args:
+            state (`BaseGraphState`):
+                The initial state object to be processed and evolved.
+            entry_node (`str`, *optional*, defaults to `"ingestion"`):
+                The name of the first node to execute.
+            on_progress (`Optional[Callable]`, *optional*):
+                A callback function for reporting progress during execution.
+            stopwatch (`Optional[Any]`, *optional*):
+                An optional instrumentation utility for tracking timing across nodes.
+
+        Returns:
+            `BaseGraphState`: The final evolved state after execution completes.
         """
         self.stopwatch = stopwatch
 
@@ -69,8 +118,16 @@ class Orchestrator:
 
         return state
 
-    def aggregate_usage(self, state: BaseGraphState, agent_output: Any):
-        """Standardized usage tracking from Pydantic models or dicts."""
+    def aggregate_usage(self, state: BaseGraphState, agent_output: Any) -> None:
+        r"""
+        Aggregates token usage from an agent output into the global graph state.
+
+        Args:
+            state (`BaseGraphState`):
+                The state object where usage statistics are accumulated.
+            agent_output (`Any`):
+                The output from an agent execution, which may contain 'usage' metadata.
+        """
         usage = {}
         if hasattr(agent_output, "usage"):
             usage = agent_output.usage
@@ -87,3 +144,6 @@ class Orchestrator:
                 state.usage["total_tokens"] += t
         except Exception as e:
             logger.warning(f"[GRAPH] Usage aggregation error: {e}")
+
+
+__all__ = ["Orchestrator"]

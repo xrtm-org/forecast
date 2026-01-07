@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 import os
 from typing import Any, Dict, Optional
@@ -8,10 +23,20 @@ from forecast.tools.base import Tool
 
 logger = logging.getLogger(__name__)
 
+
 class TavilySearchTool(Tool):
+    r"""
+    A Tool for performing web searches via the Tavily API.
+
+    Tavily is optimized for LLM consumption, providing concise and relevant
+    search results or direct answers to queries.
+
+    Args:
+        api_key (`str`, *optional*):
+            The Tavily API key. If not provided, it will be read from the
+            `TAVILY_API_KEY` environment variable.
     """
-    Tool for searching the web using the Tavily API.
-    """
+
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("TAVILY_API_KEY")
         if not self.api_key:
@@ -30,20 +55,29 @@ class TavilySearchTool(Tool):
         return {
             "type": "object",
             "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "The search query to execute."
-                },
+                "query": {"type": "string", "description": "The search query to execute."},
                 "search_depth": {
                     "type": "string",
                     "description": "The depth of the search (basic or advanced).",
-                    "default": "basic"
-                }
+                    "default": "basic",
+                },
             },
-            "required": ["query"]
+            "required": ["query"],
         }
 
     async def run(self, **kwargs: Any) -> Any:
+        r"""
+        Executes a search query against the Tavily API.
+
+        Args:
+            query (`str`):
+                The search query.
+            search_depth (`str`, *optional*, defaults to `"basic"`):
+                The depth of the search.
+
+        Returns:
+            `Any`: The JSON response from the Tavily API, or an error message.
+        """
         query = kwargs.get("query")
         search_depth = kwargs.get("search_depth", "basic")
         if not self.api_key:
@@ -54,7 +88,7 @@ class TavilySearchTool(Tool):
             "api_key": self.api_key,
             "query": query,
             "search_depth": search_depth,
-            "include_answer": True
+            "include_answer": True,
         }
 
         try:
@@ -69,3 +103,6 @@ class TavilySearchTool(Tool):
         except Exception as e:
             logger.error(f"Tavily search failed: {e}")
             return f"Error executed search: {str(e)}"
+
+
+__all__ = ["TavilySearchTool"]

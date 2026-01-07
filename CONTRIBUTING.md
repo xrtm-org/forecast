@@ -36,8 +36,33 @@ If you prefer to run locally:
 
 ## Style Guide
 - **Python**: We follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) and use `ruff` for enforcement.
-- **Typing**: All new code must be fully typed.
-- **Docstrings**: Use Google-style docstrings.
+- **Typing**: All new code must be fully typed and pass `mypy` with strict settings.
+- **License Headers**: Every `.py` file must start with the standard Apache 2.0 license header.
+- **Docstrings**: We use an "Institutional Style" (HuggingFace/Google hybrid):
+    - Use `r""" """` for all docstrings.
+    - Include `Args`, `Returns`, and `Example` sections for all public classes and methods.
+    - Argument types should be in backticks: ``name (`type`, *optional*, defaults to `X`): description``.
+    - Include `>>>` code snippets in the `Example` section.
+
+```python
+    def example_method(self, value: int) -> bool:
+        r"""
+        Brief description of what the method does.
+
+        Args:
+            value (`int`):
+                Detailed description of the argument.
+        
+        Returns:
+            `bool`: Description of the return value.
+
+        Example:
+            ```python
+            >>> obj.example_method(42)
+            True
+            ```
+        """
+```
 
 ## Release Process
 1. Update version in `pyproject.toml`.

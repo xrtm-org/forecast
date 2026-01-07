@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 import os
 import uuid
@@ -7,11 +22,20 @@ from forecast.telemetry.schemas import SpanKind, TelemetryEvent, TelemetrySpan, 
 
 logger = logging.getLogger(__name__)
 
+
 class TelemetryManager:
+    r"""
+    A management layer for structured telemetry and observability.
+
+    `TelemetryManager` coordinates the lifecycle of traces and spans, ensuring
+    alignment with OpenTelemetry standards. It provides utilities for tracking
+    agent execution paths and exporting results for auditing.
+
+    Args:
+        log_dir (`str`, *optional*, defaults to `"logs/telemetry"`):
+            The directory where telemetry traces will be exported.
     """
-    Manages structured telemetry for the forecasting engine.
-    Compatible with OpenTelemetry standards.
-    """
+
     def __init__(self, log_dir: str = "logs/telemetry"):
         self.log_dir = log_dir
         os.makedirs(self.log_dir, exist_ok=True)
@@ -19,26 +43,41 @@ class TelemetryManager:
         self._span_stack: List[TelemetrySpan] = []
 
     def start_trace(self) -> str:
-        """Starts a new global trace."""
+        r"""
+        Initializes a new global trace context.
+
+        Returns:
+            `str`: The unique identifier for the new trace.
+        """
         trace_id = uuid.uuid4().hex
         self._current_trace = Trace(trace_id=trace_id)
         self._span_stack = []
         logger.debug(f"Started new telemetry trace: {trace_id}")
         return trace_id
 
-    def start_span(self, name: str, kind: SpanKind = SpanKind.INTERNAL, attributes: Optional[Dict] = None) -> TelemetrySpan:
-        """Starts a new span as a child of the current span (if any)."""
+    def start_span(
+        self, name: str, kind: SpanKind = SpanKind.INTERNAL, attributes: Optional[Dict] = None
+    ) -> TelemetrySpan:
+        r"""
+        Creates and starts a new span, making it the current active context.
+
+        Args:
+            name (`str`):
+                The logical name of the span (e.g., "reasoning_step").
+            kind (`SpanKind`, *optional*, defaults to `INTERNAL`):
+                The category of the span (INTERNAL, SERVER, CLIENT, etc.).
+            attributes (`Dict`, *optional*):
+                Metadata to attach to the span.
+
+        Returns:
+            `TelemetrySpan`: The newly created span instance.
+        """
         if not self._current_trace:
             self.start_trace()
 
         parent_id = self._span_stack[-1].context["span_id"] if self._span_stack else None
 
-        span = TelemetrySpan(
-            name=name,
-            kind=kind,
-            parent_id=parent_id,
-            attributes=attributes or {}
-        )
+        span = TelemetrySpan(name=name, kind=kind, parent_id=parent_id, attributes=attributes or {})
         span._manager = self
 
         # Ensure trace ID matches the current trace
@@ -48,8 +87,16 @@ class TelemetryManager:
             self._current_trace.spans.append(span)
         return span
 
-    def end_span(self, status_code: str = "OK", status_message: Optional[str] = None):
-        """Ends the current active span."""
+    def end_span(self, status_code: str = "OK", status_message: Optional[str] = None) -> None:
+        r"""
+        Terminates the current active span and updates its status.
+
+        Args:
+            status_code (`str`, *optional*, defaults to `"OK"`):
+                The final status of the span (OK, ERROR).
+            status_message (`str`, *optional*):
+                An optional message describing the status.
+        """
         if not self._span_stack:
             logger.warning("Attempted to end a span but none are active.")
             return
@@ -57,8 +104,16 @@ class TelemetryManager:
         span = self._span_stack.pop()
         span.end(status_code=status_code, status_message=status_message)
 
-    def add_event(self, name: str, attributes: Optional[Dict] = None):
-        """Adds an event to the current active span."""
+    def add_event(self, name: str, attributes: Optional[Dict] = None) -> None:
+        r"""
+        Logs an event to the currently active span.
+
+        Args:
+            name (`str`):
+                The name of the event.
+            attributes (`Dict`, *optional*):
+                Metadata associated with the event.
+        """
         if not self._span_stack:
             logger.warning("Attempted to add an event but no span is active.")
             return
@@ -67,7 +122,16 @@ class TelemetryManager:
         self._span_stack[-1].events.append(event)
 
     def export_trace(self, filename: Optional[str] = None) -> str:
-        """Exports the current trace to a JSON file."""
+        r"""
+        Serializes and exports the current trace to a JSON file.
+
+        Args:
+            filename (`str`, *optional*):
+                The name of the file to write. Defaults to `trace_{id}.json`.
+
+        Returns:
+            `str`: The absolute path to the exported trace file.
+        """
         if not self._current_trace:
             return ""
 
@@ -83,5 +147,8 @@ class TelemetryManager:
             logger.error(f"Failed to export telemetry trace: {e}")
             return ""
 
+
 # Global singleton
 telemetry_manager = TelemetryManager()
+
+__all__ = ["TelemetryManager", "telemetry_manager"]
