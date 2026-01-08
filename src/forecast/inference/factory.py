@@ -14,12 +14,12 @@
 # limitations under the License.
 
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import SecretStr
 
 from forecast.inference.base import InferenceProvider
-from forecast.inference.config import GeminiConfig, OpenAIConfig, ProviderConfig
+from forecast.inference.config import GeminiConfig, OpenAIConfig
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class ModelFactory:
 
     @staticmethod
     def get_provider(
-        config: Optional[ProviderConfig] = None,
+        config: Optional[Any] = None,
         provider_type: Optional[str] = None,
         model_id: Optional[str] = None,
         api_key: Optional[SecretStr] = None,
@@ -44,8 +44,8 @@ class ModelFactory:
         Creates and returns a provider instance.
 
         Args:
-            config (`ProviderConfig`, *optional*):
-                The configuration object.
+            config (`ProviderConfig` or `str`, *optional*):
+                The configuration object or a shortcut string (e.g. "gemini:gemini-2.0-flash").
             provider_type (`str`, *optional*):
                 Explicitly request "GEMINI" or "OPENAI" if config is not provided.
             model_id (`str`, *optional*):
@@ -60,16 +60,30 @@ class ModelFactory:
         """
         from forecast.exceptions import ConfigurationError
 
+        # Ergonomic Shortcut: string input
+        if isinstance(config, str):
+            if ":" in config:
+                provider_type, model_id = config.split(":", 1)
+            else:
+                provider_type = config
+            config = None
+
         if config is None:
-            if not provider_type or not model_id or not api_key:
+            if not provider_type:
                 raise ConfigurationError(
-                    "Explicitly provide either a `config` object or `provider_type`, `model_id`, and `api_key`."
+                    "Explicitly provide either a `config` object or `provider_type` (or a shortcut string)."
                 )
 
             if provider_type.upper() == "GEMINI":
-                config = GeminiConfig(model_id=model_id, api_key=api_key, **kwargs)
+                # model_id is allowed to be None here; the injection layer will handle defaults later?
+                # Actually, GeminiConfig requires model_id. We'll set a smart default if missing.
+                mid = model_id or "gemini-2.0-flash"
+                config = GeminiConfig(model_id=mid, api_key=api_key, **kwargs)
             elif provider_type.upper() == "OPENAI":
-                config = OpenAIConfig(model_id=model_id, api_key=api_key, **kwargs)
+                mid = model_id or "gpt-4o"
+                config = OpenAIConfig(model_id=mid, api_key=api_key, **kwargs)
+            else:
+                raise ConfigurationError(f"Unsupported provider type: {provider_type}")
 
         from forecast.config import settings
 

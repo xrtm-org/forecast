@@ -2,6 +2,14 @@
 
 Reference implementation for the XRTM reasoning engine. We welcome contributions!
 
+## Design Philosophy: "Pure Core, Practical Shell"
+
+`xrtm-forecast` is built on a dual-layer architecture:
+1.  **The Pure Core**: A strictly decoupled, domain-agnostic engine. Components (Inference, Graph, Telemetry) are pure and do not depend on global state or environment secrets directly. They are injected with explicit `Config` objects.
+2.  **The Practical Shell**: Ergonomic entry points and "Assistants" that wrap the core for 80% of use cases. These high-level factories handle common configuration presets and environment variable injection automatically.
+
+Contributors should ensure that core logic remains "Pure," while high-level APIs in `forecast.assistants` or module `__init__.py` files remain "Practical."
+
 ## Development Environment
 
 We provide a fully isolated development environment using **Docker** and **uv**.

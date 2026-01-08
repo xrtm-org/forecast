@@ -2,8 +2,8 @@ from forecast.agents.base import Agent
 from forecast.agents.graph import GraphAgent
 from forecast.agents.llm import LLMAgent
 from forecast.agents.registry import registry
-from forecast.agents.specialists.analyst import ForecastingAnalyst
 from forecast.agents.tool import ToolAgent
+from forecast.assistants import create_forecasting_analyst
 from forecast.graph.orchestrator import Orchestrator
 from forecast.inference.factory import ModelFactory
 from forecast.memory.unified import Memory
@@ -14,6 +14,7 @@ from forecast.tools.registry import tool_registry
 __all__ = [
     "Agent",
     "ForecastingAnalyst",
+    "create_forecasting_analyst",
     "registry",
     "LLMAgent",
     "ToolAgent",
@@ -26,7 +27,7 @@ __all__ = [
     "tool_registry",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __author__ = "XRTM Team"
 __contact__ = "moy@xrtm.org"
 __license__ = "Apache-2.0"

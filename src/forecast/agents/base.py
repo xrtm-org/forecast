@@ -51,13 +51,13 @@ class Agent(abc.ABC):
         r"""
         Factory method to create an agent instance.
 
-        In the core abstract class, this simply passes arguments through to the
-        constructor. Subclasses or examples may override this to provide
-        magical initialization if desired, but the core remains abstract.
+        This method provides ergonomic shortcuts for agent initialization. If a
+        string is passed as the `model`, it is automatically resolved into a
+        provider instance via the `ModelFactory`.
 
         Args:
             model (`Any`, *optional*):
-                The model instance to inject.
+                The model instance or a shortcut string (e.g. "gemini").
             name (`str`, *optional*):
                 The agent's logical name.
             **kwargs:
@@ -67,6 +67,12 @@ class Agent(abc.ABC):
             `Agent`: A fully initialized agent instance.
         """
         import inspect
+
+        from forecast.inference.factory import ModelFactory
+
+        # Ergonomic Shortcut: Resolve model string into a provider
+        if isinstance(model, str):
+            model = ModelFactory.get_provider(model)
 
         # Basic injection loop: if constructor takes 'model' and we have one, pass it.
         sig = inspect.signature(cls.__init__)

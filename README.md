@@ -56,23 +56,18 @@ Each major module (`inference`, `graph`, `telemetry`, `tools`) has its own `conf
 
 ## Quick Start
 
-`xrtm-forecast` is an abstract engine. To run a forecast, you provide your own configuration and model choice.
+`xrtm-forecast` is designed for high-end ergonomics. Use the pre-configured assistants to start forecasting in seconds:
 
 ```python
 import asyncio
-from forecast.agents.specialists import ForecastingAnalyst
-from forecast.inference.factory import ModelFactory
-from forecast.inference.config import GeminiConfig
+from forecast import create_forecasting_analyst
 
 async def main():
-    # 1. Define model configuration
-    config = GeminiConfig(model_id="gemini-2.0-flash")
+    # 1. Instantiate the analyst with a shortcut
+    # (API keys are automatically injected from your .env file)
+    agent = create_forecasting_analyst(model_id="gemini")
     
-    # 2. Instantiate the provider and agent
-    model = ModelFactory.get_provider(config)
-    agent = ForecastingAnalyst(model=model)
-    
-    # 3. Execute reasoning on a complex probabilistic question
+    # 2. Execute reasoning on a complex probabilistic question
     result = await agent.run(
         "Will a general-purpose AI (AGI) be publicly announced before 2030?"
     )

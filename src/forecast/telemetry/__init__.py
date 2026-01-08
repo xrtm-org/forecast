@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from forecast.telemetry.audit import auditor
-from forecast.telemetry.manager import TelemetryManager, telemetry_manager
-from forecast.telemetry.schemas import SpanKind, TelemetryEvent, TelemetrySpan, Trace
+from forecast.telemetry.config import TelemetryConfig
+from forecast.telemetry.manager import telemetry_manager
 
-__all__ = ["TelemetrySpan", "TelemetryEvent", "Trace", "SpanKind", "TelemetryManager", "telemetry_manager", "auditor"]
+__all__ = ["telemetry_manager", "TelemetryConfig", "auditor"]
