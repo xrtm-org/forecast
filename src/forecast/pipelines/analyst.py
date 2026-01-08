@@ -24,10 +24,12 @@ from forecast.telemetry.audit import auditor
 
 logger = logging.getLogger(__name__)
 
+
 class GenericAnalystPipeline:
     """
     Standardized pipeline for fetching a question and generating an analyst forecast.
     """
+
     def __init__(self, data_source: DataSource, analyst: ForecastingAnalyst, max_cycles: int = 5):
         self.data_source = data_source
         self.analyst = analyst
@@ -55,7 +57,7 @@ class GenericAnalystPipeline:
         output = await self.analyst.run(question)
         state.context["output"] = output
 
-        await on_progress(2, "Analysis", "COMPLETE", f"Forecast generated: {output.confidence*100:.1f}%")
+        await on_progress(2, "Analysis", "COMPLETE", f"Forecast generated: {output.confidence * 100:.1f}%")
         return None
 
     async def run(self, subject_id: str, on_progress: Optional[Callable] = None) -> BaseGraphState:

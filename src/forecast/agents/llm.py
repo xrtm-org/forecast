@@ -41,6 +41,7 @@ class LLMAgent(Agent):
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the class name.
     """
+
     def __init__(self, model: InferenceProvider, name: Optional[str] = None):
         super().__init__(name)
         self.model = model

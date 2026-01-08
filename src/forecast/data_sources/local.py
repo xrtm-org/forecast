@@ -22,10 +22,12 @@ from forecast.schemas.forecast import ForecastQuestion
 
 logger = logging.getLogger(__name__)
 
+
 class LocalDataSource(DataSource):
     """
     DataSource implementation that reads from a local JSON file.
     """
+
     def __init__(self, file_path: str):
         self.file_path = file_path
 

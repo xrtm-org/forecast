@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 class SpanKind(str, Enum):
     r"""Category of a telemetry span, following OTel conventions."""
+
     INTERNAL = "INTERNAL"
     SERVER = "SERVER"
     CLIENT = "CLIENT"
@@ -34,8 +35,9 @@ class TelemetryEvent(BaseModel):
     r"""
     A discrete event occurring within a reasoning span (e.g., a log, error, or data arrival).
     """
+
     name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     attributes: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -43,13 +45,14 @@ class TelemetrySpan(BaseModel):
     r"""
     A single unit of work within a trace, providing granular observability into agent execution.
     """
+
     name: str
     context: Dict[str, str] = Field(
         default_factory=lambda: {"trace_id": uuid.uuid4().hex, "span_id": uuid.uuid4().hex[:16]}
     )
     parent_id: Optional[str] = None
     kind: SpanKind = SpanKind.INTERNAL
-    start_time: datetime = Field(default_factory=datetime.utcnow)
+    start_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     end_time: Optional[datetime] = None
     status_code: str = "UNSET"  # UNSET, OK, ERROR
     status_message: Optional[str] = None
@@ -60,7 +63,7 @@ class TelemetrySpan(BaseModel):
     def end(self, status_code: str = "OK", status_message: Optional[str] = None) -> None:
         r"""Marks the span as complete."""
         if not self.end_time:  # Prevent multiple ends
-            self.end_time = datetime.utcnow()
+            self.end_time = datetime.now(timezone.utc)
             self.status_code = status_code
             self.status_message = status_message
 
@@ -94,6 +97,7 @@ class Trace(BaseModel):
     r"""
     A collection of spans representing a single, end-to-end reasoning flow.
     """
+
     trace_id: str
     spans: List[TelemetrySpan] = Field(default_factory=list)
 

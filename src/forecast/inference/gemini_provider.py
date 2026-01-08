@@ -47,6 +47,8 @@ class GeminiProvider(InferenceProvider):
             and `"FAST"` (lowest latency).
     """
 
+    model_id: str
+
     def __init__(self, config: GeminiConfig, tier: str = "SMART"):
         """
         Args:
@@ -54,21 +56,15 @@ class GeminiProvider(InferenceProvider):
             tier: Performance tier (SMART or FAST).
         """
         self.config = config
-        self.model_id = config.model_id
 
-        if not self.model_id:
-            # Tiered Logic from config
-            if config.use_cheap_models:
-                if tier == "FAST":
-                    self.model_id = config.flash_model_id
-                else:
-                    self.model_id = config.smart_model_id
-            else:
-                self.model_id = config.model_id or "gemini-2.0-flash"
+        # Determine initial model ID, handling None case explicitly for type safety
+        initial_model_id = config.model_id or "gemini-2.0-flash"
 
         # Strip prefixes if any
-        if "/" in self.model_id:
-            self.model_id = self.model_id.split("/")[-1]
+        if "/" in initial_model_id:
+            initial_model_id = initial_model_id.split("/")[-1]
+
+        self.model_id = initial_model_id
 
         key = config.api_key.get_secret_value() if config.api_key else None
         self.client = genai.Client(api_key=key)
@@ -155,7 +151,7 @@ class GeminiProvider(InferenceProvider):
                             contents.append(response.candidates[0].content)
                         tool_outputs = await self._execute_tool_calls(tool_calls, tools or [])
                         contents.append(types.Content(role="user", parts=tool_outputs))
-                        continue
+                        break  # Exit retry loop to handle tool calls in next turn
 
                     usage = {
                         "prompt_tokens": getattr(response.usage_metadata, "prompt_token_count", 0),
@@ -204,8 +200,13 @@ class GeminiProvider(InferenceProvider):
                         logger.warning(f"Gemini 429 Detected (Async). Retrying in {delay:.2f}s")
                         await asyncio.sleep(delay)
                         continue
-                    raise e
-        return ModelResponse(text="Error: Max tool turns exceeded.", raw={})
+                    from forecast.exceptions import ProviderError
+
+                    raise ProviderError(f"Gemini generation failed: {e}") from e
+
+        from forecast.exceptions import ProviderError
+
+        raise ProviderError("Error: Max tool turns exceeded.")
 
     async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[types.Part]:
         results = []
@@ -237,7 +238,7 @@ class GeminiProvider(InferenceProvider):
                     target = name_map[fname]
                     if asyncio.iscoroutinefunction(target):
                         res = await target(**args)
-                    elif inspect.iscoroutinefunction(target): # Check for __call__ or tool.run
+                    elif inspect.iscoroutinefunction(target):  # Check for __call__ or tool.run
                         res = await target(**args)
                     else:
                         res = await asyncio.to_thread(target, **args)
@@ -418,11 +419,8 @@ class GeminiProvider(InferenceProvider):
             # Protocol check for Tool instances
             if hasattr(t, "parameters_schema") and hasattr(t, "run"):
                 import copy
-                spec = {
-                    "name": t.name,
-                    "description": t.description,
-                    "parameters": copy.deepcopy(t.parameters_schema)
-                }
+
+                spec = {"name": t.name, "description": t.description, "parameters": copy.deepcopy(t.parameters_schema)}
                 # Sanitize name
                 spec["name"] = re.sub(r"[^a-zA-Z0-9_\-.:]", "_", spec["name"])
                 if not re.match(r"^[a-zA-Z_]", spec["name"]):
@@ -433,6 +431,7 @@ class GeminiProvider(InferenceProvider):
 
             if hasattr(t, "tool_spec") and isinstance(t.tool_spec, dict):
                 import copy
+
                 spec = copy.deepcopy(t.tool_spec)
                 if "inputSchema" in spec and isinstance(spec["inputSchema"], dict):
                     if "json" in spec["inputSchema"]:
@@ -534,4 +533,6 @@ class GeminiProvider(InferenceProvider):
 
     def stream(self, *args, **kwargs) -> AsyncIterable[Any]:
         return self._stream_generator(*args, **kwargs)
-__all__ = ['GeminiProvider']
+
+
+__all__ = ["GeminiProvider"]

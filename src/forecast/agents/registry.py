@@ -26,6 +26,7 @@ class AgentRegistry:
     Handles explicit registration and discovery of specialist agents.
     Enables modular, multi-agent reasoning swarms.
     """
+
     def __init__(self):
         self._agents: Dict[str, Agent] = {}
 
@@ -38,6 +39,7 @@ class AgentRegistry:
 
         # Mypy safe cast
         from typing import cast
+
         agent_instance = cast(Agent, agent)
 
         name = name or agent_instance.name
@@ -55,6 +57,7 @@ class AgentRegistry:
     # Compatibility Aliases for legacy specialist support
     def get_specialist(self, domain: str) -> Optional[Agent]:
         return self.get_agent(domain)
+
 
 # Global Singleton instance for the library
 registry = AgentRegistry()

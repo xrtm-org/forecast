@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 import logging
 import os
@@ -14,7 +29,11 @@ from forecast.pipelines.analyst import GenericAnalystPipeline
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("showcase")
 
+
 async def run_showcase():
+    r"""
+    Executes the standard forecasting analyst showcase pipeline.
+    """
     # 1. Setup Inference
     # Ensure GEMINI_API_KEY is set in your environment
     api_key = os.getenv("GEMINI_API_KEY")
@@ -25,7 +44,7 @@ async def run_showcase():
     config = GeminiConfig(
         model_id="gemini-2.0-flash-lite",
         api_key=SecretStr(api_key),
-        redis_url=os.getenv("REDIS_URL", "redis://redis:6379/0")
+        redis_url=os.getenv("REDIS_URL", "redis://redis:6379/0"),
     )
     provider = ModelFactory.get_provider(config)
 
@@ -46,9 +65,10 @@ async def run_showcase():
     state = await pipeline.run(subject_id=target_market_id, on_progress=on_progress)
 
     # 5. Output Results
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print(state.context.get("report", "No report generated."))
-    print("="*50 + "\n")
+    print("=" * 50 + "\n")
+
 
 if __name__ == "__main__":
     asyncio.run(run_showcase())

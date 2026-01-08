@@ -44,22 +44,23 @@ GEMINI_API_KEY=your_key_here
 REDIS_URL=redis://localhost:6379/0  # Optional (fallback to in-memory)
 ```
 
-## Quick Start: Inference
+## Quick Start
+
+`xrtm-forecast` automates configuration via environment variables. Simply set your `GEMINI_API_KEY` and run:
 
 ```python
 import asyncio
-from forecast import ModelFactory
-from forecast.inference.config import GeminiConfig
-from pydantic import SecretStr
+from forecast.agents.specialists import ForecastingAnalyst
 
 async def main():
-    config = GeminiConfig(
-        api_key=SecretStr("your-key"), 
-        model_id="gemini-2.0-flash-lite"
+    # Zero-boilerplate initialization
+    agent = ForecastingAnalyst.from_config()
+    
+    # Execute complex reasoning
+    response = await agent.run(
+        query="What is the impact of current inflation on consumer spending?"
     )
-    provider = ModelFactory.get_provider(config)
-    response = await provider.generate_content_async("What is the causality of inflation?")
-    print(response.text)
+    print(response)
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -69,9 +70,9 @@ if __name__ == "__main__":
 
 - **Architecture**: [The "Lego" Design](docs/architecture.md)
 - **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
-- **Examples**: Check the [examples/](examples/) directory for structured entry points:
-    - `core/`: Basic library usage.
-    - `features/`: Specialized modules (Skills, Eval, Telemetry).
+- **Examples**: Check the [examples/](examples/) directory:
+    - [examples/minimal_agent.py](examples/minimal_agent.py): One-line agent setup.
+    - [examples/features/discovery.py](examples/features/discovery.py): Dynamic skill discovery.
     - `pipelines/`: End-to-end multi-agent workflows.
 
 ## Contributing

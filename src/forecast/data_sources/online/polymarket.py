@@ -23,10 +23,12 @@ from forecast.schemas.forecast import ForecastQuestion, MetadataBase
 
 logger = logging.getLogger(__name__)
 
+
 class PolymarketSource(DataSource):
     """
     DataSource implementation that fetches from the Polymarket Gamma API.
     """
+
     API_BASE = "https://gamma-api.polymarket.com"
 
     async def fetch_questions(self, query: Optional[str] = None, limit: int = 5) -> List[ForecastQuestion]:
@@ -75,9 +77,9 @@ class PolymarketSource(DataSource):
             content=item.get("description", ""),
             metadata=MetadataBase(
                 tags=item.get("tags", []),
-                market_type="binary", # Default for demo
+                market_type="binary",  # Default for demo
                 source_version="polymarket-gamma-v1",
                 # Pass through raw data for expert agents
-                raw_data=item
-            )
+                raw_data=item,
+            ),
         )

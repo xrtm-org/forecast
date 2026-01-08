@@ -76,6 +76,7 @@ class TokenBucket:
         if redis_url:
             try:
                 import redis.asyncio as redis
+
                 self.redis = redis.from_url(redis_url, encoding="utf-8", decode_responses=True)
                 self.script = self.redis.register_script(LUA_RATE_LIMIT_SCRIPT)
                 self.use_redis = True
@@ -92,8 +93,7 @@ class TokenBucket:
                 try:
                     now = time.time()
                     allowed = await self.script(
-                        keys=[f"{self.key}:tokens", f"{self.key}:ts"],
-                        args=[self.rate, self.capacity, now, tokens]
+                        keys=[f"{self.key}:tokens", f"{self.key}:ts"], args=[self.rate, self.capacity, now, tokens]
                     )
                     if allowed:
                         return
@@ -119,12 +119,15 @@ class TokenBucket:
         """Blocks until enough tokens are available (Sync)."""
         if self.use_redis:
             import redis as redis_sync
+
             try:
                 r = redis_sync.from_url(self.redis_url, encoding="utf-8", decode_responses=True)
                 script = r.register_script(LUA_RATE_LIMIT_SCRIPT)
                 while True:
                     now = time.time()
-                    if script(keys=[f"{self.key}:tokens", f"{self.key}:ts"], args=[self.rate, self.capacity, now, tokens]):
+                    if script(
+                        keys=[f"{self.key}:tokens", f"{self.key}:ts"], args=[self.rate, self.capacity, now, tokens]
+                    ):
                         return
                     time.sleep(1.0)
             except Exception as e:

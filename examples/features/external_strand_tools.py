@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 import os
 
@@ -12,22 +27,23 @@ from forecast.inference.config import GeminiConfig
 # This part simulates how a third-party library like 'strand-agents' defines tools.
 class ExternalStrandTool:
     """A simulated tool following the @strands.tool protocol."""
+
     def __init__(self):
         self.name = "get_market_sentiment"
         self.description = "Calculates current market sentiment for a ticker based on simulation."
         self.spec = {
             "type": "object",
-            "properties": {
-                "ticker": {"type": "string", "description": "Stock or crypto ticker."}
-            },
-            "required": ["ticker"]
+            "properties": {"ticker": {"type": "string", "description": "Stock or crypto ticker."}},
+            "required": ["ticker"],
         }
 
     async def fn(self, ticker: str) -> str:
         # Business logic from the external library
         return f"Sentiment for {ticker} is moderately bullish (+0.65)."
 
+
 # --- INTEGRATION EXAMPLE ---
+
 
 async def main():
     # 1. Initialize an external tool (e.g., from strand-agents)
@@ -44,10 +60,7 @@ async def main():
         print("[Abort] GEMINI_API_KEY not found. Please set it to run the real LLM handshake.")
         return
 
-    config = GeminiConfig(
-        model_id="gemini-2.0-flash-lite",
-        api_key=SecretStr(api_key)
-    )
+    config = GeminiConfig(model_id="gemini-2.0-flash-lite", api_key=SecretStr(api_key))
     model = ModelFactory.get_provider(config)
 
     # We create a generic analyst that knows it can use registry tools
@@ -68,10 +81,11 @@ async def main():
     agent = ResearchAgent(model=model, name="Researcher")
     result = await agent.run("ETH")
 
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("FINAL AGENT REPORT (Using External Strand Tool):")
     print(result)
-    print("="*50 + "\n")
+    print("=" * 50 + "\n")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

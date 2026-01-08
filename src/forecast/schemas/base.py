@@ -87,7 +87,9 @@ class EpisodicExperience(BaseModel):
     input_snapshot: Dict[str, Any] = Field(description="Context available during reasoning.")
     action_taken: str = Field(description="The chosen trajectory or decision.")
 
-    reasoning: ReasoningSchema = Field(default_factory=lambda: ReasoningSchema(claim="N/A", evidence=[], risks=[], rationale="N/A"))
+    reasoning: ReasoningSchema = Field(
+        default_factory=lambda: ReasoningSchema(claim="N/A", evidence=[], risks=[], rationale="N/A")
+    )
     confidence_metrics: ConfidenceMetrics = Field(default_factory=ConfidenceMetrics)
 
     outcome_score: Optional[float] = None

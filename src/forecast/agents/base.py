@@ -15,6 +15,7 @@
 
 import abc
 import logging
+import threading
 from typing import Any, Dict, Optional, TypeVar
 
 from pydantic import BaseModel
@@ -32,13 +33,55 @@ class Agent(abc.ABC):
     the `Agent` base class. This allows for extreme modularity and recursion, where
     a complex pipeline can be treated as a single agent within a larger graph.
 
+    This implementation includes threading locks for skill management to ensure
+    stability in concurrent execution environments.
+
     Args:
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the class name.
     """
+
     def __init__(self, name: Optional[str] = None):
         self.name = name or self.__class__.__name__
         self.skills: Dict[str, Any] = {}
+        self._skills_lock = threading.Lock()
+
+    @classmethod
+    def from_config(cls, model_tier: str = "SMART", name: Optional[str] = None, **kwargs) -> "Agent":
+        r"""
+        Factory method to create an agent instance using global configuration.
+
+        This method automatically retrieves the primary inference provider from
+        `forecast.config.settings` and injects it if the class requires a `model`.
+
+        Args:
+            model_tier (`str`, *optional*, defaults to `"SMART"`):
+                The performance tier for the model (e.g., "SMART" or "FAST").
+            name (`str`, *optional*):
+                Override for the agent's logical name.
+            **kwargs:
+                Additional arguments passed to the agent's constructor.
+
+        Returns:
+            `Agent`: A fully initialized agent instance.
+
+        Example:
+            ```python
+            >>> from forecast.agents.specialists.analyst import ForecastingAnalyst
+            >>> agent = ForecastingAnalyst.from_config()
+            ```
+        """
+        import inspect
+
+        from forecast.inference.factory import ModelFactory
+
+        # Check if the class constructor expects a 'model'
+        sig = inspect.signature(cls.__init__)
+        if "model" in sig.parameters:
+            model = ModelFactory.get_provider(tier=model_tier)
+            return cls(model=model, name=name, **kwargs)  # type: ignore[call-arg]
+
+        return cls(name=name, **kwargs)
 
     def add_skill(self, skill: Any) -> None:
         r"""
@@ -55,8 +98,9 @@ class Agent(abc.ABC):
             >>> agent.add_skill(web_search_skill)
             ```
         """
-        self.skills[skill.name] = skill
-        logger.debug(f"Agent {self.name} equipped with skill: {skill.name}")
+        with self._skills_lock:
+            self.skills[skill.name] = skill
+            logger.debug(f"Agent {self.name} equipped with skill: {skill.name}")
 
     def get_skill(self, name: str) -> Optional[Any]:
         r"""
@@ -69,7 +113,8 @@ class Agent(abc.ABC):
         Returns:
             `Optional[Any]`: The skill instance if found, else `None`.
         """
-        return self.skills.get(name)
+        with self._skills_lock:
+            return self.skills.get(name)
 
     @abc.abstractmethod
     async def run(self, input_data: Any, **kwargs) -> Any:
@@ -100,7 +145,7 @@ class Agent(abc.ABC):
         return {
             "name": self.name,
             "type": self.__class__.__name__,
-            "version": "0.1.1" # Placeholder for versioning logic
+            "version": "0.1.1",  # Placeholder for versioning logic
         }
 
 

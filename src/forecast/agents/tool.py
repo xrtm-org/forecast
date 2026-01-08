@@ -33,6 +33,7 @@ class ToolAgent(Agent):
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the function's `__name__`.
     """
+
     def __init__(self, fn: Callable, name: Optional[str] = None):
         super().__init__(name or fn.__name__)
         self.fn = fn

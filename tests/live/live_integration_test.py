@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 import os
 from typing import Any, cast
@@ -15,6 +30,7 @@ def mock_tool(a: int, b: int) -> int:
     """Adds two numbers."""
     return a + b
 
+
 # Give it a tool_spec like the providers expect
 mock_tool_any = cast(Any, mock_tool)
 mock_tool_any.tool_spec = {
@@ -22,15 +38,20 @@ mock_tool_any.tool_spec = {
     "description": "Adds two numbers.",
     "parameters": {
         "type": "object",
-        "properties": {
-            "a": {"type": "integer"},
-            "b": {"type": "integer"}
-        },
-        "required": ["a", "b"]
-    }
+        "properties": {"a": {"type": "integer"}, "b": {"type": "integer"}},
+        "required": ["a", "b"],
+    },
 }
 
+
 async def run_complex_test(provider_name: str, config):
+    r"""
+    Runs a suite of complex integration tests (logprobs, tool calling) against a live provider.
+
+    Args:
+        provider_name (`str`): The name of the provider (e.g. OpenAI, Gemini).
+        config: The provider configuration object.
+    """
     print(f"\n🚀 Testing {provider_name} with Complex Features...")
     provider = ModelFactory.get_provider(config)
 
@@ -50,8 +71,7 @@ async def run_complex_test(provider_name: str, config):
     try:
         # We ask it to use the tool
         res = await provider.generate_content_async(
-            "Use the mock_tool to add 123 and 456. Tell me the final sum.",
-            tools=[mock_tool]
+            "Use the mock_tool to add 123 and 456. Tell me the final sum.", tools=[mock_tool]
         )
         # Check if tool calls were detected in raw response
         if provider_name == "OpenAI":
@@ -67,8 +87,12 @@ async def run_complex_test(provider_name: str, config):
     except Exception as e:
         print(f"❌ [{provider_name}] Tool call failed: {e}")
 
+
 @pytest.mark.asyncio
 async def test_orchestrator_live():
+    r"""
+    Smoke test for the Orchestrator using a live LLM provider.
+    """
     openai_key = os.getenv("OPENAI_API_KEY")
     if not openai_key:
         print("⏭️ Skipping Orchestrator live test (OPENAI_API_KEY not set)")
@@ -101,6 +125,7 @@ async def test_orchestrator_live():
     else:
         print(f"❌ Orchestrator failed or returned unexpected text: {state.context.get('node_1')}")
 
+
 async def main():
     # Load keys
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -114,12 +139,9 @@ async def main():
 
     if gemini_key:
         # Use flash for speed
-        ge_config = GeminiConfig(
-            model_id="gemini-2.0-flash-lite",
-            api_key=SecretStr(gemini_key),
-            redis_url=redis_url
-        )
+        ge_config = GeminiConfig(model_id="gemini-2.0-flash-lite", api_key=SecretStr(gemini_key), redis_url=redis_url)
         await run_complex_test("Gemini", ge_config)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

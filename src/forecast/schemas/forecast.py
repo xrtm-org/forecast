@@ -116,9 +116,7 @@ class ForecastOutput(BaseModel):
     logical_trace: List[CausalNode] = Field(
         default_factory=list, description="The Bayesian-style sequence of assumptions (Mental Model)"
     )
-    structural_trace: List[str] = Field(
-        default_factory=list, description="Order of graph nodes executed (Audit Trail)"
-    )
+    structural_trace: List[str] = Field(default_factory=list, description="Order of graph nodes executed (Audit Trail)")
 
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Model info, latency, usage, cost")
 

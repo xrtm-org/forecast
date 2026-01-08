@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, SecretStr
 class ProviderConfig(BaseModel):
     """Base configuration for any inference provider."""
 
-    model_id: str
+    model_id: Optional[str] = None
     api_key: Optional[SecretStr] = None
     rpm: int = 15
     timeout: int = 30

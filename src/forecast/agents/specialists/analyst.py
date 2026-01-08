@@ -28,6 +28,7 @@ class AnalystOutput(BaseModel):
     r"""
     Internal schema for structured output from the Forecasting Analyst.
     """
+
     confidence: float = Field(..., ge=0, le=1)
     reasoning: str
     causal_chain: List[CausalNode] = Field(default_factory=list)
@@ -45,6 +46,7 @@ class ForecastingAnalyst(LLMAgent):
     to fork and customize the persona, few-shot examples, and structural constraints
     for specific forecasting niches.
     """
+
     async def run(self, input_data: ForecastQuestion, **kwargs) -> ForecastOutput:
         """
         Processes a ForecastQuestion and returns a ForecastOutput.
@@ -95,7 +97,9 @@ class ForecastingAnalyst(LLMAgent):
             logical_trace=logical_trace,
             metadata={
                 "model_id": getattr(self.model, "model_id", "unknown"),
-                "token_usage": getattr(response, "usage", {})
-            }
+                "token_usage": getattr(response, "usage", {}),
+            },
         )
-__all__ = ['ForecastingAnalyst']
+
+
+__all__ = ["ForecastingAnalyst"]

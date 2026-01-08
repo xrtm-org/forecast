@@ -42,6 +42,20 @@ class Orchestrator:
         # format: {"node_name": callable}
         self.nodes: Dict[str, Callable] = {}
 
+    @classmethod
+    def create_standard(cls, max_cycles: int = 5) -> "Orchestrator":
+        r"""
+        Creates an orchestrator instance with standard platform defaults.
+
+        Args:
+            max_cycles (`int`, *optional*, defaults to `5`):
+                Maximum reasoning iterations allowed.
+
+        Returns:
+            `Orchestrator`: A pre-configured orchestrator instance.
+        """
+        return cls(max_cycles=max_cycles)
+
     def register_node(self, name: str, func: Callable) -> None:
         r"""
         Registers a processing node in the graph registry.

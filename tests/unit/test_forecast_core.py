@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from typing import Any, Callable, Dict, Optional
 
 import pytest
@@ -11,6 +26,10 @@ from forecast.schemas.graph import BaseGraphState
 
 # 1. Mock Provider for tests
 class MockProvider(InferenceProvider):
+    r"""
+    A fake inference provider for high-level core tests.
+    """
+
     def __init__(self, config=None, tier="SMART"):
         self.config = config
         self.tier = tier
@@ -31,6 +50,10 @@ class MockProvider(InferenceProvider):
 
 # 2. Mock Agent
 class MockAgent(LLMAgent):
+    r"""
+    A fake agent implementation for unit testing.
+    """
+
     async def run(self, input_data: Any, **kwargs: Any) -> Dict[str, Any]:
         result = await self.model.generate_content_async(str(input_data))
         return self.parse_output(result.text)
@@ -38,6 +61,9 @@ class MockAgent(LLMAgent):
 
 @pytest.mark.asyncio
 async def test_library_standalone_orchestration():
+    r"""
+    Ensures xrtm-forecast core can run a reasoning chain without CAFE dependencies.
+    """
     """
     Ensures xrtm-forecast core can run a reasoning chain without CAFE dependencies.
     """
@@ -63,6 +89,9 @@ async def test_library_standalone_orchestration():
 
 @pytest.mark.asyncio
 async def test_agent_parsing_logic():
+    r"""
+    Verifies that Agent correctly parses markdown JSON from model responses.
+    """
     """
     Verifies that Agent correctly parses markdown JSON.
     """
@@ -82,6 +111,9 @@ async def test_agent_parsing_logic():
 
 @pytest.mark.asyncio
 async def test_model_factory_tier_handling():
+    r"""
+    Verifies the factory correctly returns providers based on performance tiers.
+    """
     """
     Verifies the factory correctly returns providers based on tiers.
     """

@@ -25,6 +25,7 @@ class GraphAgent(Agent):
     Agent that encapsulates a sub-graph (Orchestrator).
     Enables 'Composite Nodes' where an agent internally runs a whole pipeline.
     """
+
     def __init__(self, orchestrator: Orchestrator, entry_node: str, name: Optional[str] = None):
         super().__init__(name)
         self.orchestrator = orchestrator

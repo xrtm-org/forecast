@@ -37,13 +37,15 @@ class OpenAIProvider(InferenceProvider):
             Configuration object containing the API key, model ID, and optional base URL.
     """
 
+    model_id: str
+
     def __init__(self, config: OpenAIConfig):
         """
         Args:
             config: Explicit OpenAI configuration.
         """
         self.config = config
-        self.model_id = config.model_id
+        self.model_id = config.model_id or "gpt-4o"
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
 
@@ -60,9 +62,12 @@ class OpenAIProvider(InferenceProvider):
         prompt: Any,
         output_logprobs: bool = False,
         tools: Optional[List[Any]] = None,
-        **kwargs
+        max_tool_turns: int = 5,
+        **kwargs,
     ) -> ModelResponse:
-        """Standardized async generation."""
+        """
+        Standardized async generation with multi-turn tool support.
+        """
         # Cast to Any to satisfy strict mypy checks on the Union definition
         messages = cast(Any, self._normalize_messages(prompt or kwargs.get("messages")))
 
@@ -73,59 +78,108 @@ class OpenAIProvider(InferenceProvider):
                 if hasattr(t, "tool_spec"):
                     openai_tools.append({"type": "function", "function": t.tool_spec})
                 else:
-                    openai_tools.append({
-                        "type": "function",
-                        "function": {
-                            "name": getattr(t, "__name__", str(t)),
-                            "parameters": {"type": "object", "properties": {}}
+                    openai_tools.append(
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": getattr(t, "__name__", str(t)),
+                                "parameters": {"type": "object", "properties": {}},
+                            },
                         }
-                    })
+                    )
 
-        response = await self.client.chat.completions.create(
-            model=self.model_id,
-            messages=messages,
-            tools=cast(Any, openai_tools),
-            logprobs=output_logprobs,
-            top_logprobs=5 if output_logprobs else None,
-            **kwargs
-        )
+        current_turn = 0
+        while current_turn < max_tool_turns:
+            current_turn += 1
+            response = await self.client.chat.completions.create(
+                model=self.model_id,
+                messages=messages,
+                tools=cast(Any, openai_tools),
+                logprobs=output_logprobs,
+                top_logprobs=5 if output_logprobs else None,
+                **kwargs,
+            )
 
-        choice = response.choices[0]
-        text = choice.message.content or ""
+            choice = response.choices[0]
+            if choice.message.tool_calls:
+                logger.info(f"[OPENAI] Detected {len(choice.message.tool_calls)} tool calls. Turn {current_turn}")
+                messages.append(choice.message)
+                tool_outputs = await self._execute_tool_calls(choice.message.tool_calls, tools or [])
+                messages.extend(tool_outputs)
+                continue  # Handle the tool outputs in the next turn
 
-        normalized_logprobs = None
-        if output_logprobs and choice.logprobs and choice.logprobs.content:
-            normalized_logprobs = []
-            for lp in choice.logprobs.content:
-                normalized_logprobs.append({
-                    "token": lp.token,
-                    "logprob": lp.logprob,
-                })
+            text = choice.message.content or ""
+            normalized_logprobs = None
+            if output_logprobs and choice.logprobs and choice.logprobs.content:
+                normalized_logprobs = []
+                for lp in choice.logprobs.content:
+                    normalized_logprobs.append(
+                        {
+                            "token": lp.token,
+                            "logprob": lp.logprob,
+                        }
+                    )
 
-        if choice.message.tool_calls:
-            logger.info(f"[OPENAI] Detected {len(choice.message.tool_calls)} tool calls.")
+            usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            if response.usage:
+                usage = {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens,
+                }
 
-        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-        if response.usage:
-            usage = {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens,
-            }
+            return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs)
 
-        return ModelResponse(
-            text=text,
-            raw=response,
-            usage=usage,
-            logprobs=normalized_logprobs
-        )
+        from forecast.exceptions import ProviderError
+
+        raise ProviderError(f"OpenAI generation failed: Max tool turns ({max_tool_turns}) exceeded.")
+
+    async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[Dict[str, Any]]:
+        """Executes tool calls and returns OpenAI-formatted tool results."""
+        results = []
+        import json
+
+        for call in tool_calls:
+            tool_name = call.function.name
+            args = json.loads(call.function.arguments)
+
+            # Find tool in the list
+            target_tool = None
+            for t in tools:
+                if hasattr(t, "name") and t.name == tool_name:
+                    target_tool = t
+                    break
+                if getattr(t, "__name__", None) == tool_name:
+                    target_tool = t
+                    break
+
+            if target_tool:
+                try:
+                    if hasattr(target_tool, "execute"):
+                        output = await target_tool.execute(**args)
+                    elif hasattr(target_tool, "run"):
+                        output = await target_tool.run(**args)
+                    else:
+                        output = target_tool(**args)
+                    result_str = str(output)
+                except Exception as e:
+                    logger.error(f"Error executing tool {tool_name}: {e}")
+                    result_str = f"Error: {e}"
+            else:
+                result_str = f"Error: Tool {tool_name} not found."
+
+            results.append(
+                {
+                    "tool_call_id": call.id,
+                    "role": "tool",
+                    "name": tool_name,
+                    "content": result_str,
+                }
+            )
+        return results
 
     def generate_content(
-        self,
-        prompt: Any,
-        output_logprobs: bool = False,
-        tools: Optional[List[Any]] = None,
-        **kwargs
+        self, prompt: Any, output_logprobs: bool = False, tools: Optional[List[Any]] = None, **kwargs
     ) -> ModelResponse:
         """Standardized sync generation."""
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
@@ -133,8 +187,7 @@ class OpenAIProvider(InferenceProvider):
         response = self.sync_client.chat.completions.create(
             model=self.model_id,
             messages=cast(Any, messages),
-            logprobs=output_logprobs,
-            **kwargs
+            **kwargs,
         )
 
         choice = response.choices[0]
@@ -146,11 +199,7 @@ class OpenAIProvider(InferenceProvider):
                 "total_tokens": response.usage.total_tokens,
             }
 
-        return ModelResponse(
-            text=choice.message.content or "",
-            raw=response,
-            usage=usage
-        )
+        return ModelResponse(text=choice.message.content or "", raw=response, usage=usage)
 
     async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
         """Streaming implementation."""
@@ -159,16 +208,19 @@ class OpenAIProvider(InferenceProvider):
             model=self.model_id,
             messages=messages,
             stream=True,
-            **kwargs
+            **kwargs,
         )
 
-        async for chunk in stream:
-            if chunk.choices and chunk.choices[0].delta.content:
-                yield {"contentBlockDelta": {"delta": {"text": chunk.choices[0].delta.content}}}
+        if hasattr(stream, "__aiter__"):
+            async for chunk in cast(AsyncIterable[Any], stream):
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield {"contentBlockDelta": {"delta": {"text": chunk.choices[0].delta.content}}}
 
         yield {"messageStop": {"stopReason": "end_turn"}}
 
     def stream(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
         """Streaming implementation wrapper."""
         return self._stream_generator(messages, **kwargs)
-__all__ = ['OpenAIProvider']
+
+
+__all__ = ["OpenAIProvider"]

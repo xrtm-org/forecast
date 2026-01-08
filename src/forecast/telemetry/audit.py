@@ -17,7 +17,7 @@ import json
 import logging
 import os
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from forecast.telemetry.hashing import AuditHasher
@@ -48,7 +48,7 @@ class Audit:
         Saves the reasoning chain to a signed JSON file.
         Returns the filepath of the saved log.
         """
-        log_ts = timestamp or datetime.utcnow()
+        log_ts = timestamp or datetime.now(timezone.utc)
         file_ts = log_ts.strftime("%Y%m%d_%H%M%S")
         filename = f"{file_ts}_{subject_id}.json"
         filepath = os.path.join(self.log_dir, filename)
@@ -104,18 +104,18 @@ class Audit:
         report = [
             "# Forecast Execution Report",
             f"Subject: {state.subject_id}",
-            f"Timestamp: {datetime.utcnow().isoformat()}",
+            f"Timestamp: {datetime.now(timezone.utc).isoformat()}",
             "\n## 1. Structural Trace (The 'How')",
-            "Path through the reasoning graph:"
+            "Path through the reasoning graph:",
         ]
 
         for i, node in enumerate(state.execution_path):
-            report.append(f"{i+1}. **{node}**")
+            report.append(f"{i + 1}. **{node}**")
 
         report.append("\n## 2. Logical Trace (The 'Why')")
         if hasattr(output, "logical_trace"):
             for entry in output.logical_trace:
-                prob_str = f" [{entry.probability*100:.1f}%]" if entry.probability is not None else ""
+                prob_str = f" [{entry.probability * 100:.1f}%]" if entry.probability is not None else ""
                 report.append(f"- {entry.event}{prob_str}: *{entry.description or ''}*")
         else:
             report.append("No logical trace data provided by the analyst.")
@@ -125,6 +125,7 @@ class Audit:
             report.append(f"**Score: {output.confidence * 100:.1f}%**")
 
         return "\n".join(report)
+
 
 # Global auditor for the library
 auditor = Audit(log_dir="logs/audit")

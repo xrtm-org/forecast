@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import abc
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Callable, Optional, Protocol, runtime_checkable
 
 
 @runtime_checkable
@@ -76,4 +76,65 @@ class BaseSkill(abc.ABC):
         pass
 
 
-__all__ = ["Skill", "BaseSkill"]
+class FunctionalSkill(BaseSkill):
+    r"""
+    A wrapper class that converts a Python function into a `Skill`.
+
+    This class enables functional programming patterns within the engine by
+    providing a standard `Skill` interface for naked functions.
+    """
+
+    def __init__(self, func: Callable, name: str, description: str):
+        self._func = func
+        self._name = name
+        self._description = description
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    async def execute(self, **kwargs: Any) -> Any:
+        return await self._func(**kwargs)
+
+
+def skill(name: str, description: Optional[str] = None):
+    r"""
+    Decorator to convert an async function into a `Skill`.
+
+    The decorated function is automatically wrapped in a `FunctionalSkill` and
+    can be registered with the platform's tool registry.
+
+    Args:
+        name (`str`):
+            The unique identifier for the skill.
+        description (`str`, *optional*):
+            A summary of the skill's purpose. If omitted, the function's
+            docstring is used.
+
+    Returns:
+        `Callable`: The decorator function.
+    """
+
+    def decorator(func):
+        desc = description or func.__doc__ or "No description provided."
+        functional_skill = FunctionalSkill(func, name, desc)
+
+        # Auto-register with the global registry if available
+        # We perform a lazy import to avoid circular dependencies
+        try:
+            from forecast.tools.registry import tool_registry
+
+            tool_registry.register_skill(functional_skill)
+        except (ImportError, AttributeError):
+            pass
+
+        return functional_skill
+
+    return decorator
+
+
+__all__ = ["Skill", "BaseSkill", "FunctionalSkill", "skill"]

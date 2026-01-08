@@ -1,9 +1,27 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 
 from forecast.telemetry import SpanKind, telemetry_manager
 
 
 async def simulate_work():
+    r"""
+    Simulates a sequence of reasoning steps with telemetry tracing.
+    """
     # 1. Start a Trace
     telemetry_manager.start_trace()
 
@@ -28,10 +46,12 @@ async def simulate_work():
     path = telemetry_manager.export_trace()
     print(f"\nTrace exported to: {path}")
 
+
 async def main():
     # Note: TelemetryManager doesn't support 'with' yet, I should add that for better DX.
     # For now, manually ending.
     await simulate_work()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

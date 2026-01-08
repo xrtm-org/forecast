@@ -24,6 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 class ConfidenceStrategy(ABC):
+    r"""
+    Abstract base class for all confidence estimation strategies.
+
+    Strategies define how verbal confidence and raw logprobs are synthesized
+    into a final `ConfidenceMetrics` object.
+    """
+
     @abstractmethod
     def evaluate(self, verbal: float, logprobs: Optional[List[Dict[str, Any]]]) -> ConfidenceMetrics:
         pass

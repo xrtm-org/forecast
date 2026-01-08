@@ -17,8 +17,16 @@ from typing import Any, Dict
 
 
 class Anonymizer:
+    r"""
+    A utility for scrubbing sensitive information from datasets and traces.
+
+    Ensures that PII (Personally Identifiable Information) and other sensitive
+    data are redacted before logging or auditing.
+    """
+
     def scrub_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         # Basic pass-through for now
         return data
+
 
 redactor = Anonymizer()

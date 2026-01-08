@@ -32,6 +32,7 @@ class ToolRegistry:
 
     def __init__(self):
         self._tools: Dict[str, Tool] = {}
+        self._skills: Dict[str, Any] = {}
 
     def register_tool(self, tool: Tool):
         r"""
@@ -45,6 +46,19 @@ class ToolRegistry:
             logger.warning(f"Overwriting tool: {tool.name}")
         self._tools[tool.name] = tool
         logger.debug(f"Registered tool: {tool.name}")
+
+    def register_skill(self, skill: Any):
+        r"""
+        Registers a high-level `Skill` instance.
+
+        Args:
+            skill (`Skill`):
+                The skill object to register.
+        """
+        if skill.name in self._skills:
+            logger.warning(f"Overwriting skill: {skill.name}")
+        self._skills[skill.name] = skill
+        logger.debug(f"Registered skill: {skill.name}")
 
     def register_fn(self, fn: Callable, name: Optional[str] = None, description: Optional[str] = None):
         r"""
@@ -70,9 +84,31 @@ class ToolRegistry:
         r"""Retrieves a registered tool by name."""
         return self._tools.get(name)
 
+    def get_skill(self, name: str) -> Optional[Any]:
+        r"""Retrieves a registered skill by name."""
+        return self._skills.get(name)
+
     def list_tools(self) -> List[str]:
         r"""Returns a list of all registered tool names."""
         return list(self._tools.keys())
+
+    def list_skills(self) -> List[str]:
+        r"""Returns a list of all registered skill names."""
+        return list(self._skills.keys())
+
+    def list_available(self) -> List[Dict[str, Any]]:
+        r"""
+        Returns metadata for all available tools and skills.
+
+        Returns:
+            `List[Dict[str, Any]]`: A list of metadata dictionaries.
+        """
+        available = []
+        for name, tool in self._tools.items():
+            available.append({"name": name, "type": "tool", "description": tool.description})
+        for name, skill in self._skills.items():
+            available.append({"name": name, "type": "skill", "description": skill.description})
+        return available
 
     def get_all_specs(self) -> List[Dict[str, Any]]:
         r"""
@@ -83,9 +119,7 @@ class ToolRegistry:
         """
         specs = []
         for tool in self._tools.values():
-            specs.append(
-                {"name": tool.name, "description": tool.description, "parameters": tool.parameters_schema}
-            )
+            specs.append({"name": tool.name, "description": tool.description, "parameters": tool.parameters_schema})
         return specs
 
 
