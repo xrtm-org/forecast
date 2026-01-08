@@ -27,7 +27,7 @@ __all__ = [
     "PandasSkill",
 ]
 
-__version__ = "0.1.2"
+__version__ = "0.1.4"
 __author__ = "XRTM Team"
 __contact__ = "moy@xrtm.org"
 __license__ = "Apache-2.0"
