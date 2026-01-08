@@ -104,7 +104,9 @@ async def test_orchestrator_live():
     config = OpenAIConfig(model_id="gpt-4o-mini", api_key=SecretStr(openai_key))
     provider = ModelFactory.get_provider(config)
 
-    orchestrator = Orchestrator(max_cycles=3)
+    from forecast.graph.config import GraphConfig
+    graph_config = GraphConfig(max_cycles=3)
+    orchestrator = Orchestrator(config=graph_config)
 
     async def hello_node(state: BaseGraphState, on_progress) -> str:
         res = await provider.generate_content_async("Say 'Node 1 reached'.")

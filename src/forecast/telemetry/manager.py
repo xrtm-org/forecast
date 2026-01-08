@@ -19,6 +19,7 @@ import os
 import uuid
 from typing import Dict, List, Optional
 
+from forecast.telemetry.config import TelemetryConfig
 from forecast.telemetry.schemas import SpanKind, TelemetryEvent, TelemetrySpan, Trace
 
 logger = logging.getLogger(__name__)
@@ -44,8 +45,9 @@ class TelemetryManager:
             The directory where telemetry traces will be exported.
     """
 
-    def __init__(self, log_dir: str = "logs/telemetry"):
+    def __init__(self, log_dir: str = "logs/telemetry", config: Optional[TelemetryConfig] = None):
         self.log_dir = log_dir
+        self.config = config or TelemetryConfig()
         os.makedirs(self.log_dir, exist_ok=True)
 
     @property

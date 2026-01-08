@@ -17,6 +17,7 @@ import logging
 from typing import Any, Callable, Dict, List, Optional
 
 from forecast.tools.base import FunctionTool, StrandToolWrapper, Tool
+from forecast.tools.config import ToolConfig
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,8 @@ class ToolRegistry:
     LLM function calling.
     """
 
-    def __init__(self):
+    def __init__(self, config: Optional[ToolConfig] = None):
+        self.config = config or ToolConfig()
         self._tools: Dict[str, Tool] = {}
         self._skills: Dict[str, Any] = {}
 

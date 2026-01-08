@@ -20,6 +20,7 @@ import platform
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
+from forecast.telemetry.config import TelemetryConfig
 from forecast.telemetry.hashing import AuditHasher
 from forecast.utils.privacy import redactor
 
@@ -32,9 +33,9 @@ class Audit:
     Creates an immutable record of why an action was taken.
     """
 
-    def __init__(self, log_dir: str, version: str = "0.1.0"):
+    def __init__(self, log_dir: str = "logs/audit", config: Optional[TelemetryConfig] = None):
         self.log_dir = log_dir
-        self.version = version
+        self.config = config or TelemetryConfig()
         os.makedirs(self.log_dir, exist_ok=True)
 
     def log_chain(
@@ -55,7 +56,7 @@ class Audit:
 
         # Base entry with system metadata
         audit_entry: Dict[str, Any] = {
-            "version": self.version,
+            "version": self.config.version,
             "timestamp": log_ts.isoformat(),
             "subject_id": subject_id,
             "chain": chain,
@@ -70,7 +71,8 @@ class Audit:
             audit_entry.update(extra_metadata)
 
         # Scrub PII before signing
-        audit_entry = redactor.scrub_dict(audit_entry)
+        if self.config.enable_masking:
+            audit_entry = redactor.scrub_dict(audit_entry)
 
         # Attempt to add system stats if psutil is available
         try:

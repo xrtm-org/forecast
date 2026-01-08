@@ -18,6 +18,7 @@ from typing import Callable, Optional
 
 from forecast.agents.specialists.analyst import ForecastingAnalyst
 from forecast.data_sources.base import DataSource
+from forecast.graph.config import GraphConfig
 from forecast.graph.orchestrator import Orchestrator
 from forecast.schemas.graph import BaseGraphState
 from forecast.telemetry.audit import auditor
@@ -30,10 +31,16 @@ class GenericAnalystPipeline:
     Standardized pipeline for fetching a question and generating an analyst forecast.
     """
 
-    def __init__(self, data_source: DataSource, analyst: ForecastingAnalyst, max_cycles: int = 5):
+    def __init__(
+        self,
+        data_source: DataSource,
+        analyst: ForecastingAnalyst,
+        config: Optional[GraphConfig] = None,
+    ):
         self.data_source = data_source
         self.analyst = analyst
-        self.orchestrator = Orchestrator(max_cycles=max_cycles)
+        self.config = config or GraphConfig()
+        self.orchestrator = Orchestrator(config=self.config)
         self._setup_graph()
 
     def _setup_graph(self):

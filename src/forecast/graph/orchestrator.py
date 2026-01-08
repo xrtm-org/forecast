@@ -17,6 +17,7 @@ import logging
 import time
 from typing import Any, Callable, Dict, Optional
 
+from forecast.graph.config import GraphConfig
 from forecast.schemas.graph import BaseGraphState
 
 logger = logging.getLogger(__name__)
@@ -31,30 +32,33 @@ class Orchestrator:
     for iterative reasoning, conditional branching, and global usage tracking.
 
     Args:
-        max_cycles (`int`, *optional*, defaults to `3`):
-            The maximum number of state-machine iterations allowed before
-            enforcing termination. Prevents infinite loops in autonomous graphs.
+        config (`GraphConfig`, *optional*):
+            The configuration for the graph engine. If `None`, defaults are used.
     """
 
-    def __init__(self, max_cycles: int = 3):
-        self.max_cycles = max_cycles
+    def __init__(self, config: Optional[GraphConfig] = None):
+        self.config = config or GraphConfig()
+        self.max_cycles = self.config.max_cycles
         # Registry of nodes (functions) that process the state
         # format: {"node_name": callable}
         self.nodes: Dict[str, Callable] = {}
 
     @classmethod
-    def create_standard(cls, max_cycles: int = 5) -> "Orchestrator":
+    def create_standard(cls, max_cycles: Optional[int] = None) -> "Orchestrator":
         r"""
         Creates an orchestrator instance with standard platform defaults.
 
         Args:
-            max_cycles (`int`, *optional*, defaults to `5`):
-                Maximum reasoning iterations allowed.
+            max_cycles (`int`, *optional*):
+                Override for the maximum reasoning iterations allowed.
 
         Returns:
             `Orchestrator`: A pre-configured orchestrator instance.
         """
-        return cls(max_cycles=max_cycles)
+        config = GraphConfig()
+        if max_cycles is not None:
+            config.max_cycles = max_cycles
+        return cls(config=config)
 
     def register_node(self, name: str, func: Callable) -> None:
         r"""

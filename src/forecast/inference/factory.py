@@ -71,14 +71,21 @@ class ModelFactory:
             elif provider_type.upper() == "OPENAI":
                 config = OpenAIConfig(model_id=model_id, api_key=api_key, **kwargs)
 
-        if isinstance(config, GeminiConfig):
-            from forecast.inference.gemini_provider import GeminiProvider
+        from forecast.config import settings
 
+        # Injection Layer: Resolve API keys from global settings if missing in component config
+        if isinstance(config, GeminiConfig):
+            if not config.api_key and settings.gemini_api_key:
+                config.api_key = settings.gemini_api_key
+
+            from forecast.inference.gemini_provider import GeminiProvider
             return GeminiProvider(config=config)
 
         elif isinstance(config, OpenAIConfig):
-            from forecast.inference.openai_provider import OpenAIProvider
+            if not config.api_key and settings.openai_api_key:
+                config.api_key = settings.openai_api_key
 
+            from forecast.inference.openai_provider import OpenAIProvider
             return OpenAIProvider(config=config)
 
         else:
