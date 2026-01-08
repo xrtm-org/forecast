@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xrtm-forecast"
-version = "0.1.4"
-description = "Institutional-grade parallelized agentic reasoning engine."
+version = "0.1.5"
+description = "Institutional-grade modular engine for generative forecasting and agentic reasoning."
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Apache-2.0"}
