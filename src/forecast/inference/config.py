@@ -22,7 +22,10 @@ class ProviderConfig(BaseModel):
     """Base configuration for any inference provider."""
 
     model_id: str = Field(..., description="The unique identifier for the model (e.g. 'gpt-4o')")
-    api_key: SecretStr = Field(..., description="API key for the provider")
+    api_key: Optional[SecretStr] = Field(
+        default=None,
+        description="API key for the provider. If None, it will be pulled from environment.",
+    )
     rpm: int = 15
     timeout: int = 30
     extra: Dict[str, Any] = Field(default_factory=dict)

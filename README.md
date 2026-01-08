@@ -54,17 +54,13 @@ OPENAI_API_KEY=your_key_here
 
 ```python
 import asyncio
-from pydantic import SecretStr
 from forecast.agents.specialists import ForecastingAnalyst
 from forecast.inference.factory import ModelFactory
 from forecast.inference.config import GeminiConfig
 
 async def main():
-    # 1. Define your own configuration (No hardcoded defaults in core)
-    config = GeminiConfig(
-        model_id="gemini-2.0-flash", 
-        api_key=SecretStr("your_api_key_here")
-    )
+    # 1. Provide your model configuration
+    config = GeminiConfig(model_id="gemini-2.0-flash")
     
     # 2. Instantiate the provider and agent
     model = ModelFactory.get_provider(config)

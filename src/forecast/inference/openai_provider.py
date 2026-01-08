@@ -46,7 +46,14 @@ class OpenAIProvider(InferenceProvider):
         """
         self.config = config
         self.model_id = config.model_id
-        self.api_key = config.api_key.get_secret_value() if config.api_key else None
+        from forecast.config import settings
+
+        self.api_key = None
+        if config.api_key:
+            self.api_key = config.api_key.get_secret_value()
+        elif settings.openai_api_key:
+            self.api_key = settings.openai_api_key.get_secret_value()
+
         self.base_url = config.base_url
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)

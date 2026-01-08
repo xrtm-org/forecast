@@ -66,7 +66,14 @@ class GeminiProvider(InferenceProvider):
 
         self.model_id = initial_model_id
 
-        key = config.api_key.get_secret_value() if config.api_key else None
+        from forecast.config import settings
+
+        key = None
+        if config.api_key:
+            key = config.api_key.get_secret_value()
+        elif settings.gemini_api_key:
+            key = settings.gemini_api_key.get_secret_value()
+
         self.client = genai.Client(api_key=key)
 
         self.rate_limiter = None
