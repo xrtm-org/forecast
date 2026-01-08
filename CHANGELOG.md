@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-01-08
+
+### Added
+- **"Pure Core, Practical Shell" Architecture**: Re-engineered the platform to separate strict abstract logic from ergonomic high-level APIs.
+- **Assistants Module**: Introduced `forecast.assistants` with high-level factories like `create_forecasting_analyst()` for one-line agent setup.
+- **Flattened Namespace**: Key classes and factories (e.g., `ModelFactory`, `Orchestrator`, `TelemetryManager`) are now accessible directly at the module level (e.g., `from forecast.inference import ModelFactory`).
+- **Smart Model Resolution**: `ModelFactory` and `Agent.from_config()` now support string shortcuts and model presets (e.g., `model="gemini"`).
+
+### Changed
+- **Decentralized Configuration**: Every major platform sub-package (`graph`, `telemetry`, `tools`) now owns its own `config.py`, removing dependencies on global singletons.
+- **Branding Audit**: Removed all references to "CAFE" from the repository to ensure domain-agnosticism.
+
+### Fixed
+- **CI Mypy Stability**: Resolved a CI failure in GitHub Actions by exposing missing telemetry types in the ergonomic namespace.
+- **Inference Injection**: Fixed a bug where API keys were not correctly injected from global settings into pure provider configs.
+
 ## [0.1.1] - 2026-01-07
 
 ### Added
