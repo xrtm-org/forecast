@@ -31,9 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_forecasting_analyst(
-    model_id: str = "gemini:gemini-2.0-flash",
-    name: Optional[str] = None,
-    **kwargs
+    model_id: str = "gemini:gemini-2.0-flash", name: Optional[str] = None, **kwargs
 ) -> ForecastingAnalyst:
     r"""
     A high-level factory to create a pre-configured Forecasting Analyst.
@@ -59,9 +57,7 @@ def create_forecasting_analyst(
 
 
 def create_local_analyst(
-    model_path: str = "sshleifer/tiny-gpt2",
-    name: Optional[str] = None,
-    **kwargs
+    model_path: str = "sshleifer/tiny-gpt2", name: Optional[str] = None, **kwargs
 ) -> ForecastingAnalyst:
     r"""
     Creates a Forecasting Analyst backed by a local Hugging Face model.

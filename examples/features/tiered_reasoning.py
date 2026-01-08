@@ -34,11 +34,7 @@ async def run_tiered_reasoning():
 
     # 2. Instantiate the Router
     # It uses a default router model (Gemini-Flash) to classify the task
-    router = RoutingAgent(
-        fast_tier=fast_model,
-        smart_tier=smart_model,
-        name="EfficiencyRouter"
-    )
+    router = RoutingAgent(fast_tier=fast_model, smart_tier=smart_model, name="EfficiencyRouter")
 
     # 3. Simple Task (Expect FAST route)
     print("\nExecuting Simple Task...")
@@ -47,13 +43,13 @@ async def run_tiered_reasoning():
     # 4. Complex Task (Expect SMART route)
     print("\nExecuting Complex Task...")
     res_smart = await router.run(
-        "Analyze the causal relationship between rising interest rates and "
-        "regional housing supply elasticity in 2026."
+        "Analyze the causal relationship between rising interest rates and regional housing supply elasticity in 2026."
     )
 
     print("\n--- Summary ---")
     print(f"Simple Task Result (from local/fast): {res_fast}")
     print(f"Complex Task Result (from cloud/smart): {res_smart.text[:100]}...")
+
 
 if __name__ == "__main__":
     asyncio.run(run_tiered_reasoning())

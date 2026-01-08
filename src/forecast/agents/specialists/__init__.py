@@ -16,4 +16,3 @@
 from forecast.agents.specialists.analyst import ForecastingAnalyst
 
 __all__ = ["ForecastingAnalyst"]
-

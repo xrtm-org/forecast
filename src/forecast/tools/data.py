@@ -46,9 +46,7 @@ class SQLSkill(Tool):
     def parameters_schema(self) -> Dict[str, Any]:
         return {
             "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "The SQL SELECT query to execute."}
-            },
+            "properties": {"query": {"type": "string", "description": "The SQL SELECT query to execute."}},
             "required": ["query"],
         }
 
@@ -73,8 +71,8 @@ class SQLSkill(Tool):
         forbidden_keywords = r"\b(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b"
 
         # Strip comments for validation purposes
-        clean_query = re.sub(r"--.*?\n", "\n", query) # Strip -- comments
-        clean_query = re.sub(r"/\*.*?\*/", "", clean_query, flags=re.DOTALL) # Strip /* */ comments
+        clean_query = re.sub(r"--.*?\n", "\n", query)  # Strip -- comments
+        clean_query = re.sub(r"/\*.*?\*/", "", clean_query, flags=re.DOTALL)  # Strip /* */ comments
 
         if re.search(forbidden_keywords, clean_query, re.IGNORECASE):
             return "Error: For security reasons, only read-only (SELECT) operations are allowed."
@@ -84,7 +82,7 @@ class SQLSkill(Tool):
 
         # Ensure it starts with SELECT after stripping whitespace/comments
         if not re.search(r"^\s*SELECT\b", clean_query.strip(), re.IGNORECASE):
-             return "Error: The first statement in the query must be a SELECT."
+            return "Error: The first statement in the query must be a SELECT."
 
         try:
             # We use local threading fallback since sqlite3 is blocking

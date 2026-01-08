@@ -170,3 +170,4 @@ docker-compose.override.yml
 
 # Agent internals
 .agent/
+data/analysis/

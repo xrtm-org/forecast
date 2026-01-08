@@ -32,11 +32,7 @@ async def test_routing_agent_logic():
     smart_agent = MagicMock()
     smart_agent.run = AsyncMock(return_value="smart_result")
 
-    agent = RoutingAgent(
-        router_model=router_model,
-        fast_tier=fast_agent,
-        smart_tier=smart_agent
-    )
+    agent = RoutingAgent(router_model=router_model, fast_tier=fast_agent, smart_tier=smart_agent)
 
     # 1. Test FAST path
     router_model.run = AsyncMock(return_value=ModelResponse(text="FAST"))
@@ -50,6 +46,7 @@ async def test_routing_agent_logic():
     assert result == "smart_result"
     smart_agent.run.assert_called_with("complex reasoning task")
 
+
 @pytest.mark.asyncio
 async def test_routing_agent_fallback():
     r"""Verifies that RoutingAgent falls back to available routes if decision fails."""
@@ -59,10 +56,7 @@ async def test_routing_agent_fallback():
     smart_agent = MagicMock()
     smart_agent.run = AsyncMock(return_value="fallback_result")
 
-    agent = RoutingAgent(
-        router_model=router_model,
-        smart_tier=smart_agent
-    )
+    agent = RoutingAgent(router_model=router_model, smart_tier=smart_agent)
 
     result = await agent.run("any task")
     assert result == "fallback_result"

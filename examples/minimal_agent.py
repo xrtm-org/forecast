@@ -13,6 +13,7 @@ from forecast.inference.factory import ModelFactory
 # The core platform remains abstract and model-agnostic.
 DEFAULT_MODEL = "gemini-2.0-flash"
 
+
 async def main():
     # 1. Explicitly configure the model
     # Note: API keys are automatically injected from environment if not provided here.

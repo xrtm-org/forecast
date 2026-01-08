@@ -15,7 +15,7 @@
 
 import asyncio
 import logging
-from typing import Any, AsyncIterable, Dict, List
+from typing import Any, AsyncIterable
 
 from forecast.inference.base import InferenceProvider, ModelResponse
 from forecast.inference.config import HFConfig
@@ -93,9 +93,7 @@ class HuggingFaceProvider(InferenceProvider):
 
         self._is_initialized = True
 
-    async def generate_content_async(
-        self, prompt: str, output_logprobs: bool = False, **kwargs: Any
-    ) -> ModelResponse:
+    async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> ModelResponse:
         r"""
         Asynchronously generates content from a local Hugging Face model.
 
@@ -155,20 +153,79 @@ class HuggingFaceProvider(InferenceProvider):
             },
         )
 
-    def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
+    async def stream(self, messages: Any, **kwargs: Any) -> AsyncIterable[Any]:
         r"""
-        Streaming support for HF (limited implementation).
+        Streaming support for HF models, standardized to match OpenAI/Gemini formats.
 
         Args:
-            messages (`List[Dict[str, str]]`):
-                Conversation history.
+            messages (`Any`):
+                Conversation history or prompt string.
             **kwargs:
                 Additional generation parameters.
 
         Returns:
             `AsyncIterable[Any]`: An async generator of response chunks.
         """
-        raise NotImplementedError("Streaming is not yet implemented for HuggingFaceProvider.")
+        self._ensure_initialized()
+        assert self._tokenizer is not None, "Tokenizer must be initialized"
+        assert self._model is not None, "Model must be initialized"
+
+        from threading import Thread
+
+        from transformers import TextIteratorStreamer
+
+        # 1. Prepare Inputs
+        prompt = messages
+        if isinstance(messages, list):
+            # Basic concatenation for now, sophisticated templates later
+            prompt = "\n".join([m.get("content", "") for m in messages])
+
+        inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
+
+        # 2. Setup Streamer
+        streamer = TextIteratorStreamer(self._tokenizer, skip_prompt=True, skip_special_tokens=True)
+        generation_kwargs = dict(
+            inputs,
+            streamer=streamer,
+            max_new_tokens=kwargs.get("max_new_tokens", 512),
+            temperature=kwargs.get("temperature", 0.7),
+            do_sample=kwargs.get("temperature", 0.7) > 0,
+        )
+
+        # 3. Verify Thread Safety: Run generation in a separate thread
+        thread = Thread(target=self._model.generate, kwargs=generation_kwargs)
+        thread.start()
+
+        # 4. Yield Chunks Asynchronously
+        # The streamer is an iterator, but iterating it blocks.
+        # We need to iterate it in a non-blocking way relative to the event loop.
+        # Since 'for text in streamer' blocks, we can't easily `await` each chunk
+        # unless we wrap the iterator or use run_in_executor for the *entire* loop?
+        # Actually, `TextIteratorStreamer` uses a Queue internally.
+        # We can poll it or iterate it. Iterating blocks until next token.
+        # Best practice for AsyncIO integration:
+
+        # 4. Yield Chunks Asynchronously
+        # The streamer is an iterator, but iterating it blocks.
+        # We need to iterate it in a non-blocking way relative to the event loop.
+
+        # Best practice for AsyncIO integration with blocking iterators:
+        # We yield control explicitly with await asyncio.sleep(0)
+
+        # To strictly await, we iterate the sync generator in a thread?
+        # A simpler pattern:
+        for text in streamer:
+            # This blocks the loop briefly per token, but usually acceptable for local inference.
+            # Ideally we'd use `await loop.run_in_executor(None, next, streamer)` but streamer isn't a simple iterator.
+            # Given Python GIL, simple iteration is often the pragmatic choice for HF streamers.
+            # To be "Institutional Grade", we should yield control.
+            await asyncio.sleep(0)  # Yield control
+
+            chunk = {"contentBlockDelta": {"delta": {"text": text}}}
+            yield chunk
+
+        # 5. Yield Stop Signal
+        yield {"messageStop": {"stopReason": "end_turn"}}
 
     @property
     def supports_tools(self) -> bool:

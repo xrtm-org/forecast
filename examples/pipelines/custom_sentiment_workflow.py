@@ -134,7 +134,9 @@ async def run_custom_pipeline():
     trend_tool = ToolAgent(fn=get_trend_multiplier, name="TrendMultiplier")
 
     # Orchestrator
-    orchestrator = Orchestrator(max_cycles=10)
+    from forecast.graph.config import GraphConfig
+
+    orchestrator = Orchestrator(config=GraphConfig(max_cycles=10))
     orchestrator.register_node("fetch_news", fetch_news_node)
     orchestrator.register_node("analyze", analyze_node)
     orchestrator.register_node("calculate_trend", trend_node)

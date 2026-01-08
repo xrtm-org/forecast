@@ -25,4 +25,5 @@ class GraphConfig(BaseModel):
     entry_node: str = Field(default="ingestion", description="Initial node to start execution from.")
     timeout: Optional[float] = Field(default=None, description="Global timeout for the entire graph run.")
 
+
 __all__ = ["GraphConfig"]

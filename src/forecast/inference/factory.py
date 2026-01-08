@@ -106,6 +106,7 @@ class ModelFactory:
                 config.api_key = settings.gemini_api_key
 
             from forecast.inference.gemini_provider import GeminiProvider
+
             return GeminiProvider(config=config, **kwargs)
 
         elif isinstance(config, OpenAIConfig):
@@ -113,10 +114,12 @@ class ModelFactory:
                 config.api_key = settings.openai_api_key
 
             from forecast.inference.openai_provider import OpenAIProvider
+
             return OpenAIProvider(config=config, **kwargs)
 
         elif isinstance(config, (HFConfig, XLMConfig)):
             from forecast.inference.hf_provider import HuggingFaceProvider
+
             return HuggingFaceProvider(config=config)
 
         else:

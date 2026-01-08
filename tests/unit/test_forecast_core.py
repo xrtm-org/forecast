@@ -71,6 +71,7 @@ async def test_library_standalone_orchestration():
     _ = MockAgent(model=mock_provider)
 
     from forecast.graph.config import GraphConfig
+
     orchestrator = Orchestrator(config=GraphConfig(max_cycles=2))
 
     # Define a simple node

@@ -26,7 +26,7 @@ class GraphAgent(Agent):
     Enables 'Composite Nodes' where an agent internally runs a whole pipeline.
     """
 
-    def __init__(self, orchestrator: Orchestrator, entry_node: str, name: Optional[str] = None):
+    def __init__(self, orchestrator: Orchestrator, entry_node: Optional[str] = None, name: Optional[str] = None):
         super().__init__(name)
         self.orchestrator = orchestrator
         self.entry_node = entry_node
@@ -40,7 +40,8 @@ class GraphAgent(Agent):
         state = BaseGraphState(subject_id=f"subgraph_{self.name}")
         state.context = {"input": input_data, **kwargs}
 
-        await self.orchestrator.run(state, entry_node=self.entry_node)
+        start_node = self.entry_node or self.orchestrator.entry_point or "ingestion"
+        await self.orchestrator.run(state, entry_node=start_node)
 
         # Return the final context or a specific output if defined in state
         return state.context.get("output", state.context)

@@ -23,6 +23,7 @@ from forecast.inference.config import GeminiConfig, OpenAIConfig
 from forecast.inference.factory import ModelFactory
 
 
+@pytest.mark.live
 @pytest.mark.asyncio
 async def test_gemini_live():
     r"""
@@ -44,6 +45,7 @@ async def test_gemini_live():
         print(f"❌ Gemini Failed: {e}")
 
 
+@pytest.mark.live
 @pytest.mark.asyncio
 async def test_openai_live():
     r"""

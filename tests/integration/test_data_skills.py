@@ -38,6 +38,7 @@ def temp_db():
     if os.path.exists(db_file):
         os.remove(db_file)
 
+
 @pytest.mark.asyncio
 async def test_sql_skill_hardened_security(temp_db):
     r"""Verifies that SQLSkill enforces read-only guardrails."""
@@ -62,17 +63,17 @@ async def test_sql_skill_hardened_security(temp_db):
     # Our regex allows leading whitespace/comments if SELECT follows
     assert isinstance(res, list)
 
+
 @pytest.mark.asyncio
 async def test_pandas_skill_analytics():
     r"""Verifies that PandasSkill correctly processes tabular data."""
     import importlib.util
+
     if importlib.util.find_spec("pandas") is None:
         pytest.skip("Pandas not installed")
 
     skill = PandasSkill()
-    data = [
-        {"val": 10}, {"val": 20}, {"val": 30}
-    ]
+    data = [{"val": 10}, {"val": 20}, {"val": 30}]
 
     # Sum
     res = await skill.run(data=data, operation="sum", column="val")

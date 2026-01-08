@@ -60,9 +60,12 @@ class TestProviderConformance:
         r"""Verifies that the ergonomic .run() alias exists (logic check)."""
         # We don't actually call the network here, just check the method exists and is async
         import inspect
+
         assert inspect.iscoroutinefunction(provider_class.run)
 
-    def test_docstring_institutional_standard(self, provider_class: Type[InferenceProvider], config_class: Any, model_id: str):
+    def test_docstring_institutional_standard(
+        self, provider_class: Type[InferenceProvider], config_class: Any, model_id: str
+    ):
         r"""Verifies that public methods have Hugging Face style docstrings."""
         methods = ["generate_content_async", "generate_content", "stream"]
         for m_name in methods:

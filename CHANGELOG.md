@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-01-08
+
+### Added
+- **Composable Topologies**: Introduced factory functions for advanced architectural patterns, including `DebateTopology` and `FanOutTopology`.
+- **Parallel Group Execution**: Enhanced the `Orchestrator` to support concurrent node execution with barrier synchronization for high-throughput workflows.
+- **Streaming Sovereignty**: Standardized asynchronous streaming across all providers (OpenAI, Gemini, and Local Hugging Face).
+- **Visualization & Bias Tools**: Added `ReliabilityDiagram` in `forecast.eval.viz` to detect and visualize model overconfidence and calibration bias.
+- **Deep Dive Wiki**: Restructured documentation into a hierarchical concept-based Wiki for improved developer onboarding.
+
+### Fixed
+- **State Race Conditions**: Resolved a non-deterministic state mutation bug in parallel execution groups.
+- **Numerical Stability**: Fixed division-by-zero edge cases in calibration calculations.
+- **Orchestration Resilience**: Added explicit error propagation and logging for failed parallel nodes.
+
 ## [0.1.4] - 2026-01-08
 
 ### Fixed

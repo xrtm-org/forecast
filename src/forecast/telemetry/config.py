@@ -27,4 +27,5 @@ class TelemetryConfig(BaseModel):
     export_otlp: bool = Field(default=False, description="Whether to export traces to an OTLP endpoint.")
     version: str = Field(default="0.1.2", description="The telemetry schema version.")
 
+
 __all__ = ["TelemetryConfig"]

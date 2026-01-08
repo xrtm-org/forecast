@@ -21,6 +21,7 @@ from forecast import create_local_analyst
 # Setup logging to see the "Pure Core" initialization
 logging.basicConfig(level=logging.INFO)
 
+
 async def run_local_inference():
     r"""
     Demonstrates the 'Practical Shell' capability to spin up a private
@@ -33,10 +34,7 @@ async def run_local_inference():
     model_path = "sshleifer/tiny-gpt2"
 
     print(f"Instantiating private analyst with {model_path}...")
-    analyst = create_local_analyst(
-        model_path=model_path,
-        name="PrivateResearcher"
-    )
+    analyst = create_local_analyst(model_path=model_path, name="PrivateResearcher")
 
     print("Executing local reasoning...")
     # The 'run' method is the standardized ergonomic alias
@@ -46,6 +44,7 @@ async def run_local_inference():
     print(f"Model: {result.metadata.get('model_id')}")
     print(f"Output: {result.reasoning}")
     print(f"Confidence: {result.confidence}")
+
 
 if __name__ == "__main__":
     asyncio.run(run_local_inference())

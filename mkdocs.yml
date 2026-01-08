@@ -37,6 +37,16 @@ plugins:
 nav:
   - Home: index.md
   - Architecture: architecture.md
+  - Wiki (Deep Dive):
+      - Glossary & Index: wiki/glossary.md
+      - Core Concepts:
+          - Agents: wiki/concepts/agents.md
+          - Tools: wiki/concepts/tools.md
+          - Orchestration: wiki/concepts/orchestration.md
+      - Patterns:
+          - Topologies: wiki/patterns/topologies.md
+      - Standards:
+          - Streaming Sovereignty: wiki/standards/streaming.md
   - API Reference:
       - Overview: api/index.md
       - Agents: api/agents.md

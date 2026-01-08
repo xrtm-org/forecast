@@ -57,5 +57,6 @@ async def run_data_analysis():
     # Cleanup
     os.remove(db_path)
 
+
 if __name__ == "__main__":
     asyncio.run(run_data_analysis())

@@ -88,6 +88,7 @@ async def run_complex_test(provider_name: str, config):
         print(f"❌ [{provider_name}] Tool call failed: {e}")
 
 
+@pytest.mark.live
 @pytest.mark.asyncio
 async def test_orchestrator_live():
     r"""
@@ -105,6 +106,7 @@ async def test_orchestrator_live():
     provider = ModelFactory.get_provider(config)
 
     from forecast.graph.config import GraphConfig
+
     graph_config = GraphConfig(max_cycles=3)
     orchestrator = Orchestrator(config=graph_config)
 

@@ -25,4 +25,5 @@ class ToolConfig(BaseModel):
     tavily_api_key: Optional[SecretStr] = Field(default=None, description="API key for web search capabilities.")
     user_agent: str = Field(default="xrtm-forecast/0.1.2", description="User agent string for HTTP requests.")
 
+
 __all__ = ["ToolConfig"]
