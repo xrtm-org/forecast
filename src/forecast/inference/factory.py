@@ -16,6 +16,8 @@
 import logging
 from typing import Optional
 
+from pydantic import SecretStr
+
 from forecast.inference.base import InferenceProvider
 from forecast.inference.config import GeminiConfig, OpenAIConfig, ProviderConfig
 
@@ -31,50 +33,48 @@ class ModelFactory:
     """
 
     @staticmethod
-    def get_provider(config: Optional[ProviderConfig] = None, tier: str = "SMART") -> InferenceProvider:
-        r"""
-        Creates and returns a provider instance based on the provided configuration.
-
-        If no configuration is provided, it falls back to the global `forecast.config.settings`.
+    def get_provider(
+        config: Optional[ProviderConfig] = None,
+        provider_type: Optional[str] = None,
+        model_id: Optional[str] = None,
+        api_key: Optional[SecretStr] = None,
+        **kwargs,
+    ) -> InferenceProvider:
+        """
+        Creates and returns a provider instance.
 
         Args:
             config (`ProviderConfig`, *optional*):
-                The configuration object. If `None`, defaults are loaded from environment.
-            tier (`str`, *optional*, defaults to `"SMART"`):
-                The performance tier for the model.
+                The configuration object.
+            provider_type (`str`, *optional*):
+                Explicitly request "GEMINI" or "OPENAI" if config is not provided.
+            model_id (`str`, *optional*):
+                The model identifier (e.g. "gpt-4o").
+            api_key (`SecretStr`, *optional*):
+                The API key for the provider.
+            **kwargs:
+                Additional arguments for the provider.
 
         Returns:
-            `InferenceProvider`: An instantiated and configured provider.
-
-        Raises:
-            `ValueError`: If the provided config type is not supported or no API keys are found.
+            `InferenceProvider`: An instantiated provider.
         """
-        from forecast.config import settings
         from forecast.exceptions import ConfigurationError
 
         if config is None:
-            provider_type = settings.primary_provider
-            if provider_type == "GEMINI":
-                if not settings.gemini_api_key:
-                    raise ConfigurationError("GEMINI_API_KEY not found in environment or settings.")
-                config = GeminiConfig(
-                    api_key=settings.gemini_api_key,
-                    smart_model_id=settings.gemini_smart_model,
-                    flash_model_id=settings.gemini_flash_model,
+            if not provider_type or not model_id or not api_key:
+                raise ConfigurationError(
+                    "Explicitly provide either a `config` object or `provider_type`, `model_id`, and `api_key`."
                 )
-            elif provider_type == "OPENAI":
-                if not settings.openai_api_key:
-                    raise ConfigurationError("OPENAI_API_KEY not found in environment or settings.")
-                config = OpenAIConfig(
-                    api_key=settings.openai_api_key,
-                    model_id=settings.openai_model,
-                    base_url=settings.openai_base_url,
-                )
+
+            if provider_type.upper() == "GEMINI":
+                config = GeminiConfig(model_id=model_id, api_key=api_key, **kwargs)
+            elif provider_type.upper() == "OPENAI":
+                config = OpenAIConfig(model_id=model_id, api_key=api_key, **kwargs)
 
         if isinstance(config, GeminiConfig):
             from forecast.inference.gemini_provider import GeminiProvider
 
-            return GeminiProvider(config=config, tier=tier)
+            return GeminiProvider(config=config)
 
         elif isinstance(config, OpenAIConfig):
             from forecast.inference.openai_provider import OpenAIProvider
@@ -82,7 +82,7 @@ class ModelFactory:
             return OpenAIProvider(config=config)
 
         else:
-            raise ConfigurationError(f"Unsupported configuration type or no config provided: {type(config)}")
+            raise ConfigurationError(f"Unsupported configuration type: {type(config)}")
 
 
 __all__ = ["ModelFactory"]

@@ -45,7 +45,7 @@ class OpenAIProvider(InferenceProvider):
             config: Explicit OpenAI configuration.
         """
         self.config = config
-        self.model_id = config.model_id or "gpt-4o"
+        self.model_id = config.model_id
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
 

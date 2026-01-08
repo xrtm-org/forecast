@@ -57,8 +57,8 @@ class GeminiProvider(InferenceProvider):
         """
         self.config = config
 
-        # Determine initial model ID, handling None case explicitly for type safety
-        initial_model_id = config.model_id or "gemini-2.0-flash"
+        # Determine initial model ID
+        initial_model_id = config.model_id
 
         # Strip prefixes if any
         if "/" in initial_model_id:

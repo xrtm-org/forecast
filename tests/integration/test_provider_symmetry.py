@@ -62,6 +62,6 @@ def test_config_singleton_integrity():
     from forecast.config import settings
 
     assert settings is not None
-    # Verify default values are preserved
-    assert settings.gemini_smart_model == "gemini-2.0-flash"
-    assert settings.openai_model == "gpt-4o"
+    # Verify defaults are minimal/gone
+    assert not hasattr(settings, "gemini_smart_model")
+    assert not hasattr(settings, "openai_model")

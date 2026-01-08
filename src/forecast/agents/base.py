@@ -47,38 +47,30 @@ class Agent(abc.ABC):
         self._skills_lock = threading.Lock()
 
     @classmethod
-    def from_config(cls, model_tier: str = "SMART", name: Optional[str] = None, **kwargs) -> "Agent":
+    def from_config(cls, model: Optional[Any] = None, name: Optional[str] = None, **kwargs) -> "Agent":
         r"""
-        Factory method to create an agent instance using global configuration.
+        Factory method to create an agent instance.
 
-        This method automatically retrieves the primary inference provider from
-        `forecast.config.settings` and injects it if the class requires a `model`.
+        In the core abstract class, this simply passes arguments through to the
+        constructor. Subclasses or examples may override this to provide
+        magical initialization if desired, but the core remains abstract.
 
         Args:
-            model_tier (`str`, *optional*, defaults to `"SMART"`):
-                The performance tier for the model (e.g., "SMART" or "FAST").
+            model (`Any`, *optional*):
+                The model instance to inject.
             name (`str`, *optional*):
-                Override for the agent's logical name.
+                The agent's logical name.
             **kwargs:
-                Additional arguments passed to the agent's constructor.
+                Additional arguments passed to the constructor.
 
         Returns:
             `Agent`: A fully initialized agent instance.
-
-        Example:
-            ```python
-            >>> from forecast.agents.specialists.analyst import ForecastingAnalyst
-            >>> agent = ForecastingAnalyst.from_config()
-            ```
         """
         import inspect
 
-        from forecast.inference.factory import ModelFactory
-
-        # Check if the class constructor expects a 'model'
+        # Basic injection loop: if constructor takes 'model' and we have one, pass it.
         sig = inspect.signature(cls.__init__)
-        if "model" in sig.parameters:
-            model = ModelFactory.get_provider(tier=model_tier)
+        if "model" in sig.parameters and model:
             return cls(model=model, name=name, **kwargs)  # type: ignore[call-arg]
 
         return cls(name=name, **kwargs)

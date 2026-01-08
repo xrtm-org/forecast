@@ -21,8 +21,8 @@ from pydantic import BaseModel, Field, SecretStr
 class ProviderConfig(BaseModel):
     """Base configuration for any inference provider."""
 
-    model_id: Optional[str] = None
-    api_key: Optional[SecretStr] = None
+    model_id: str = Field(..., description="The unique identifier for the model (e.g. 'gpt-4o')")
+    api_key: SecretStr = Field(..., description="API key for the provider")
     rpm: int = 15
     timeout: int = 30
     extra: Dict[str, Any] = Field(default_factory=dict)
@@ -31,10 +31,7 @@ class ProviderConfig(BaseModel):
 class GeminiConfig(ProviderConfig):
     """Specific configuration for Google Gemini."""
 
-    use_cheap_models: bool = True
-    flash_model_id: str = "gemini-2.0-flash-lite"
-    smart_model_id: str = "gemini-2.0-flash"
-    redis_url: Optional[str] = "redis://localhost:6379"
+    redis_url: Optional[str] = None
 
 
 class OpenAIConfig(ProviderConfig):

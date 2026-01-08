@@ -37,30 +37,46 @@ pip install git+https://github.com/xrtm-org/forecast.git
 
 ## Configuration
 
-`xrtm-forecast` relies on environment variables for API keys and service connections. Create a `.env` file in your project root:
+`xrtm-forecast` implements an institutional-grade configuration system that automatically selects the appropriate inference provider based on your environment. Pro-actively set your API keys in a `.env` file:
 
 ```bash
+# Provider Keys
 GEMINI_API_KEY=your_key_here
-REDIS_URL=redis://localhost:6379/0  # Optional (fallback to in-memory)
+OPENAI_API_KEY=your_key_here
+
+# Optional: Explicitly force a provider (defaults to GEMINI if keys are present)
+# PRIMARY_PROVIDER=OPENAI 
 ```
 
 ## Quick Start
 
-`xrtm-forecast` automates configuration via environment variables. Simply set your `GEMINI_API_KEY` and run:
+`xrtm-forecast` is an abstract engine. To run a forecast, you provide your own configuration and model choice.
 
 ```python
 import asyncio
+from pydantic import SecretStr
 from forecast.agents.specialists import ForecastingAnalyst
+from forecast.inference.factory import ModelFactory
+from forecast.inference.config import GeminiConfig
 
 async def main():
-    # Zero-boilerplate initialization
-    agent = ForecastingAnalyst.from_config()
-    
-    # Execute complex reasoning
-    response = await agent.run(
-        query="What is the impact of current inflation on consumer spending?"
+    # 1. Define your own configuration (No hardcoded defaults in core)
+    config = GeminiConfig(
+        model_id="gemini-2.0-flash", 
+        api_key=SecretStr("your_api_key_here")
     )
-    print(response)
+    
+    # 2. Instantiate the provider and agent
+    model = ModelFactory.get_provider(config)
+    agent = ForecastingAnalyst(model=model)
+    
+    # 3. Execute reasoning on a complex probabilistic question
+    result = await agent.run(
+        "Will a general-purpose AI (AGI) be publicly announced before 2030?"
+    )
+    
+    print(f"Confidence: {result.confidence * 100}%")
+    print(f"Reasoning: {result.reasoning}")
 
 if __name__ == "__main__":
     asyncio.run(main())

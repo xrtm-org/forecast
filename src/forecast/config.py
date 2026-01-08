@@ -37,34 +37,14 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Gemini Settings
-    # Supports GEMINI_API_KEY or FORECAST_GEMINI_API_KEY
+    # API Keys are loaded from environment for convenience, but NOT used for global defaults.
     gemini_api_key: Optional[SecretStr] = Field(default=None, validation_alias="GEMINI_API_KEY")
-    gemini_smart_model: str = "gemini-2.0-flash"
-    gemini_flash_model: str = "gemini-2.0-flash-lite"
-
-    # OpenAI Settings
-    # Supports OPENAI_API_KEY or FORECAST_OPENAI_API_KEY
     openai_api_key: Optional[SecretStr] = Field(default=None, validation_alias="OPENAI_API_KEY")
-    openai_model: str = "gpt-4o"
-    openai_base_url: str = "https://api.openai.com/v1"
-
-    # Search Tool Settings
-    # Supports TAVILY_API_KEY or FORECAST_TAVILY_API_KEY
     tavily_api_key: Optional[SecretStr] = Field(default=None, validation_alias="TAVILY_API_KEY")
 
-    # Global Performance Settings
+    # Global connection defaults
     default_rpm: int = 15
     default_timeout: int = 30
-
-    @property
-    def primary_provider(self) -> str:
-        r"""Determines the primary provider based on available keys."""
-        if self.gemini_api_key:
-            return "GEMINI"
-        if self.openai_api_key:
-            return "OPENAI"
-        return "GEMINI"  # Default
 
 
 # Singleton instance for library-wide usage

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import logging
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, Field
 
@@ -47,11 +47,18 @@ class ForecastingAnalyst(LLMAgent):
     for specific forecasting niches.
     """
 
-    async def run(self, input_data: ForecastQuestion, **kwargs) -> ForecastOutput:
+    async def run(self, input_data: Union[str, ForecastQuestion], **kwargs) -> ForecastOutput:
         """
-        Processes a ForecastQuestion and returns a ForecastOutput.
+        Processes a ForecastQuestion (or a raw string) and returns a ForecastOutput.
         Demonstrates how to use skills if they are present.
         """
+        if isinstance(input_data, str):
+            input_data = ForecastQuestion(
+                id="quick-query",
+                title=input_data,
+                content="Auto-generated from string input.",
+            )
+
         context = input_data.content or "No additional context provided."
 
         # Dynamic Skill Usage: If the agent has a 'web_search' skill, use it to gather more info.
