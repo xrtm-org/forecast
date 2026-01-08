@@ -16,8 +16,10 @@
 from forecast.inference.factory import ModelFactory
 
 
-def test_model_factory_env_profiles():
+def test_model_factory_env_profiles(monkeypatch):
     r"""Verifies that Environment Profiles correctly influence model selection."""
+    monkeypatch.setenv("OPENAI_API_KEY", "mock-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "mock-key")
 
     # 1. Dev Profile (OpenAI)
     p_dev_oa = ModelFactory.get_provider("openai", env="dev")
