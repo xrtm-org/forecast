@@ -15,5 +15,6 @@
 
 from forecast.graph.config import GraphConfig
 from forecast.graph.orchestrator import Orchestrator
+from forecast.schemas.graph import BaseGraphState
 
-__all__ = ["Orchestrator", "GraphConfig"]
+__all__ = ["Orchestrator", "GraphConfig", "BaseGraphState"]

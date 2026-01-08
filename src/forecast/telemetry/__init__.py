@@ -15,6 +15,16 @@
 
 from forecast.telemetry.audit import auditor
 from forecast.telemetry.config import TelemetryConfig
-from forecast.telemetry.manager import telemetry_manager
+from forecast.telemetry.manager import telemetry_manager, trace_context
+from forecast.telemetry.schemas import SpanKind, TelemetryEvent, TelemetrySpan, Trace
 
-__all__ = ["telemetry_manager", "TelemetryConfig", "auditor"]
+__all__ = [
+    "telemetry_manager",
+    "TelemetryConfig",
+    "auditor",
+    "trace_context",
+    "SpanKind",
+    "TelemetryEvent",
+    "TelemetrySpan",
+    "Trace",
+]
