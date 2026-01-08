@@ -22,8 +22,8 @@ class InferenceProvider(ABC):
     Abstract Base Class for Large Language Model (LLM) providers.
 
     `InferenceProvider` standardizes the interface for interacting with various
-    LLM SDKs (e.g., Gemini, OpenAI, Anthropic). This allows the rest of the
-    platform to remain agnostic to the specific backend being used.
+    LLM SDKs (e.g., Gemini, OpenAI, Anthropic, Hugging Face). This allows the rest
+    of the platform to remain agnostic to the specific backend being used.
     """
 
     @abstractmethod
@@ -40,9 +40,22 @@ class InferenceProvider(ABC):
                 Additional provider-specific parameters (e.g., temperature, max_tokens).
 
         Returns:
-            `Any`: A `ModelResponse` instance containing the generated text and metadata.
+            `ModelResponse`: A unified response object containing text and metadata.
         """
         pass
+
+    async def run(self, prompt: str, **kwargs) -> "ModelResponse":
+        r"""
+        High-level ergonomic alias for `generate_content_async`.
+
+        Args:
+            prompt (`str`): The input prompt.
+            **kwargs: Additional generation parameters.
+
+        Returns:
+            `ModelResponse`: The model's response.
+        """
+        return await self.generate_content_async(prompt, **kwargs)
 
     @property
     def supports_tools(self) -> bool:
@@ -57,7 +70,7 @@ class InferenceProvider(ABC):
     @abstractmethod
     def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs) -> Any:
         r"""
-        Synchronously generates content from the LLM.
+        Synchronously generates content from the LLM (for non-async environments).
         """
         pass
 

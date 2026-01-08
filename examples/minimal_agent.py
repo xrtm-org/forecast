@@ -27,7 +27,7 @@ async def main():
     # We can pass a raw string or a structured ForecastQuestion
     result = await agent.run("Will the S&P 500 close above 5,000 by end of 2026?")
 
-    print(f"\nConfidence: {result.confidence * 100:.1f}%")
+    print(f"\nConfidence: {result.confidence}")
     print(f"Reasoning: {result.reasoning[:300]}...")
 
 

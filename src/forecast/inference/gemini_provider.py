@@ -35,27 +35,24 @@ class GeminiProvider(InferenceProvider):
     Native implementation for Google Gemini models.
 
     `GeminiProvider` leverages the `google-genai` SDK to provide high-performance
-    access to Gemini's reasoning and tool-calling capabilities. It includes
-    built-in support for tiered model selection, token-bucket rate limiting,
-    and automatic PII masking.
+    access to Gemini's reasoning and tool-calling capabilities.
 
     Args:
         config (`GeminiConfig`):
             Explicit configuration object containing the API key and model IDs.
-        tier (`str`, *optional*, defaults to `"SMART"`):
-            Performance tier selection. Available options are `"SMART"` (highest precision)
-            and `"FAST"` (lowest latency).
     """
 
-    model_id: str
+    def __init__(self, config: GeminiConfig, **kwargs: Any):
+        r"""
+        Initializes the Gemini provider.
 
-    def __init__(self, config: GeminiConfig, tier: str = "SMART"):
-        """
         Args:
-            config: Explicit Gemini configuration.
-            tier: Performance tier (SMART or FAST).
+            config (`GeminiConfig`): Explicit Gemini configuration.
+            **kwargs: Additional provider-specific options.
         """
         self.config = config
+        # tier logic moved to internal or config if needed
+        self.tier = kwargs.get("tier", "SMART")
 
         # Determine initial model ID
         initial_model_id = config.model_id
@@ -93,6 +90,24 @@ class GeminiProvider(InferenceProvider):
         tools: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> ModelResponse:
+        r"""
+        Asynchronously generates content from Gemini.
+
+        Args:
+            prompt (`Any`):
+                The input prompt or list of messages.
+            output_logprobs (`bool`, *optional*, defaults to `False`):
+                Whether to return log probabilities.
+            mask (`bool`, *optional*, defaults to `False`):
+                Whether to apply PII masking to the prompt.
+            tools (`List[Any]`, *optional*):
+                Optional list of tools for function calling.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `ModelResponse`: The standardized model response.
+        """
         import random
 
         if not self.supports_tools and tools:
@@ -298,6 +313,24 @@ class GeminiProvider(InferenceProvider):
         tools: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> ModelResponse:
+        r"""
+        Synchronously generates content from Gemini.
+
+        Args:
+            prompt (`Any`):
+                The input prompt or list of messages.
+            output_logprobs (`bool`, *optional*, defaults to `False`):
+                Whether to return log probabilities.
+            mask (`bool`, *optional*, defaults to `False`):
+                Whether to apply PII masking to the prompt.
+            tools (`List[Any]`, *optional*):
+                Optional list of tools for function calling.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `ModelResponse`: The standardized model response.
+        """
         import random
 
         if not self.supports_tools and tools:
@@ -531,8 +564,20 @@ class GeminiProvider(InferenceProvider):
         yield {"contentBlockStop": {"contentBlockIndex": 0}}
         yield {"messageStop": {"stopReason": "end_turn"}}
 
-    def stream(self, *args, **kwargs) -> AsyncIterable[Any]:
-        return self._stream_generator(*args, **kwargs)
+    def stream(self, messages: Any, **kwargs: Any) -> AsyncIterable[Any]:
+        r"""
+        Opens a streaming connection to Gemini.
+
+        Args:
+            messages (`Any`):
+                Conversation history or prompt.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `AsyncIterable[Any]`: An async generator of response chunks.
+        """
+        return self._stream_generator(messages, **kwargs)
 
 
 __all__ = ["GeminiProvider"]

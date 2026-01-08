@@ -29,25 +29,24 @@ class OpenAIProvider(InferenceProvider):
     Adapter for OpenAI and OpenAI-compatible APIs (e.g., Anthropic via proxy).
 
     This provider implements the `InferenceProvider` interface for the OpenAI
-    Chat Completions API, supporting system instructions, tool calling, and
-    logprob extraction.
+    Chat Completions API.
 
     Args:
         config (`OpenAIConfig`):
             Configuration object containing the API key, model ID, and optional base URL.
     """
 
-    model_id: str
+    def __init__(self, config: OpenAIConfig, **kwargs: Any):
+        r"""
+        Initializes the OpenAI provider.
 
-    def __init__(self, config: OpenAIConfig):
-        """
         Args:
-            config: Explicit OpenAI configuration.
+            config (`OpenAIConfig`): Explicit OpenAI configuration.
+            **kwargs: Additional provider-specific options.
         """
         self.config = config
         self.model_id = config.model_id
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
-
         self.base_url = config.base_url
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
@@ -64,10 +63,25 @@ class OpenAIProvider(InferenceProvider):
         output_logprobs: bool = False,
         tools: Optional[List[Any]] = None,
         max_tool_turns: int = 5,
-        **kwargs,
+        **kwargs: Any,
     ) -> ModelResponse:
-        """
-        Standardized async generation with multi-turn tool support.
+        r"""
+        Asynchronously generates content from OpenAI.
+
+        Args:
+            prompt (`Any`):
+                The input prompt or list of messages.
+            output_logprobs (`bool`, *optional*, defaults to `False`):
+                Whether to return log probabilities.
+            tools (`List[Any]`, *optional*):
+                Optional list of tools for function calling.
+            max_tool_turns (`int`, *optional*, defaults to `5`):
+                Maximum number of tool-execution turns to prevent infinite loops.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `ModelResponse`: The standardized model response.
         """
         # Cast to Any to satisfy strict mypy checks on the Union definition
         messages = cast(Any, self._normalize_messages(prompt or kwargs.get("messages")))
@@ -180,9 +194,24 @@ class OpenAIProvider(InferenceProvider):
         return results
 
     def generate_content(
-        self, prompt: Any, output_logprobs: bool = False, tools: Optional[List[Any]] = None, **kwargs
+        self, prompt: Any, output_logprobs: bool = False, tools: Optional[List[Any]] = None, **kwargs: Any
     ) -> ModelResponse:
-        """Standardized sync generation."""
+        r"""
+        Synchronously generates content from OpenAI.
+
+        Args:
+            prompt (`Any`):
+                The input prompt or list of messages.
+            output_logprobs (`bool`, *optional*, defaults to `False`):
+                Whether to return log probabilities.
+            tools (`List[Any]`, *optional*):
+                Optional list of tools for function calling.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `ModelResponse`: The standardized model response.
+        """
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
 
         response = self.sync_client.chat.completions.create(
@@ -219,8 +248,19 @@ class OpenAIProvider(InferenceProvider):
 
         yield {"messageStop": {"stopReason": "end_turn"}}
 
-    def stream(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
-        """Streaming implementation wrapper."""
+    def stream(self, messages: Any, **kwargs: Any) -> AsyncIterable[Any]:
+        r"""
+        Opens a streaming connection to OpenAI.
+
+        Args:
+            messages (`Any`):
+                Conversation history or prompt.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `AsyncIterable[Any]`: An async generator of response chunks.
+        """
         return self._stream_generator(messages, **kwargs)
 
 

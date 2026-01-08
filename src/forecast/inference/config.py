@@ -41,3 +41,26 @@ class OpenAIConfig(ProviderConfig):
     """Specific configuration for OpenAI or compatible backends."""
 
     base_url: str = "https://api.openai.com/v1"
+
+
+class HFConfig(ProviderConfig):
+    """Configuration for local Hugging Face models."""
+
+    device: str = "cpu"  # cpu, cuda, mps
+    quantization: Optional[str] = None  # 4bit, 8bit
+    trust_remote_code: bool = False
+    cache_dir: Optional[str] = None
+
+
+class VLLMConfig(ProviderConfig):
+    """Configuration for vLLM high-throughput local serving."""
+
+    tensor_parallel_size: int = 1
+    gpu_memory_utilization: float = 0.9
+    max_model_len: Optional[int] = None
+
+
+class XLMConfig(HFConfig):
+    """Specific configuration for XLM (Local Encoder) specialists."""
+
+    use_fast_tokenizer: bool = True

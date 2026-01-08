@@ -4,18 +4,19 @@ Institutional-grade parallelized agentic reasoning engine.
 
 ## Overview
 `xrtm-forecast` is an institutional-grade, domain-agnostic intelligence engine. It provides a framework for:
-- **Inference Layer**: Standardized provider interfaces for Gemini and OpenAI.
+- **Inference Layer**: Standardized provider interfaces for Gemini, OpenAI, and **local Hugging Face models**.
+- **Tiered Reasoning**: Composite `RoutingAgent` for cost-optimized task dispatching.
 - **Reasoning Graph**: A pluggable state-machine orchestrator for multi-agent workflows.
 - **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
-- **Skill Protocol**: Composable behaviors (e.g., Search) that agents can dynamically equip.
+- **Skill Protocol**: Composable behaviors (e.g., Search, **SQL**, **Pandas**) that agents can dynamically equip.
 - **Observability**: OTel-native structured telemetry and institutional execution reports.
 - **Evaluation**: Built-in harness for backtesting and accuracy metrics (Brier Score).
 
-## Architectural Design: "Engine vs. Specialists"
+## Architectural Design: "Pure Core, Practical Shell"
 
-`xrtm-forecast` is designed for modularity using a "Lego" philosophy:
-- **The Engine (`agents/`)**: Core structural bricks like `LLMAgent` and `ToolAgent`.
-- **The Specialists (`agents/specialists/`)**: Pre-built expert roles like the `ForecastingAnalyst`.
+`xrtm-forecast` is designed for modularity using the "Pure Core, Practical Shell" philosophy:
+- **The Core (`agents/`, `inference/`)**: Strict abstract logic and standardized interfaces.
+- **The Shell (`assistants/`, `tools/`)**: Pre-built expert roles, ergonomic factories, and specialized skills.
 - **The Registry**: A central exchange for discovering and plugging in agents and tools.
 
 For a deep dive, see [Architecture & Design Principles](docs/architecture.md).
@@ -26,8 +27,8 @@ For a deep dive, see [Architecture & Design Principles](docs/architecture.md).
 ```bash
 pip install xrtm-forecast
 
-# With extras (redis, memory)
-pip install "xrtm-forecast[redis,memory]"
+# With institutional extras
+pip install "xrtm-forecast[local,data,redis,memory]"
 ```
 
 ### From Source (Latest)
@@ -72,7 +73,7 @@ async def main():
         "Will a general-purpose AI (AGI) be publicly announced before 2030?"
     )
     
-    print(f"Confidence: {result.confidence * 100}%")
+    print(f"Confidence: {result.confidence}")
     print(f"Reasoning: {result.reasoning}")
 
 if __name__ == "__main__":
@@ -85,8 +86,10 @@ if __name__ == "__main__":
 - **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
 - **Examples**: Check the [examples/](examples/) directory:
     - [examples/minimal_agent.py](examples/minimal_agent.py): One-line agent setup.
+    - [examples/core/local_analyst.py](examples/core/local_analyst.py): Private reasoning with HF models.
+    - [examples/features/tiered_reasoning.py](examples/features/tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
+    - [examples/features/enterprise_data.py](examples/features/enterprise_data.py): Integrated SQL and Pandas analytics.
     - [examples/features/discovery.py](examples/features/discovery.py): Dynamic skill discovery.
-    - `pipelines/`: End-to-end multi-agent workflows.
 
 ## Contributing
 

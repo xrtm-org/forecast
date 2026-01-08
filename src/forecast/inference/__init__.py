@@ -14,8 +14,9 @@
 # limitations under the License.
 
 from forecast.inference.base import InferenceProvider, ModelResponse
-from forecast.inference.config import GeminiConfig, OpenAIConfig, ProviderConfig
+from forecast.inference.config import GeminiConfig, HFConfig, OpenAIConfig, ProviderConfig, VLLMConfig, XLMConfig
 from forecast.inference.factory import ModelFactory
+from forecast.inference.hf_provider import HuggingFaceProvider
 
 __all__ = [
     "InferenceProvider",
@@ -23,5 +24,9 @@ __all__ = [
     "ProviderConfig",
     "GeminiConfig",
     "OpenAIConfig",
+    "HFConfig",
+    "VLLMConfig",
+    "XLMConfig",
     "ModelFactory",
+    "HuggingFaceProvider",
 ]

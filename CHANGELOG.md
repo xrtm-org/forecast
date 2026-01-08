@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - Unreleased
+
+### Added
+- **Local Model Sovereignty**: Introduced `HuggingFaceProvider` for local, air-gapped reasoning via state-of-the-art weights (LLama-3, Mistral, etc.).
+- **Tiered Reasoning (RoutingAgent)**: Added a composite `RoutingAgent` that dispatches tasks between high-cost smart models and low-cost fast/local models.
+- **Institutional Data Skills**: Added `SQLSkill` (SQLite/Postgres) and `PandasSkill` for high-throughput structured data analysis.
+- **Provider Conformance Suite**: Implemented a mandatory symmetry test suite to ensure all future providers meet the "Institutional Grade" interface.
+- **Environment Profiles**: `ModelFactory` now supports `env="production"` and `env="dev"` profiles for automatic model orchestration based on deployment context.
+
+### Changed
+- **Standardized Inference Interface**: Refactored the `InferenceProvider` ABC with a clean, polymorphic `run()` method and improved HF-style docstrings.
+- **Dependency Isolation**: Gated local model and data analysis libraries behind optional extras (`[local]`, `[data]`) to keep the core engine lightweight.
+
 ## [0.1.2] - 2026-01-08
 
 ### Added

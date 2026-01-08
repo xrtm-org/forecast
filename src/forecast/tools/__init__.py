@@ -15,6 +15,7 @@
 
 from forecast.tools.base import Tool
 from forecast.tools.config import ToolConfig
+from forecast.tools.data import PandasSkill, SQLSkill
 from forecast.tools.registry import tool_registry
 
-__all__ = ["tool_registry", "ToolConfig", "Tool"]
+__all__ = ["tool_registry", "ToolConfig", "Tool", "SQLSkill", "PandasSkill"]

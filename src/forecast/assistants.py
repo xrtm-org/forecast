@@ -58,4 +58,34 @@ def create_forecasting_analyst(
     return ForecastingAnalyst(model=model, name=name, **kwargs)
 
 
-__all__ = ["create_forecasting_analyst"]
+def create_local_analyst(
+    model_path: str = "sshleifer/tiny-gpt2",
+    name: Optional[str] = None,
+    **kwargs
+) -> ForecastingAnalyst:
+    r"""
+    Creates a Forecasting Analyst backed by a local Hugging Face model.
+
+    This is the primary entry point for 'Air-gapped' or 'Sovereign' reasoning
+    pipelines where data privacy is requirements.
+
+    Args:
+        model_path (`str`, *optional*, defaults to `"sshleifer/tiny-gpt2"`):
+            The local path or Hugging Face repo ID.
+        name (`str`, *optional*):
+            The logical name of the analyst.
+        **kwargs:
+            Additional arguments passed to the specialist (e.g., quantization="4bit").
+
+    Returns:
+        `ForecastingAnalyst`: A private specialist agent.
+    """
+    logger.info(f"Creating local ForecastingAnalyst from: {model_path}")
+
+    # Use 'hf:' prefix to force local resolution in ModelFactory
+    model = ModelFactory.get_provider(f"hf:{model_path}", **kwargs)
+
+    return ForecastingAnalyst(model=model, name=name, **kwargs)
+
+
+__all__ = ["create_forecasting_analyst", "create_local_analyst"]
