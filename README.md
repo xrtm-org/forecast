@@ -37,16 +37,22 @@ pip install git+https://github.com/xrtm-org/forecast.git
 
 ## Configuration
 
-`xrtm-forecast` implements an institutional-grade configuration system that automatically selects the appropriate inference provider based on your environment. Pro-actively set your API keys in a `.env` file:
+`xrtm-forecast` follows a decentralized configuration pattern. Global environment variables are used for infrastructure (API keys), while specific behaviors are controlled via module-level configuration classes.
+
+### 1. Environment Secrets
+
+Set your API keys in a `.env` file or environment:
 
 ```bash
-# Provider Keys
+# Core API Keys
 GEMINI_API_KEY=your_key_here
 OPENAI_API_KEY=your_key_here
-
-# Optional: Explicitly force a provider (defaults to GEMINI if keys are present)
-# PRIMARY_PROVIDER=OPENAI 
+TAVILY_API_KEY=your_key_here
 ```
+
+### 2. Component Configuration
+
+Each major module (`inference`, `graph`, `telemetry`, `tools`) has its own `config.py` defining its schema. This allows you to instantiate multiple components with different settings in the same process.
 
 ## Quick Start
 
@@ -59,7 +65,7 @@ from forecast.inference.factory import ModelFactory
 from forecast.inference.config import GeminiConfig
 
 async def main():
-    # 1. Provide your model configuration
+    # 1. Define model configuration (API keys are injected from .env)
     config = GeminiConfig(model_id="gemini-2.0-flash")
     
     # 2. Instantiate the provider and agent

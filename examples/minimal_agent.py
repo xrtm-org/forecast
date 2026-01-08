@@ -4,9 +4,6 @@ Showcasing explicit configuration and user-defined model defaults.
 """
 
 import asyncio
-import os
-
-from pydantic import SecretStr
 
 from forecast.agents.specialists.analyst import ForecastingAnalyst
 from forecast.inference.config import GeminiConfig
@@ -17,19 +14,11 @@ from forecast.inference.factory import ModelFactory
 DEFAULT_MODEL = "gemini-2.0-flash"
 
 async def main():
-    # 1. Load API key from environment
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("Please set GEMINI_API_KEY environment variable.")
-        return
+    # 1. Explicitly configure the model
+    # Note: API keys are automatically injected from environment if not provided here.
+    config = GeminiConfig(model_id=DEFAULT_MODEL)
 
-    # 2. Explicitly configure the model
-    config = GeminiConfig(
-        model_id=DEFAULT_MODEL,
-        api_key=SecretStr(api_key)
-    )
-
-    # 3. Create the agent with the explicit model
+    # 2. Create the agent with the explicit model
     model = ModelFactory.get_provider(config)
     agent = ForecastingAnalyst(model=model)
 
