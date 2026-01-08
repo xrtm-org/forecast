@@ -3,7 +3,7 @@
 Institutional-grade parallelized agentic reasoning engine.
 
 ## Overview
-`xrtm-forecast` is the core intelligence engine originally developed for the CAFE (Computer-Aided Financial Engineering) platform. It provides a domain-agnostic framework for:
+`xrtm-forecast` is an institutional-grade, domain-agnostic intelligence engine. It provides a framework for:
 - **Inference Layer**: Standardized provider interfaces for Gemini and OpenAI.
 - **Reasoning Graph**: A pluggable state-machine orchestrator for multi-agent workflows.
 - **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
@@ -65,7 +65,7 @@ from forecast.inference.factory import ModelFactory
 from forecast.inference.config import GeminiConfig
 
 async def main():
-    # 1. Define model configuration (API keys are injected from .env)
+    # 1. Define model configuration
     config = GeminiConfig(model_id="gemini-2.0-flash")
     
     # 2. Instantiate the provider and agent

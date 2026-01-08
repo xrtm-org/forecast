@@ -62,10 +62,10 @@ class MockAgent(LLMAgent):
 @pytest.mark.asyncio
 async def test_library_standalone_orchestration():
     r"""
-    Ensures xrtm-forecast core can run a reasoning chain without CAFE dependencies.
+    Ensures xrtm-forecast core can run a reasoning chain standalone.
     """
     """
-    Ensures xrtm-forecast core can run a reasoning chain without CAFE dependencies.
+    Ensures xrtm-forecast core can run a reasoning chain standalone.
     """
     mock_provider = MockProvider()
     _ = MockAgent(model=mock_provider)
