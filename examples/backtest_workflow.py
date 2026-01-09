@@ -4,7 +4,8 @@ from datetime import datetime
 
 from forecast.graph.orchestrator import Orchestrator
 from forecast.graph.stages.guardian import LeakageGuardian
-from forecast.inference.openai_provider import OpenAIProvider, ProviderConfig
+from forecast.inference.openai_provider import OpenAIProvider
+from forecast.inference.config import OpenAIConfig
 from forecast.schemas.graph import BaseGraphState, TemporalContext
 from forecast.tools.search import TavilySearchTool
 
@@ -25,7 +26,7 @@ async def forecasting_node(state, report):
 
 async def main():
     # 1. Setup Inference for Guardian
-    config = ProviderConfig(api_key=os.getenv("OPENAI_API_KEY", "fake"))
+    config = OpenAIConfig(api_key=os.getenv("OPENAI_API_KEY", "fake"))
     provider = OpenAIProvider(config)
     guardian = LeakageGuardian(provider=provider)
 
