@@ -7,12 +7,12 @@ This glossary defines the "Institutional Language" used throughout the `xrtm-for
 ### **Agent**
 An autonomous software entity capable of perceiving context, reasoning via an LLM, and executing actions.
 *   *See*: [Concepts > Agents](concepts/agents.md)
-*   *Code*: `forecast.agents.Agent`
+*   *Code*: `forecast.kit.agents.Agent`
 
 ### **Tool**
 A granular, low-level Python function that performs a single action.
 *   *Analogy*: A hammer.
-*   *Code*: Any `@tool` decorated function.
+*   *Code*: Any function wrapped by `FunctionTool`.
 
 ### **Skill**
 A high-level **Capability** that often bundles several tools and specific logic for a domain.
@@ -43,7 +43,7 @@ The **Orchestrator** is in charge. The logic runs automatically as a mandatory s
 ### **Orchestrator**
 The state-machine engine that manages the workflow.
 *   *See*: [Concepts > Orchestration](concepts/orchestration.md)
-*   *Code*: `forecast.graph.orchestrator.Orchestrator`
+*   *Code*: `forecast.core.orchestrator.Orchestrator`
 
 ### **GraphState**
 The shared memory object passed between **Stages** during execution.
@@ -60,7 +60,7 @@ A set of **Stages** that execute at the same time (concurrently).
 ### **Topology**
 A pre-defined, reusable pattern of **Stages** and Edges.
 *   *See*: [Patterns > Topologies](patterns/topologies.md)
-*   *Code*: `forecast.graph.topologies`
+*   *Code*: `forecast.kit.patterns`
 
 ---
 

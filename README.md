@@ -13,23 +13,28 @@ Institutional-grade parallelized agentic reasoning engine.
 - **Evaluation**: Built-in **Backtest Engine** for large-scale accuracy metrics (Brier Score, ECE).
 - **Temporal Sandboxing**: Multi-layered protection (PiT Tools, Clock Mocking, Leakage Guardian) to prevent look-ahead bias in historical backtests.
 
-## Architectural Design: "Pure Core, Practical Shell"
+## Architectural Design: "Pure Core / The Kit"
 
-`xrtm-forecast` is designed for modularity using the "Pure Core, Practical Shell" philosophy:
-- **The Core (`agents/`, `inference/`)**: Strict abstract logic and standardized interfaces.
-- **The Shell (`assistants/`, `tools/`)**: Pre-built expert roles, ergonomic factories, and specialized skills.
-- **The Registry**: A central exchange for discovering and plugging in agents and tools.
-
-For a deep dive, see [Architecture & Design Principles](docs/architecture.md).
+`xrtm-forecast` is designed for modularity using a strict three-tier architecture:
+- **The Core (`/core`)**: Zero-dependency protocol layer and state-machine orchestrator.
+- **The Kit (`/kit`)**: Importable "Instruments" (Agents, Skills, Evaluators) for standard use cases.
+- **Providers (`/providers`)**: Concrete connectors for cloud and local inference backends.
 
 ## Installation
 
 ### From PyPI (Stable)
 ```bash
+# Standard Institutional Install (Cloud + Core)
 pip install xrtm-forecast
 
-# With institutional extras
-pip install "xrtm-forecast[local,data,redis,memory]"
+# Hardware-Specific Local Inference
+pip install "xrtm-forecast[transformers]"  # PyTorch + HuggingFace
+pip install "xrtm-forecast[vllm]"          # High-throughput serving
+pip install "xrtm-forecast[llama-cpp]"     # CPU-optimized GGUF
+pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
+
+# Researcher Kit (Enhanced Data/Viz)
+pip install "xrtm-forecast[data,viz,memory]"
 ```
 
 ### From Source (Latest)
@@ -86,12 +91,12 @@ if __name__ == "__main__":
 - **Architecture**: [The "Lego" Design](docs/architecture.md)
 - **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
 - **Examples**: Check the [examples/](examples/) directory:
-    - [examples/minimal_agent.py](examples/minimal_agent.py): One-line agent setup.
-    - [examples/core/local_analyst.py](examples/core/local_analyst.py): Private reasoning with HF models.
-    - [examples/features/tiered_reasoning.py](examples/features/tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
-    - [examples/features/enterprise_data.py](examples/features/enterprise_data.py): Integrated SQL and Pandas analytics.
-    - [examples/features/discovery.py](examples/features/discovery.py): Dynamic skill discovery.
-    - [examples/backtest_workflow.py](examples/backtest_workflow.py): Historical backtesting with temporal sandboxing.
+    - [examples/kit/minimal_agent.py](examples/kit/minimal_agent.py): One-line agent setup.
+    - [examples/kit/local_analyst.py](examples/kit/local_analyst.py): Private reasoning with HF models.
+    - [examples/kit/features/tiered_reasoning.py](examples/kit/features/tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
+    - [examples/kit/features/enterprise_data.py](examples/kit/features/enterprise_data.py): Integrated SQL and Pandas analytics.
+    - [examples/kit/features/discovery.py](examples/kit/features/discovery.py): Dynamic skill discovery.
+    - [examples/kit/backtest_workflow.py](examples/kit/backtest_workflow.py): Historical backtesting with temporal sandboxing.
 
 ## Contributing
 

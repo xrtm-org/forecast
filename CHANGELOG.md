@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-01-09
+
+### Added
+- **Scenario Branching**: Introduced `ScenarioManager` and `state_ops.clone_state` for parallel "What-If" analysis.
+- **Deterministic Trace Replay**: Added `TraceReplayer` and decoupled `BacktestRunner.evaluate_state` for offline re-scoring.
+- **Metadata Slicing**: Implemented `SliceAnalytics` and `EvaluationReport.slices` for automated sub-group performance analysis.
+- **Deep Copy Utility**: `clone_state` now supports Pydantic models with explicit overrides for safe branching.
+
+### Changed
+- **Directory Structure**: strict mirroring of `/core`, `/kit`, and `/providers` in `examples/` directory.
+- **Evaluation Report**: Schema updated to include recursive `slices` for sub-reports.
+
+## [0.2.0] - 2026-01-09
+
+### Changed
+- **Major Architecture Refactor**: Migrated to "Pure Core / The Kit" architecture.
+    - `/core`: Zero-dependency protocols and orchestrator.
+    - `/kit`: Importable agents, skills, and evaluators.
+    - `/providers`: Concrete inference and tool implementations.
+- **Module Relocation**:
+    - `src/forecast/agents/` -> `src/forecast/kit/agents/`
+    - `src/forecast/skills/` -> `src/forecast/kit/skills/`
+    - `src/forecast/inference/` -> `src/forecast/providers/inference/`
+
 ## [0.1.5] - 2026-01-08
 
 ### Added

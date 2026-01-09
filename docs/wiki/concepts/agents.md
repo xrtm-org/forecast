@@ -16,8 +16,8 @@ An Agent connects three components:
 
 ## Instantiation
 ```python
-from forecast.agents import LLMAgent
-from forecast.inference.openai_provider import OpenAIProvider
+from forecast.kit.agents import LLMAgent
+from forecast.providers.inference.openai_provider import OpenAIProvider
 
 provider = OpenAIProvider(api_key="...")
 agent = LLMAgent(model=provider, name="Alice", role="Researcher")

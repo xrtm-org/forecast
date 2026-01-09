@@ -2,31 +2,31 @@
 
 This document tracks the "Lego pieces" available in the `xrtm-forecast` library. We distinguish between the bricks used to build agents and the pre-built specialist roles.
 
-## Core Structural Bricks (`src/forecast/agents/`)
+## Core Structural Bricks (`src/forecast/kit/agents/`)
 
 These are the fundamental building blocks used to construct any agentic workflow.
 
-### 1. `LLMAgent` ([llm.py](file:///workspace/forecast/src/forecast/agents/llm.py))
+### 1. `LLMAgent` ([llm.py](file:///workspace/forecast/src/forecast/kit/agents/llm.py))
 The bridge between an LLM and the forecasting engine.
 - **Responsibility**: Prompt management, output parsing, and context maintenance.
 - **Usage**: Inherit from this to create your own specialists.
 
-### 2. `ToolAgent` ([tool.py](file:///workspace/forecast/src/forecast/agents/tool.py))
+### 2. `ToolAgent` ([tool.py](file:///workspace/forecast/src/forecast/kit/agents/tool.py))
 Treats any deterministic Python function as a first-class Agent.
 - **Responsibility**: Data transformation, mathematical calculations, or search execution.
 - **Usage**: Automatically used when you register a function in the registry.
 
-### 3. `GraphAgent` ([graph.py](file:///workspace/forecast/src/forecast/agents/graph.py))
+### 3. `GraphAgent` ([graph.py](file:///workspace/forecast/src/forecast/kit/agents/graph.py))
 A composite brick that treats an entire sub-graph as a single agent.
 - **Responsibility**: Hierarchical reasoning or nested task parallelization.
 
 ---
 
-## Specialist Roles (`src/forecast/agents/specialists/`)
+## Specialist Roles (`src/forecast/kit/agents/`)
 
 Pre-assembled kits designed for specific analytical missions.
 
-### 1. `ForecastingAnalyst` ([analyst.py](file:///workspace/forecast/src/forecast/agents/specialists/analyst.py))
+### 1. `ForecastingAnalyst` ([analyst.py](file:///workspace/forecast/src/forecast/kit/pipelines/forecasting_analyst.py))
 Our flagship analyst implementation.
 - **Role**: Bayesian-style probability estimation.
 - **Key Output**: High-fidelity logical traces and confidence scores.
@@ -35,12 +35,12 @@ Our flagship analyst implementation.
 
 ## Skill & Tool Registries
 
-### 1. Skill Registry (`src/forecast/skills/`)
+### 1. Skill Registry (`src/forecast/kit/skills/`)
 The high-level behaviors available to agents.
 *   **Usage**: `agent.add_skill(MarketResearchSkill())`.
 *   **Contains**: Complex workflows (Search + RAG + Summarization).
 
-### 2. Tool Registry (`src/forecast/tools/`)
+### 2. Tool Registry (`src/forecast/providers/tools/`)
 The low-level driver functions.
 *   **Usage**: Used by Skills, rarely by Agents directly.
 *   **Contains**: Atomic drivers (`GoogleSearchTool`, `CalculatorTool`).

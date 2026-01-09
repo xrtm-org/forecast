@@ -6,10 +6,13 @@ In `xrtm-forecast`, we distinguish between **Tools** (low-level actions) and **S
 A **Tool** is a single, deterministic Python function. It is intended for granular tasks.
 
 ```python
-@tool
+from forecast.providers.tools import FunctionTool
+
 def get_stock_price(ticker: str):
     """Fetches the latest EOD price."""
     return 150.0
+
+stock_tool = FunctionTool(get_stock_price)
 ```
 
 ## 2. Skills (The "Ability")
@@ -18,18 +21,19 @@ A **Skill** is a high-level **bundle**. It represents an agent's "professional t
 | Skill | Description |
 | :--- | :--- |
 | **SQLSkill** | The ability to safely query and analyze relational data. |
-| **SearchSkill** | The ability to research and cite external sources. |
+| **WebSearchSkill** | The ability to research and cite external sources. |
 | **VizSkill** | The ability to generate reliability diagrams and charts. |
-Use the `@tool` decorator to turn any Python function into a skill.
+Use the `FunctionTool` wrapper or `tool_registry` to turn any Python function into a skill.
 
 ```python
-from forecast.tools import tool
+from forecast.providers.tools import FunctionTool
 
-@tool("calculate_var")
 def calculate_risk(portfolio_value: float, confidence: float = 0.95) -> float:
     """Calculates Value at Risk (VaR)."""
     # ... logic ...
     return 1000.0
+
+risk_tool = FunctionTool(calculate_risk)
 ```
 
 ## Security Note

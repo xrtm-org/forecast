@@ -1,6 +1,6 @@
 # Composable Topologies
 
-The `forecast.graph.topologies` module provides pre-wired architectural patterns for reasoning. Instead of manually wiring every edge in an `Orchestrator`, you can use these factories to instantiate robust, institutional-grade topologies.
+The `forecast.kit.patterns` module provides pre-wired architectural patterns for reasoning. Instead of manually wiring every edge in an `Orchestrator`, you can use these factories to instantiate robust, institutional-grade topologies.
 
 ## Philosophy
 We adhere to the **"Pure Core, Practical Shell"** philosophy:
@@ -25,7 +25,7 @@ graph LR
 
 **Usage:**
 ```python
-from forecast.graph.topologies import create_debate_graph
+from forecast.kit.patterns import create_debate_graph
 
 graph = create_debate_graph(
     pro_agent=pro_agent,
@@ -55,7 +55,7 @@ graph LR
 
 **Usage:**
 ```python
-from forecast.graph.topologies import create_fanout_graph
+from forecast.kit.patterns import create_fanout_graph
 
 workers = [analyst_1, analyst_2, analyst_3]
 graph = create_fanout_graph(

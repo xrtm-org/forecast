@@ -2,33 +2,33 @@
 
 Tools for benchmarking and validating agent performance.
 
-::: forecast.eval.definitions.Evaluator
+::: forecast.core.eval.definitions.Evaluator
     options:
       show_root_heading: true
 
-::: forecast.eval.runner.BacktestRunner
+::: forecast.kit.eval.runner.BacktestRunner
     options:
       show_root_heading: true
 
-::: forecast.eval.runner.BacktestInstance
+::: forecast.kit.eval.runner.BacktestInstance
     options:
       show_root_heading: true
 
-::: forecast.eval.definitions.EvaluationReport
+::: forecast.core.eval.definitions.EvaluationReport
     options:
       show_root_heading: true
       members:
         - to_json
         - to_pandas
 
-::: forecast.eval.definitions.ReliabilityBin
+::: forecast.core.eval.definitions.ReliabilityBin
     options:
       show_root_heading: true
 
-::: forecast.eval.metrics.BrierScoreEvaluator
+::: forecast.kit.eval.metrics.BrierScoreEvaluator
     options:
       show_root_heading: true
 
-::: forecast.eval.metrics.ExpectedCalibrationErrorEvaluator
+::: forecast.kit.eval.metrics.ExpectedCalibrationErrorEvaluator
     options:
       show_root_heading: true
