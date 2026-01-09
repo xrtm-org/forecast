@@ -4,8 +4,8 @@ from datetime import datetime
 
 from forecast.graph.orchestrator import Orchestrator
 from forecast.graph.stages.guardian import LeakageGuardian
-from forecast.inference.openai_provider import OpenAIProvider
 from forecast.inference.config import OpenAIConfig
+from forecast.inference.openai_provider import OpenAIProvider
 from forecast.schemas.graph import BaseGraphState, TemporalContext
 from forecast.tools.search import TavilySearchTool
 
