@@ -65,7 +65,11 @@ class TavilySearchTool(Tool):
             "required": ["query"],
         }
 
-    async def run(self, **kwargs: Any) -> Any:
+    @property
+    def pit_supported(self) -> bool:
+        return True
+
+    async def run(self, temporal_context: Optional[Any] = None, **kwargs: Any) -> Any:
         r"""
         Executes a search query against the Tavily API.
 
@@ -74,11 +78,16 @@ class TavilySearchTool(Tool):
                 The search query.
             search_depth (`str`, *optional*, defaults to `"basic"`):
                 The depth of the search.
+            temporal_context (`Optional[TemporalContext]`, *optional*):
+                The context for temporal sandboxing.
 
         Returns:
             `Any`: The JSON response from the Tavily API, or an error message.
         """
-        query = kwargs.get("query")
+        query = str(kwargs.get("query", ""))
+        # Apply Temporal Sandboxing
+        query = self._apply_temporal_filters(query, temporal_context)
+
         search_depth = kwargs.get("search_depth", "basic")
         if not self.api_key:
             return "Error: TAVILY_API_KEY missing. Cannot perform search."

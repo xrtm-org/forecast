@@ -1,0 +1,182 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import asyncio
+import logging
+from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel
+
+from forecast.eval.definitions import EvaluationReport, EvaluationResult, Evaluator
+from forecast.eval.metrics import BrierScoreEvaluator
+from forecast.graph.orchestrator import Orchestrator
+from forecast.schemas.forecast import ForecastOutput, ForecastQuestion, ForecastResolution
+from forecast.schemas.graph import BaseGraphState, TemporalContext
+
+logger = logging.getLogger(__name__)
+
+
+class BacktestInstance(BaseModel):
+    r"""
+    A single data point for a historical backtest.
+
+    Attributes:
+        question (`ForecastQuestion`):
+            The question/task to be performed.
+        resolution (`ForecastResolution`):
+        reference_time (`datetime`):
+            The point in time to which the system should be "rewound".
+    """
+
+    question: ForecastQuestion
+    resolution: ForecastResolution
+    reference_time: datetime
+
+
+class BacktestDataset(BaseModel):
+    r"""A collection of historical instances for batch evaluation."""
+
+    name: str = "default_backtest"
+    items: List[BacktestInstance]
+
+
+class BacktestRunner:
+    r"""
+    An industrial-grade engine for executing large-scale historical backtests.
+
+    The `BacktestRunner` manages the temporal lifecycle of multiple graph executions,
+    ensuring that each run is isolated within its own `TemporalContext`. It supports
+    asynchronous parallel execution and produces aggregate calibration reports.
+
+    Args:
+        orchestrator (`Orchestrator`):
+            The pre-wired graph orchestrator to execute.
+        evaluator (`Evaluator`, *optional*):
+            The metric engine for scoring results. Defaults to `BrierScoreEvaluator`.
+        entry_node (`str`, *optional*, defaults to `"ingestion"`):
+            The starting node in the graph.
+        concurrency (`int`, *optional*, defaults to `5`):
+            Maximum number of concurrent backtest simulations.
+    """
+
+    def __init__(
+        self,
+        orchestrator: Orchestrator,
+        evaluator: Optional[Evaluator] = None,
+        entry_node: str = "ingestion",
+        concurrency: int = 5,
+    ):
+        self.orchestrator = orchestrator
+        self.evaluator = evaluator or BrierScoreEvaluator()
+        self.entry_node = entry_node
+        self.semaphore = asyncio.Semaphore(concurrency)
+
+    async def _run_single(self, instance: BacktestInstance) -> EvaluationResult:
+        r"""Executes a single backtest instance within a semaphore-controlled block."""
+        async with self.semaphore:
+            # 1. Prepare the state with Temporal Context
+            state = BaseGraphState(
+                subject_id=instance.question.id,
+                temporal_context=TemporalContext(reference_time=instance.reference_time, is_backtest=True),
+            )
+            # Inject question info into metadata/context if needed
+            # For now, we assume nodes know how to extract query from somewhere or we put it in node_reports
+            state.node_reports["ingestion"] = instance.question.title
+            if instance.question.content:
+                state.node_reports["ingestion"] += f"\n\nContext: {instance.question.content}"
+
+            try:
+                # 2. Run the graph
+                await self.orchestrator.run(state, entry_node=self.entry_node)
+
+                # 3. Extract prediction (defaulting to the 'consensus' or 'final_output' node if present)
+                # In xrtm-forecast, we look for a standard 'final_report' or the last written report
+                prediction_val = 0.5  # Default
+
+                # Check for ForecastOutput in node_reports
+                for report in reversed(list(state.node_reports.values())):
+                    if isinstance(report, ForecastOutput):
+                        prediction_val = report.confidence
+                        break
+                    elif isinstance(report, dict) and "confidence" in report:
+                        prediction_val = report["confidence"]
+                        break
+                    elif isinstance(report, (int, float)):
+                        prediction_val = float(report)
+                        break
+
+                # 4. Evaluate against ground truth
+                # Ground truth outcome is typically 1 (True) or 0 (False) for binary
+                outcome_raw = instance.resolution.outcome
+                if isinstance(outcome_raw, str):
+                    if outcome_raw.lower() in ["true", "yes", "1", "pass"]:
+                        gt_val = 1.0
+                    elif outcome_raw.lower() in ["false", "no", "0", "fail"]:
+                        gt_val = 0.0
+                    else:
+                        gt_val = float(outcome_raw)
+                else:
+                    gt_val = float(outcome_raw)
+
+                eval_res = self.evaluator.evaluate(
+                    prediction=prediction_val, ground_truth=gt_val, subject_id=instance.question.id
+                )
+
+                # Add temporal metadata
+                eval_res.metadata["reference_time"] = instance.reference_time.isoformat()
+                eval_res.metadata["total_latency"] = sum(state.latencies.values())
+
+                return eval_res
+
+            except Exception as e:
+                logger.error(f"Backtest error on {instance.question.id}: {e}")
+                return EvaluationResult(
+                    subject_id=instance.question.id,
+                    score=1.0,  # Worst possible Brier score on error
+                    ground_truth=instance.resolution.outcome,
+                    prediction=0.5,
+                    metadata={"error": str(e)},
+                )
+
+    async def run(self, dataset: BacktestDataset) -> EvaluationReport:
+        r"""
+        Executes the backtest across the entire dataset in parallel.
+
+        Args:
+            dataset (`BacktestDataset`):
+                The collection of historical instances to test.
+
+        Returns:
+            `EvaluationReport`: The aggregated performance metrics.
+        """
+        logger.info(f"Starting backtest '{dataset.name}' with {len(dataset.items)} instances.")
+
+        tasks = [self._run_single(item) for item in dataset.items]
+        results = await asyncio.gather(*tasks)
+
+        total_score = sum(r.score for r in results)
+        count = len(results)
+        mean_score = total_score / count if count > 0 else 0.0
+
+        return EvaluationReport(
+            metric_name=getattr(self.evaluator, "name", "Brier Score"),
+            mean_score=mean_score,
+            total_evaluations=count,
+            results=results,
+        )
+
+
+__all__ = ["BacktestInstance", "BacktestDataset", "BacktestRunner"]

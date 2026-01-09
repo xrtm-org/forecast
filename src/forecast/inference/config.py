@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, SecretStr
@@ -25,6 +26,10 @@ class ProviderConfig(BaseModel):
     api_key: Optional[SecretStr] = Field(
         default=None,
         description="API key for the provider. If None, it will be pulled from environment.",
+    )
+    knowledge_cutoff: Optional[datetime] = Field(
+        default=None,
+        description="Optional training cutoff date for the model.",
     )
     rpm: int = 15
     timeout: int = 30

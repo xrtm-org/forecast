@@ -10,7 +10,8 @@ Institutional-grade parallelized agentic reasoning engine.
 - **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
 - **Skill Protocol**: Composable behaviors (e.g., Search, **SQL**, **Pandas**) that agents can dynamically equip.
 - **Observability**: OTel-native structured telemetry and institutional execution reports.
-- **Evaluation**: Built-in harness for backtesting and accuracy metrics (Brier Score).
+- **Evaluation**: Built-in **Backtest Engine** for large-scale accuracy metrics (Brier Score, ECE).
+- **Temporal Sandboxing**: Multi-layered protection (PiT Tools, Clock Mocking, Leakage Guardian) to prevent look-ahead bias in historical backtests.
 
 ## Architectural Design: "Pure Core, Practical Shell"
 
@@ -90,6 +91,7 @@ if __name__ == "__main__":
     - [examples/features/tiered_reasoning.py](examples/features/tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
     - [examples/features/enterprise_data.py](examples/features/enterprise_data.py): Integrated SQL and Pandas analytics.
     - [examples/features/discovery.py](examples/features/discovery.py): Dynamic skill discovery.
+    - [examples/backtest_workflow.py](examples/backtest_workflow.py): Historical backtesting with temporal sandboxing.
 
 ## Contributing
 

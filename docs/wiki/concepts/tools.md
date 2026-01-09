@@ -1,17 +1,25 @@
-# Tools
+# Tools & Skills
 
-A **Tool** (or Skill) is a deterministic function that an Agent can execute. Tools bridge the gap between the LLM's reasoning and the real world.
+In `xrtm-forecast`, we distinguish between **Tools** (low-level actions) and **Skills** (high-level capabilities).
 
-## Standard Library
-`xrtm-forecast` includes "Institutional Grade" tools:
+## 1. Tools (The "Scalpel")
+A **Tool** is a single, deterministic Python function. It is intended for granular tasks.
 
-| Tool | Purpose |
+```python
+@tool
+def get_stock_price(ticker: str):
+    """Fetches the latest EOD price."""
+    return 150.0
+```
+
+## 2. Skills (The "Ability")
+A **Skill** is a high-level **bundle**. It represents an agent's "professional training" in a specific domain. Skills often contain multiple tools and specific safety/logic checks.
+
+| Skill | Description |
 | :--- | :--- |
-| `SQLSkill` | Safe, read-only database querying. |
-| `PandasSkill` | Dataframe manipulation (filtering, aggregation). |
-| `SearchSkill` | Web search for external data. |
-
-## Creating Custom Tools
+| **SQLSkill** | The ability to safely query and analyze relational data. |
+| **SearchSkill** | The ability to research and cite external sources. |
+| **VizSkill** | The ability to generate reliability diagrams and charts. |
 Use the `@tool` decorator to turn any Python function into a skill.
 
 ```python

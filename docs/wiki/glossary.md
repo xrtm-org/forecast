@@ -9,14 +9,32 @@ An autonomous software entity capable of perceiving context, reasoning via an LL
 *   *See*: [Concepts > Agents](concepts/agents.md)
 *   *Code*: `forecast.agents.Agent`
 
-### **Tool (or Skill)**
-A specific, executable function that an Agent can use.
-*   *See*: [Concepts > Tools](concepts/tools.md)
-*   *Code*: `forecast.tools.Tool`
+### **Tool**
+A granular, low-level Python function that performs a single action.
+*   *Analogy*: A hammer.
+*   *Code*: Any `@tool` decorated function.
+
+### **Skill**
+A high-level **Capability** that often bundles several tools and specific logic for a domain.
+*   *Analogy*: Carpentry (the ability to use hammer, saw, and nails to build a table).
+*   *Examples*: `SQLSkill` (bundles connection logic, security checks, and query tools).
 
 ### **Capability**
 An abstract interface allowing an Agent to acquire context from the outside world.
-*   *See*: [Concepts > Tools](concepts/tools.md)
+
+---
+
+## Integration Patterns
+
+Often, a single piece of logic (like a "Statistical Model" or "Market Fetcher") can be used in two different ways. The choice depends on **who is in charge**.
+
+### **The Instrument Pattern (Skill/Tool)**
+The **Agent** is in charge. It decides *when* and *if* to call the logic during its reasoning loop.
+*   *Analogy*: A surgeon (Agent) using a scalpel (Tool).
+
+### **The Station Pattern (Stage)**
+The **Orchestrator** is in charge. The logic runs automatically as a mandatory step in the workflow process.
+*   *Analogy*: An assembly line (Graph) where an item moves to a station (**Stage**).
 
 ---
 
@@ -28,19 +46,19 @@ The state-machine engine that manages the workflow.
 *   *Code*: `forecast.graph.orchestrator.Orchestrator`
 
 ### **GraphState**
-The shared memory object passed between nodes during execution.
+The shared memory object passed between **Stages** during execution.
 *   *See*: [Concepts > Orchestration](concepts/orchestration.md#graphstate)
 
-### **Node**
-A single step in a workflow.
-*   *See*: [Concepts > Orchestration](concepts/orchestration.md#nodes)
+### **Stage**
+A single step in a workflow (implemented as a `Node` in the engine).
+*   *See*: [Concepts > Orchestration](concepts/orchestration.md#stages-the-functional-slots)
 
 ### **Parallel Group**
-A set of Nodes that execute at the same time (concurrently).
+A set of **Stages** that execute at the same time (concurrently).
 *   *See*: [Concepts > Orchestration](concepts/orchestration.md#parallel-groups)
 
 ### **Topology**
-A pre-defined, reusable pattern of Nodes and Edges.
+A pre-defined, reusable pattern of **Stages** and Edges.
 *   *See*: [Patterns > Topologies](patterns/topologies.md)
 *   *Code*: `forecast.graph.topologies`
 

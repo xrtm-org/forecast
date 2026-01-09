@@ -16,7 +16,10 @@
 import abc
 import inspect
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
+
+if TYPE_CHECKING:
+    from forecast.schemas.graph import TemporalContext
 
 logger = logging.getLogger(__name__)
 
@@ -48,12 +51,19 @@ class Tool(abc.ABC):
         r"""Returns a JSON schema representing the tool's arguments."""
         pass
 
+    @property
+    def pit_supported(self) -> bool:
+        r"""Whether this tool supports Point-in-Time (historical) filtering."""
+        return False
+
     @abc.abstractmethod
-    async def run(self, **kwargs: Any) -> Any:
+    async def run(self, temporal_context: Optional["TemporalContext"] = None, **kwargs: Any) -> Any:
         r"""
         Asynchronously executes the tool logic.
 
         Args:
+            temporal_context (`Optional[TemporalContext]`, *optional*):
+                Metadata for temporal sandboxing (reference time, etc.).
             **kwargs:
                 Keyword arguments matching the `parameters_schema`.
 
@@ -61,6 +71,27 @@ class Tool(abc.ABC):
             `Any`: The result of the tool execution.
         """
         pass
+
+    def _apply_temporal_filters(self, query: str, temporal_context: Optional["TemporalContext"] = None) -> str:
+        r"""
+        Appends temporal constraints to a query string based on the provided context.
+
+        Args:
+            query (`str`): The original query.
+            temporal_context (`Optional[TemporalContext]`): The context to derive filters from.
+
+        Returns:
+            `str`: The query with temporal filters applied.
+        """
+        if not temporal_context or not temporal_context.is_backtest:
+            return query
+
+        # Prevent double-application
+        cutoff_date = temporal_context.reference_time.strftime("%Y-%m-%d")
+        if f"before:{cutoff_date}" in query:
+            return query
+
+        return f"{query} before:{cutoff_date}"
 
 
 class StrandToolWrapper(Tool):
@@ -94,8 +125,9 @@ class StrandToolWrapper(Tool):
             return self._tool.spec
         return {}
 
-    async def run(self, **kwargs: Any) -> Any:
+    async def run(self, temporal_context: Optional["TemporalContext"] = None, **kwargs: Any) -> Any:
         try:
+            # Note: Strand tools do not natively support our TemporalContext yet
             if inspect.iscoroutinefunction(self._tool.fn):
                 return await self._tool.fn(**kwargs)
             else:
@@ -136,7 +168,7 @@ class FunctionTool(Tool):
     def parameters_schema(self) -> Dict[str, Any]:
         return self._schema
 
-    async def run(self, **kwargs: Any) -> Any:
+    async def run(self, temporal_context: Optional["TemporalContext"] = None, **kwargs: Any) -> Any:
         if inspect.iscoroutinefunction(self.fn):
             return await self.fn(**kwargs)
         return self.fn(**kwargs)

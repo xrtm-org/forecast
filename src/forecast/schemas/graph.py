@@ -13,9 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class TemporalContext(BaseModel):
+    r"""
+    Metadata for temporal sandboxing during backtests.
+    """
+
+    reference_time: datetime = Field(description="The 'frozen' point in time for the forecast.")
+    is_backtest: bool = Field(default=False, description="Whether the run is a historical backtest.")
+    strict_mode: bool = Field(default=True, description="If True, tools MUST support PiT mode.")
 
 
 class BaseGraphState(BaseModel):
@@ -44,6 +55,8 @@ class BaseGraphState(BaseModel):
             Global token consumption statistics.
         execution_path (`List[str]`):
             An ordered record of the agent/node sequence executed.
+        temporal_context (`Optional[TemporalContext]`):
+            Context for temporal sandboxing, defining the reference time.
     """
 
     subject_id: str = Field(description="The unique identifier for the subject being analyzed.")
@@ -67,6 +80,9 @@ class BaseGraphState(BaseModel):
 
     # Communication & Audit
     execution_path: List[str] = Field(default_factory=list, description="Ordered list of agent names executed.")
+
+    # Temporal Sandboxing
+    temporal_context: Optional[TemporalContext] = Field(default=None, description="Metadata for temporal sandboxing.")
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Any, AsyncIterable, Dict, List, Optional
 
 
@@ -25,6 +26,8 @@ class InferenceProvider(ABC):
     LLM SDKs (e.g., Gemini, OpenAI, Anthropic, Hugging Face). This allows the rest
     of the platform to remain agnostic to the specific backend being used.
     """
+
+    knowledge_cutoff: Optional[datetime] = None
 
     @abstractmethod
     async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs) -> Any:

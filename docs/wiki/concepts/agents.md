@@ -27,3 +27,11 @@ agent = LLMAgent(model=provider, name="Alice", role="Researcher")
 1.  **Input**: Receives a task/message.
 2.  **Reasoning**: Uses LLM to decide on actions (Tools) or answer.
 3.  **Output**: Returns a result or tool call.
+
+## Agents as Stages
+While an Agent is an object, it is often consumed as a **Stage** in an Orchestrator graph. 
+
+We use **Topologies** to wrap agents automatically so they can communicate via the `GraphState`.
+
+*   **One Brain, Many Slots**: You can use the same Agent object in multiple different **Stages** (e.g., as a "Debater" and then as a "Summary Writer").
+*   **Context Passing**: When an Agent runs as a **Stage**, it reads its input from `state.context` and writes its results back to it.

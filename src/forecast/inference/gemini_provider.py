@@ -51,6 +51,7 @@ class GeminiProvider(InferenceProvider):
             **kwargs: Additional provider-specific options.
         """
         self.config = config
+        self.knowledge_cutoff = config.knowledge_cutoff
         # tier logic moved to internal or config if needed
         self.tier = kwargs.get("tier", "SMART")
 

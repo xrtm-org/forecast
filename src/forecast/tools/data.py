@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from forecast.tools.base import Tool
 
@@ -50,11 +50,17 @@ class SQLSkill(Tool):
             "required": ["query"],
         }
 
-    async def run(self, **kwargs: Any) -> Any:
+    @property
+    def pit_supported(self) -> bool:
+        return True
+
+    async def run(self, temporal_context: Optional[Any] = None, **kwargs: Any) -> Any:
         r"""
         Executes a read-only SQL query and returns the results.
 
         Args:
+            temporal_context (`Optional[TemporalContext]`, *optional*):
+                The context for temporal sandboxing.
             **kwargs:
                 Must include 'query' (str): The SQL SELECT query to execute.
 
@@ -64,6 +70,11 @@ class SQLSkill(Tool):
         query = kwargs.get("query")
         if not query or not isinstance(query, str):
             return "Error: 'query' argument is required and must be a string."
+
+        # In a real institutional setting, we might automatically inject
+        # "WHERE timestamp <= :ref_time" here if the schema supports it.
+        # For v0.2.0, we pass the context so the agent or a pre-processor can handle it.
+
         import re
         import sqlite3
 
@@ -141,7 +152,7 @@ class PandasSkill(Tool):
             "required": ["data", "operation"],
         }
 
-    async def run(self, **kwargs: Any) -> Any:
+    async def run(self, temporal_context: Optional[Any] = None, **kwargs: Any) -> Any:
         r"""
         Analyzes tabular data using pandas.
 

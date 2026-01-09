@@ -39,7 +39,7 @@ result = await graph.run("Thesis: Inflation is transitory.")
 ### 2. Fan-Out Topology
 *Factory*: `create_fanout_graph()`
 
-The Fan-Out topology executes N worker agents **in parallel** (concurrently) and then aggregates their results. This is critical for **Horizontal Scaling** (e.g., analyzing 50 stock tickers at once).
+The Fan-Out topology executes N worker **Stages** **in parallel** (concurrently) and then aggregates their results. This is critical for **Horizontal Scaling** (e.g., analyzing 50 stock tickers at once).
 
 ```mermaid
 graph LR

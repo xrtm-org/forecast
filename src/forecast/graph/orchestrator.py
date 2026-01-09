@@ -174,7 +174,16 @@ class Orchestrator:
                 if not node_func:
                     logger.error(f"[GRAPH] Unknown node: {active_node}")
                     break
-                next_node = await node_func(state, report_progress)
+
+                # Temporal Sandboxing: Mock System Clock
+                if state.temporal_context and state.temporal_context.is_backtest:
+                    from freezegun import freeze_time
+
+                    with freeze_time(state.temporal_context.reference_time):
+                        next_node = await node_func(state, report_progress)
+                else:
+                    next_node = await node_func(state, report_progress)
+
                 state.execution_path.append(active_node)
 
             elif active_node in self.parallel_groups:
@@ -192,7 +201,15 @@ class Orchestrator:
 
                 # Execute all workers in parallel
                 if tasks:
-                    results = await asyncio.gather(*tasks, return_exceptions=True)
+                    # Temporal Sandboxing: Mock System Clock
+                    if state.temporal_context and state.temporal_context.is_backtest:
+                        from freezegun import freeze_time
+
+                        with freeze_time(state.temporal_context.reference_time):
+                            results = await asyncio.gather(*tasks, return_exceptions=True)
+                    else:
+                        results = await asyncio.gather(*tasks, return_exceptions=True)
+
                     for i, res in enumerate(results):
                         if isinstance(res, Exception):
                             node_name = group_nodes[i] if i < len(group_nodes) else "unknown"

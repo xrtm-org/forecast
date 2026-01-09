@@ -156,12 +156,7 @@ cython_debug/
 *.swp
 
 # Local app state
-/data/
-/logs/
-/.chroma_db/
 /.ruff_cache/
-/.plans/
-/audit/
 
 # Docker
 .docker/
@@ -169,5 +164,3 @@ cython_debug/
 docker-compose.override.yml
 
 # Agent internals
-.agent/
-data/analysis/

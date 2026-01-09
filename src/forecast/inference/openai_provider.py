@@ -46,6 +46,7 @@ class OpenAIProvider(InferenceProvider):
         """
         self.config = config
         self.model_id = config.model_id
+        self.knowledge_cutoff = config.knowledge_cutoff
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
 

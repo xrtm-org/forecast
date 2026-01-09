@@ -39,6 +39,7 @@ class HuggingFaceProvider(InferenceProvider):
     def __init__(self, config: HFConfig):
         self.config = config
         self.model_id = config.model_id
+        self.knowledge_cutoff = config.knowledge_cutoff
         self._model = None
         self._tokenizer = None
         self._is_initialized = False
