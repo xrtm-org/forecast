@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from forecast.inference.config import OpenAIConfig
-from forecast.inference.openai_provider import OpenAIProvider
-from forecast.schemas.graph import BaseGraphState, TemporalContext
+from forecast.core.config.inference import OpenAIConfig
+from forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from forecast.providers.inference.openai_provider import OpenAIProvider
 
 
 def test_temporal_context_validation():

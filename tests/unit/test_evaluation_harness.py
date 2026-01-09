@@ -15,8 +15,8 @@
 
 import pytest
 
-from forecast.eval.definitions import EvaluationResult
-from forecast.eval.metrics import BrierScoreEvaluator
+from forecast.core.eval.definitions import EvaluationResult
+from forecast.kit.eval.metrics import BrierScoreEvaluator
 
 
 def test_brier_score_calc():

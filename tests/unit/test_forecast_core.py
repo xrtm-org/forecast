@@ -17,11 +17,11 @@ from typing import Any, Callable, Dict, Optional
 
 import pytest
 
-from forecast.agents.llm import LLMAgent
-from forecast.graph.orchestrator import Orchestrator
-from forecast.inference.base import InferenceProvider, ModelResponse
-from forecast.inference.config import GeminiConfig
-from forecast.schemas.graph import BaseGraphState
+from forecast.core.config.inference import GeminiConfig
+from forecast.core.orchestrator import Orchestrator
+from forecast.core.schemas.graph import BaseGraphState
+from forecast.kit.agents.llm import LLMAgent
+from forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 
 # 1. Mock Provider for tests
@@ -70,7 +70,7 @@ async def test_library_standalone_orchestration():
     mock_provider = MockProvider()
     _ = MockAgent(model=mock_provider)
 
-    from forecast.graph.config import GraphConfig
+    from forecast.core.config.graph import GraphConfig
 
     orchestrator = Orchestrator(config=GraphConfig(max_cycles=2))
 

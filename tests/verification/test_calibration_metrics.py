@@ -4,10 +4,10 @@ from typing import Any, Optional
 
 import pytest
 
-from forecast.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
-from forecast.graph.orchestrator import Orchestrator
-from forecast.schemas.forecast import ForecastQuestion, ForecastResolution
-from forecast.schemas.graph import BaseGraphState
+from forecast.core.orchestrator import Orchestrator
+from forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
+from forecast.core.schemas.graph import BaseGraphState
+from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
 
 
 class MockOrchestrator(Orchestrator):
@@ -39,7 +39,7 @@ async def test_brier_and_ece_verification(tmp_path):
     dataset_items = []
 
     # Group A: High Confidence (0.9), Low Accuracy (0.0) -> High ECE
-    from forecast.schemas.forecast import MetadataBase
+    from forecast.core.schemas.forecast import MetadataBase
 
     for i in range(5):
         q_id = f"q_overconf_{i}"

@@ -1,11 +1,12 @@
-from forecast.agents import Agent, GraphAgent, LLMAgent, RoutingAgent, ToolAgent, registry
-from forecast.assistants import create_forecasting_analyst, create_local_analyst
-from forecast.graph.orchestrator import Orchestrator
-from forecast.inference.factory import ModelFactory
-from forecast.memory.unified import Memory
-from forecast.schemas.graph import BaseGraphState
-from forecast.telemetry.audit import auditor
-from forecast.tools import PandasSkill, SQLSkill, tool_registry
+from forecast.core.orchestrator import Orchestrator
+from forecast.core.schemas.graph import BaseGraphState
+from forecast.core.telemetry.audit import auditor
+from forecast.kit.agents import Agent, GraphAgent, LLMAgent, RoutingAgent, ToolAgent, registry
+from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+from forecast.kit.assistants.main import create_forecasting_analyst, create_local_analyst
+from forecast.kit.memory.unified import Memory
+from forecast.providers.inference.factory import ModelFactory
+from forecast.providers.tools import PandasSkill, SQLSkill, tool_registry
 
 __all__ = [
     "Agent",
@@ -27,7 +28,7 @@ __all__ = [
     "PandasSkill",
 ]
 
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 __author__ = "XRTM Team"
 __contact__ = "moy@xrtm.org"
 __license__ = "Apache-2.0"

@@ -19,8 +19,8 @@ import os
 import pytest
 from pydantic import SecretStr
 
-from forecast.inference.config import GeminiConfig, OpenAIConfig
-from forecast.inference.factory import ModelFactory
+from forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from forecast.providers.inference.factory import ModelFactory
 
 
 @pytest.mark.live

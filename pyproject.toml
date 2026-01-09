@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xrtm-forecast"
-version = "0.2.0"
+version = "0.2.1"
 description = "Institutional-grade modular engine for generative forecasting and agentic reasoning."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,11 +15,11 @@ authors = [
 dependencies = [
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
-    "google-genai>=0.1.0",
-    "openai>=1.0.0",
     "aiohttp>=3.9.0",
     "rich>=13.0.0",
-    "freezegun>=1.2.0"
+    "freezegun>=1.2.0",
+    "google-genai>=0.1.0",
+    "openai>=1.0.0"
 ]
 
 [project.urls]
@@ -27,18 +27,39 @@ Repository = "https://github.com/xrtm-org/forecast"
 Issues = "https://github.com/xrtm-org/forecast/issues"
 
 [project.optional-dependencies]
-memory = [
-    "chromadb>=0.4.0"
-]
-redis = [
-    "redis>=5.0.0"
-]
-local = [
+# The Pure Foundation
+core = [] # Already covered by minimal dependencies
+
+# Cloud Providers (Included in default install, but listed here for clarity)
+google = ["google-genai>=0.1.0"]
+openai = ["openai>=1.0.0"]
+anthropic = ["anthropic>=0.1.0"]
+
+# Hardware-Specific Local Inference
+transformers = [
     "torch>=2.0.0",
     "transformers>=4.40.0",
     "accelerate>=0.26.0",
     "bitsandbytes>=0.41.0",
     "sentencepiece>=0.2.0"
+]
+vllm = [
+    "vllm>=0.3.0"
+]
+llama-cpp = [
+    "llama-cpp-python>=0.2.0"
+]
+xlm = [
+    "transformers>=4.40.0",
+    "torch>=2.0.0"
+]
+
+# Researcher Kit Components
+memory = [
+    "chromadb>=0.4.0"
+]
+redis = [
+    "redis>=5.0.0"
 ]
 data = [
     "pandas>=2.0.0",
@@ -49,6 +70,13 @@ viz = [
     "matplotlib>=3.7.0",
     "seaborn>=0.12.0"
 ]
+
+# Standard Bundle (Default + Kit)
+standard = [
+    "xrtm-forecast[google,openai,memory,data,viz]"
+]
+
+# Development Environment
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",

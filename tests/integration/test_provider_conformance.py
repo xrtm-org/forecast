@@ -18,11 +18,11 @@ from typing import Any, Type
 import pytest
 from pydantic import SecretStr
 
-from forecast.inference.base import InferenceProvider
-from forecast.inference.config import GeminiConfig, HFConfig, OpenAIConfig
-from forecast.inference.gemini_provider import GeminiProvider
-from forecast.inference.hf_provider import HuggingFaceProvider
-from forecast.inference.openai_provider import OpenAIProvider
+from forecast.core.config.inference import GeminiConfig, HFConfig, OpenAIConfig
+from forecast.providers.inference.base import InferenceProvider
+from forecast.providers.inference.gemini_provider import GeminiProvider
+from forecast.providers.inference.hf_provider import HuggingFaceProvider
+from forecast.providers.inference.openai_provider import OpenAIProvider
 
 
 @pytest.mark.parametrize(

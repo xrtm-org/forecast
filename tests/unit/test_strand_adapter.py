@@ -16,7 +16,7 @@
 
 import pytest
 
-from forecast.tools.base import StrandToolWrapper
+from forecast.core.tools.base import StrandToolWrapper
 
 
 class MockStrandTool:

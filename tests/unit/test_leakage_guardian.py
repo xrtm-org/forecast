@@ -3,9 +3,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.graph.stages.guardian import LeakageGuardian
-from forecast.inference.base import ModelResponse
-from forecast.schemas.graph import BaseGraphState, TemporalContext
+from forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from forecast.kit.stages.guardian import LeakageGuardian
+from forecast.providers.inference.base import ModelResponse
 
 
 class MockProvider:

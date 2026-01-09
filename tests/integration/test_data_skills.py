@@ -18,7 +18,7 @@ import sqlite3
 
 import pytest
 
-from forecast.tools.data import PandasSkill, SQLSkill
+from forecast.providers.tools.data import PandasSkill, SQLSkill
 
 
 @pytest.fixture

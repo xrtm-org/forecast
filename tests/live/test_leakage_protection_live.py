@@ -4,10 +4,10 @@ from datetime import datetime
 import pytest
 from pydantic import SecretStr
 
-from forecast.graph.stages.guardian import LeakageGuardian
-from forecast.inference.config import GeminiConfig, OpenAIConfig
-from forecast.inference.factory import ModelFactory
-from forecast.schemas.graph import BaseGraphState, TemporalContext
+from forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from forecast.kit.stages.guardian import LeakageGuardian
+from forecast.providers.inference.factory import ModelFactory
 
 
 @pytest.mark.live

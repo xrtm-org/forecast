@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from forecast.inference.factory import ModelFactory
+from forecast.providers.inference.factory import ModelFactory
 
 
 def test_model_factory_env_profiles(monkeypatch):

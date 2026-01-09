@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from forecast.graph.orchestrator import Orchestrator
-from forecast.schemas.graph import BaseGraphState, TemporalContext
+from forecast.core.orchestrator import Orchestrator
+from forecast.core.schemas.graph import BaseGraphState, TemporalContext
 
 
 @pytest.mark.asyncio

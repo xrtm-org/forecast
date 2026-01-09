@@ -3,8 +3,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from forecast.schemas.graph import TemporalContext
-from forecast.tools.search import TavilySearchTool
+from forecast.core.schemas.graph import TemporalContext
+from forecast.providers.tools.search import TavilySearchTool
 
 
 @pytest.mark.asyncio

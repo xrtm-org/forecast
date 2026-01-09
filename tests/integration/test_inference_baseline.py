@@ -18,8 +18,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from pydantic import SecretStr
 
-from forecast.inference.config import GeminiConfig, OpenAIConfig
-from forecast.inference.factory import ModelFactory
+from forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from forecast.providers.inference.factory import ModelFactory
 
 
 def test_gemini_provider_instantiation():
@@ -50,7 +50,7 @@ async def test_openai_generate_mock():
     r"""
     Verifies the OpenAI provider's async generation using a client mock.
     """
-    with patch("forecast.inference.openai_provider.AsyncOpenAI") as mock_client_class:
+    with patch("forecast.providers.inference.openai_provider.AsyncOpenAI") as mock_client_class:
         mock_client = mock_client_class.return_value
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
