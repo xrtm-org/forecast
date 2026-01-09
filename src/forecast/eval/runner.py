@@ -21,7 +21,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from forecast.eval.definitions import EvaluationReport, EvaluationResult, Evaluator
-from forecast.eval.metrics import BrierScoreEvaluator
+from forecast.eval.metrics import BrierScoreEvaluator, ExpectedCalibrationErrorEvaluator
 from forecast.graph.orchestrator import Orchestrator
 from forecast.schemas.forecast import ForecastOutput, ForecastQuestion, ForecastResolution
 from forecast.schemas.graph import BaseGraphState, TemporalContext
@@ -44,6 +44,7 @@ class BacktestInstance(BaseModel):
     question: ForecastQuestion
     resolution: ForecastResolution
     reference_time: datetime
+    tags: Optional[List[str]] = None
 
 
 class BacktestDataset(BaseModel):
@@ -138,6 +139,8 @@ class BacktestRunner:
                 # Add temporal metadata
                 eval_res.metadata["reference_time"] = instance.reference_time.isoformat()
                 eval_res.metadata["total_latency"] = sum(state.latencies.values())
+                if instance.tags:
+                    eval_res.metadata["tags"] = instance.tags
 
                 return eval_res
 
@@ -171,11 +174,17 @@ class BacktestRunner:
         count = len(results)
         mean_score = total_score / count if count > 0 else 0.0
 
+        # Calculate ECE and reliability data
+        ece_evaluator = ExpectedCalibrationErrorEvaluator()
+        ece_score, ece_bins = ece_evaluator.compute_calibration_data(results)
+
         return EvaluationReport(
             metric_name=getattr(self.evaluator, "name", "Brier Score"),
             mean_score=mean_score,
             total_evaluations=count,
             results=results,
+            reliability_bins=ece_bins,
+            summary_statistics={"ece": ece_score},
         )
 
 

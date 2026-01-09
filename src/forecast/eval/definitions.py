@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List, Protocol
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Protocol, Union
 
 from pydantic import BaseModel, Field
 
@@ -40,6 +41,23 @@ class EvaluationResult(BaseModel):
     ground_truth: Any
     prediction: Any
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class ReliabilityBin(BaseModel):
+    r"""
+    Data structure for a single bin in a reliability diagram.
+
+    Attributes:
+        bin_center (`float`): The center of the confidence bin (e.g., 0.05 for [0.0, 0.1]).
+        mean_prediction (`float`): Average predicted confidence in this bin.
+        mean_ground_truth (`float`): Average actual outcome (accuracy) in this bin.
+        count (`int`): Number of predictions falling into this bin.
+    """
+
+    bin_center: float
+    mean_prediction: float
+    mean_ground_truth: float
+    count: int
 
 
 class Evaluator(Protocol):
@@ -105,6 +123,29 @@ class EvaluationReport(BaseModel):
     total_evaluations: int
     results: List[EvaluationResult] = Field(default_factory=list)
     summary_statistics: Dict[str, float] = Field(default_factory=dict)
+    reliability_bins: Optional[List[ReliabilityBin]] = None
+
+    def to_json(self, path: Union[str, Path]) -> None:
+        r"""
+        Exports the report to a JSON file.
+        """
+        with open(path, "w") as f:
+            f.write(self.model_dump_json(indent=2))
+
+    def to_pandas(self) -> Any:
+        r"""
+        Converts results to a pandas DataFrame (if pandas is installed).
+        Returns a DataFrame or raises ImportError.
+        """
+        try:
+            import pandas as pd
+
+            return pd.DataFrame([r.model_dump() for r in self.results])
+        except ImportError:
+            raise ImportError("Pandas is required for to_pandas(). Install it with `pip install pandas`.")
+
+
+__all__ = ["EvaluationResult", "Evaluator", "EvaluationReport", "ReliabilityBin"]
 
 
 __all__ = ["EvaluationResult", "Evaluator", "EvaluationReport"]
