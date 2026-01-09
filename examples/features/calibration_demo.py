@@ -17,11 +17,11 @@ class MockOrchestrator(Orchestrator):
         self.confidence = confidence
 
     async def run(
-        self, 
-        state: BaseGraphState, 
-        entry_node: str = "ingestion", 
-        on_progress: Optional[Any] = None, 
-        stopwatch: Optional[Any] = None
+        self,
+        state: BaseGraphState,
+        entry_node: str = "ingestion",
+        on_progress: Optional[Any] = None,
+        stopwatch: Optional[Any] = None,
     ) -> BaseGraphState:
         # Simulate agent always outputting fixed confidence
         state.node_reports["final"] = {"confidence": self.confidence}
