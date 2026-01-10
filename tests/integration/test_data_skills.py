@@ -23,6 +23,7 @@ from forecast.providers.tools.data import PandasSkill, SQLSkill
 
 @pytest.fixture
 def temp_db():
+    r"""Fixture that provides a temporary SQLite database for data skill testing."""
     db_file = "test_qa_data.db"
     if os.path.exists(db_file):
         os.remove(db_file)

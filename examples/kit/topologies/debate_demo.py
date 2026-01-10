@@ -58,6 +58,7 @@ class MockAgent(LLMAgent):
 
 
 async def verify_debate():
+    r"""Verification loop for the debate pattern topology."""
     logger.info("--- Verifying DEBATE Topology ---")
 
     # Create mock agents
@@ -85,6 +86,7 @@ async def verify_debate():
 
 
 async def verify_fanout():
+    r"""Verification loop for the parallel fan-out pattern topology."""
     logger.info("--- Verifying FANOUT Topology ---")
 
     # Create 3 workers

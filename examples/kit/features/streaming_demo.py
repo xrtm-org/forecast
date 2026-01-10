@@ -35,6 +35,7 @@ class MockTokenIterator:
 
 
 async def verify_streaming_provider(provider_name: str, provider: Any):
+    r"""Verification loop for a provider's streaming implementation."""
     logger.info(f"--- Verifying Streaming for {provider_name} ---")
 
     chunks = []

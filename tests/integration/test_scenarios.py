@@ -22,6 +22,7 @@ from forecast.kit.scenarios import ScenarioManager
 
 
 class SimpleState(BaseGraphState):
+    r"""A minimal Pydantic state for scenario branching tests."""
     value: int
     multiplier: int = 1
 

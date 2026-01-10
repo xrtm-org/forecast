@@ -26,6 +26,7 @@ from forecast.providers.tools.search import TavilySearchTool
 
 
 async def forecasting_node(state, report):
+    r"""A demo node representing a forecaster utilizing the temporal sandbox."""
     # This node simulates a forecaster using tools
     # It will automatically have datetime.now() mocked to 2024-06-15
     print(f"\n[NODE] Reasoning at mocked time: {datetime.now()}")

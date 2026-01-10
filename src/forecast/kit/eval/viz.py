@@ -1,6 +1,18 @@
 # coding=utf-8
 # Copyright 2026 XRTM Team. All rights reserved.
 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 from dataclasses import dataclass
 from typing import Any, List, Optional
@@ -19,6 +31,17 @@ __all__ = [
 
 @dataclass
 class ReliabilityCurveData:
+    r"""
+    A container for calibration analysis results.
+
+    Attributes:
+        prob_pred (`np.ndarray`):
+            The mean predicted probability in each bin.
+        prob_true (`np.ndarray`):
+            The fraction of positives (true outcome frequency) in each bin.
+        ece (`float`):
+            The calculated Expected Calibration Error.
+    """
     prob_pred: np.ndarray
     prob_true: np.ndarray
     ece: float
@@ -119,16 +142,29 @@ def plot_reliability_diagram(
 
 
 class ReliabilityDiagram:
-    """
+    r"""
     Institutional wrapper for calibration analysis.
+
+    Provides high-level methods to compute and visualize model calibration (reliability).
+
+    Example:
+        ```python
+        from forecast.kit.eval.viz import ReliabilityDiagram
+        
+        rd = ReliabilityDiagram(n_bins=10)
+        data = rd.compute(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8])
+        rd.plot(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8], save_path="reliability.png")
+        ```
     """
 
     def __init__(self, n_bins: int = 10):
         self.n_bins = n_bins
 
     def compute(self, y_true: List[int], y_prob: List[float]) -> ReliabilityCurveData:
+        r"""Calculates the calibration curve coordinates."""
         return compute_calibration_curve(y_true, y_prob, self.n_bins)
 
     def plot(self, y_true: List[int], y_prob: List[float], save_path: Optional[str] = None) -> Any:
+        r"""Generates a visualization of the model's calibration."""
         data = self.compute(y_true, y_prob)
         return plot_reliability_diagram(data, save_path=save_path)

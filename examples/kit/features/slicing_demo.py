@@ -25,6 +25,7 @@ logger = logging.getLogger("SlicingDemo")
 
 
 def print_report_table(title: str, report: EvaluationReport):
+    r"""Helper to format and print an evaluation report with its metadata slices."""
     print(f"\n[{title}]")
     print(f"  > Brier Score: {report.mean_score:.4f} (N={report.total_evaluations})")
 

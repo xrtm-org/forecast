@@ -26,6 +26,7 @@ from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, Backtest
 
 # 1. Simple mock node that returns a confidence score based on the input
 async def predictor_node(state: BaseGraphState, on_progress: Optional[Callable] = None):
+    r"""A mock predictor node that returns confidence based on query keywords."""
     # Just echo a value or simple logic
     query = state.node_reports.get("ingestion", "0.5")
     try:

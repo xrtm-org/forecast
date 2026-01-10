@@ -24,6 +24,7 @@ from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, Backtest
 
 
 async def report_node(state: BaseGraphState, on_progress=None):
+    r"""A mock reporter that branches logic based on the subject ID for coverage tests."""
     # Determine what to report based on the subject_id
     if "output" in state.subject_id:
         state.node_reports["final"] = ForecastOutput(
@@ -38,6 +39,7 @@ async def report_node(state: BaseGraphState, on_progress=None):
 
 @pytest.fixture
 def complex_orchestrator():
+    r"""Fixture providing a mock orchestrator with branching logic."""
     orch = Orchestrator()
     orch.add_node("ingestion", report_node)
     orch.set_entry_point("ingestion")
