@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xrtm-forecast"
-version = "0.2.1"
+dynamic = ["version"]
 description = "Institutional-grade modular engine for generative forecasting and agentic reasoning."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -91,6 +91,9 @@ markers = [
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = {find = {where = ["src"]}}
+
+[tool.setuptools.dynamic]
+version = {attr = "forecast.version.__version__"}
 
 [tool.ruff]
 line-length = 120

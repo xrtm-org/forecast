@@ -58,7 +58,9 @@ async def main():
         subject_id="demo_backtest", temporal_context=TemporalContext(reference_time=historical_time, is_backtest=True)
     )
 
-    print("--- Running v0.2.0 Backtest Demo ---")
+    from forecast import __version__
+
+    print(f"--- Running v{__version__} Backtest Demo ---")
     print(f"Reference Time: {historical_time}")
 
     await orch.run(state)

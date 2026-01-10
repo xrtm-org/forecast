@@ -73,6 +73,6 @@ If you prefer to run locally:
 ```
 
 ## Release Process
-1. Update version in `pyproject.toml`.
-2. Tag the release in git: `git tag -a v0.1.1 -m "Release v0.1.1"`.
-3. Push tags: `git push origin v0.1.1`.
+1. Update version in `src/forecast/version.py`.
+2. Tag the release in git: `git tag -a v0.2.1 -m "Release v0.2.1"`.
+3. Push tags: `git push origin v0.2.1`.

@@ -13,19 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
-
-from pydantic import BaseModel, Field, SecretStr
-
-from forecast.version import __version__
-
-
-class ToolConfig(BaseModel):
-    """Configuration for external tools and skill execution."""
-
-    timeout: int = Field(default=30, description="Global timeout for tool execution in seconds.")
-    tavily_api_key: Optional[SecretStr] = Field(default=None, description="API key for web search capabilities.")
-    user_agent: str = Field(default=f"xrtm-forecast/{__version__}", description="User agent string for HTTP requests.")
-
-
-__all__ = ["ToolConfig"]
+__version__ = "0.2.1"
+__author__ = "XRTM Team"
+__contact__ = "moy@xrtm.org"
+__license__ = "Apache-2.0"
+__copyright__ = "Copyright 2026 XRTM Team"

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """
-Discovery & Functional Skills Showcase (v0.1.2)
+Discovery & Functional Skills Showcase (v0.2.1)
 Demonstrating how to define skills succinctly and discover them at runtime.
 """
 

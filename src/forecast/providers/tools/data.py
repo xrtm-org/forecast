@@ -73,7 +73,7 @@ class SQLSkill(Tool):
 
         # In a real institutional setting, we might automatically inject
         # "WHERE timestamp <= :ref_time" here if the schema supports it.
-        # For v0.2.0, we pass the context so the agent or a pre-processor can handle it.
+        # For v0.2.1, we pass the context so the agent or a pre-processor can handle it.
 
         import re
         import sqlite3

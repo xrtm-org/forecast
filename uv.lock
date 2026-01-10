@@ -5963,7 +5963,6 @@ wheels = [
 
 [[package]]
 name = "xrtm-forecast"
-version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -6102,7 +6101,7 @@ requires-dist = [
     { name = "transformers", marker = "extra == 'transformers'", specifier = ">=4.40.0" },
     { name = "transformers", marker = "extra == 'xlm'", specifier = ">=4.40.0" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.3.0" },
-    { name = "xrtm-forecast", extras = ["google", "openai", "memory", "data", "viz"], marker = "extra == 'standard'" },
+    { name = "xrtm-forecast", extras = ["data", "google", "memory", "openai", "viz"], marker = "extra == 'standard'" },
     { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'llama-cpp'" },
     { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'transformers'" },
     { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'vllm'" },

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """
-Minimal Agent Example (v0.1.2)
+Minimal Agent Example (v0.2.1)
 Showcasing explicit configuration and user-defined model defaults.
 """
 

@@ -20,6 +20,8 @@ from typing import Any, Dict, Optional, TypeVar
 
 from pydantic import BaseModel
 
+from forecast.version import __version__
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BaseModel)
@@ -143,7 +145,7 @@ class Agent(abc.ABC):
         return {
             "name": self.name,
             "type": self.__class__.__name__,
-            "version": "0.1.1",  # Placeholder for versioning logic
+            "version": __version__,
         }
 
 

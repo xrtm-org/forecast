@@ -22,6 +22,7 @@ from forecast.kit.assistants.main import create_forecasting_analyst, create_loca
 from forecast.kit.memory.unified import Memory
 from forecast.providers.inference.factory import ModelFactory
 from forecast.providers.tools import PandasSkill, SQLSkill, tool_registry
+from forecast.version import __author__, __contact__, __copyright__, __license__, __version__
 
 __all__ = [
     "Agent",
@@ -41,10 +42,9 @@ __all__ = [
     "tool_registry",
     "SQLSkill",
     "PandasSkill",
+    "__version__",
+    "__author__",
+    "__contact__",
+    "__license__",
+    "__copyright__",
 ]
-
-__version__ = "0.2.0"
-__author__ = "XRTM Team"
-__contact__ = "moy@xrtm.org"
-__license__ = "Apache-2.0"
-__copyright__ = "Copyright 2026 XRTM Team"

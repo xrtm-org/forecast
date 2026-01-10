@@ -17,6 +17,8 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from forecast.version import __version__
+
 
 class TelemetryConfig(BaseModel):
     """Configuration for tracking, logging, and performance monitoring."""
@@ -25,7 +27,7 @@ class TelemetryConfig(BaseModel):
     pii_patterns: List[str] = Field(default_factory=list, description="Extra regex patterns for custom masking.")
     verbosity: int = Field(default=1, description="Level of logging detail (0=silent, 2=debug).")
     export_otlp: bool = Field(default=False, description="Whether to export traces to an OTLP endpoint.")
-    version: str = Field(default="0.1.2", description="The telemetry schema version.")
+    version: str = Field(default=__version__, description="The telemetry schema version.")
 
 
 __all__ = ["TelemetryConfig"]
