@@ -103,19 +103,38 @@ class Evaluator(Protocol):
 
 class EvaluationReport(BaseModel):
     r"""
-    An aggregate report summarizing the performance across multiple evaluations.
+    A unified summary container for a collection of evaluation results.
+
+    Aggregates individual scores into a high-level performance metric and
+    optionally provides calibration data (reliability bins).
 
     Attributes:
         metric_name (`str`):
-            The name of the metric used (e.g., "Brier Score").
+            The name of the metric used (e.g., "Brier Score", "Accuracy").
         mean_score (`float`):
-            The average score across all evaluations.
+            The average score across all results in this report.
         total_evaluations (`int`):
             The number of items evaluated.
-        results (`List[EvaluationResult]`):
-            The individual evaluation records.
-        summary_statistics (`Dict[str, float]`):
-            Additional stats like variance, median, or quartiles.
+        results (`list[EvaluationResult]`):
+            The raw list of individual evaluation outcomes.
+        summary_statistics (`dict[str, Any]`, *optional*):
+            Additional metrics (e.g., ECE score, variance).
+        reliability_bins (`list[ReliabilityBin]`, *optional*):
+            Data for calibration analysis (e.g., reliability diagrams).
+
+    Example:
+        ```python
+        from forecast.core.eval.definitions import EvaluationReport, EvaluationResult
+
+        res = EvaluationResult(subject_id="q1", score=0.0, ground_truth=1, prediction=1.0)
+        report = EvaluationReport(
+            metric_name="Exact Match",
+            mean_score=1.0,
+            total_evaluations=1,
+            results=[res]
+        )
+        print(report.model_dump_json(indent=2))
+        ```
     """
 
     metric_name: str
@@ -149,6 +168,3 @@ class EvaluationReport(BaseModel):
 
 
 __all__ = ["EvaluationResult", "Evaluator", "EvaluationReport", "ReliabilityBin"]
-
-
-__all__ = ["EvaluationResult", "Evaluator", "EvaluationReport"]

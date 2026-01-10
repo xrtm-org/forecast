@@ -21,6 +21,8 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["TokenBucket"]
+
 
 LUA_RATE_LIMIT_SCRIPT = """
 local tokens_key = KEYS[1]

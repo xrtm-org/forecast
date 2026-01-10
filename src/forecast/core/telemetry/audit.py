@@ -26,6 +26,8 @@ from forecast.core.utils.privacy import redactor
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["Audit", "auditor"]
+
 
 class Audit:
     """

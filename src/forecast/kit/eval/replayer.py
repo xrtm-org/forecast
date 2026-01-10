@@ -1,3 +1,18 @@
+# coding=utf-8
+# Copyright 2026 XRTM Team. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 from typing import Optional
 
@@ -6,6 +21,9 @@ from forecast.core.orchestrator import Orchestrator
 from forecast.core.schemas.forecast import ForecastResolution
 from forecast.core.schemas.graph import BaseGraphState
 from forecast.kit.eval.runner import BacktestRunner
+
+__all__ = ["TraceReplayer"]
+
 
 logger = logging.getLogger(__name__)
 
@@ -65,16 +83,24 @@ class TraceReplayer:
         subject_id_override: Optional[str] = None,
     ) -> EvaluationResult:
         r"""
-        Loads a trace and re-runs the evaluation logic.
+        Loads a trace and re-runs the evaluation logic offline.
 
         Args:
-            trace_path: Path to the saved trace JSON.
-            resolution: The ground truth outcome to grade against.
-            evaluator: The evaluator engine to use (defaults to Brier via Runner).
-            subject_id_override: Optional ID to use if different from state.
+            trace_path (`str`):
+                Path to the saved trace JSON file.
+            resolution (`ForecastResolution` | `float` | `str`):
+                The ground truth outcome to grade against. Can be a full object,
+                a raw float (0-1), or a string ("True"/"False").
+            evaluator (`Evaluator`, *optional*):
+                The evaluator engine to use. Defaults to `BrierScoreEvaluator`
+                via the internal `BacktestRunner`.
+            subject_id_override (`str`, *optional*):
+                Optional ID to use if different from the ID stored in the trace.
 
         Returns:
-            EvaluationResult: The scoring outcome from the offline replay.
+            `EvaluationResult`:
+                The scoring outcome from the offline replay, including metadata
+                marking it as a replay.
         """
         # 1. Load Trace
         state = self.load_trace(trace_path)

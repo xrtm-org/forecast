@@ -23,6 +23,9 @@ from forecast.core.telemetry.audit import auditor
 from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
 from forecast.providers.data.base import DataSource
 
+__all__ = ["GenericAnalystPipeline"]
+
+
 logger = logging.getLogger(__name__)
 
 

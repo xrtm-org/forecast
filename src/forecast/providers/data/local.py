@@ -22,6 +22,8 @@ from forecast.providers.data.base import DataSource
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["LocalDataSource"]
+
 
 class LocalDataSource(DataSource):
     """

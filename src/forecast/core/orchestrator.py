@@ -148,6 +148,22 @@ class Orchestrator(Generic[StateT]):
 
         Returns:
             `BaseGraphState`: The final evolved state after execution completes.
+
+        Example:
+            ```python
+            from forecast.core.orchestrator import Orchestrator
+            from forecast.core.schemas.graph import BaseGraphState
+
+            orch = Orchestrator()
+            orch.add_node("ingestion", lambda s: "next")
+            orch.add_node("next", lambda s: None)
+            orch.add_edge("ingestion", "next")
+
+            state = BaseGraphState(subject_id="test")
+            final_state = await orch.run(state)
+            print(final_state.execution_path)
+            # Output: ['ingestion', 'next']
+            ```
         """
         self.stopwatch = stopwatch
 

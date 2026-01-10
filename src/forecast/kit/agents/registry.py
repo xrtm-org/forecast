@@ -18,6 +18,9 @@ from typing import Dict, List, Optional, Union
 
 from forecast.kit.agents.base import Agent
 
+__all__ = ["AgentRegistry", "registry"]
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +34,30 @@ class AgentRegistry:
         self._agents: Dict[str, Agent] = {}
 
     def register(self, agent: Union[Agent, type], name: Optional[str] = None):
-        """Registers an agent (instance or class) in the registry."""
+        r"""
+        Registers an agent (instance or class) in the registry.
+
+        If a class is provided, it is instantiated using its default constructor.
+        Agents are stored using lowercase names for case-insensitive lookup.
+
+        Args:
+            agent (`Union[Agent, type]`):
+                The agent instance or class to register.
+            name (`str`, *optional*):
+                The name to register the agent under. Defaults to `agent.name`.
+
+        Example:
+            ```python
+            from forecast.kit.agents.registry import registry
+            from forecast.kit.agents.analyst import ForecastAnalyst
+
+            analyst = ForecastAnalyst(name="ExpertAnalyst")
+            registry.register(analyst)
+
+            # Retrieval
+            agent = registry.get_agent("expertanalyst")
+            ```
+        """
         if isinstance(agent, type):
             # If it's a class, we'll instantiate it if we can
             # but usually we want instances registered with specific configs

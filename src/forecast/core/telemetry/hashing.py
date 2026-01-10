@@ -20,6 +20,8 @@ from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["AuditHasher"]
+
 
 class AuditHasher:
     """

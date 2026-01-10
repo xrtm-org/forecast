@@ -9,6 +9,13 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
+__all__ = [
+    "ReliabilityCurveData",
+    "compute_calibration_curve",
+    "plot_reliability_diagram",
+    "ReliabilityDiagram",
+]
+
 
 @dataclass
 class ReliabilityCurveData:
