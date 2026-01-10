@@ -27,7 +27,7 @@ class BrierScoreEvaluator(Evaluator):
 
     Formula: $BS = (f - o)^2$
     Range: [0, 1], where 0 is perfect accuracy and 1 is perfect inaccuracy.
-    """
+    r"""
 
     def score(self, prediction: Union[float, Any], ground_truth: Union[int, bool, str, Any]) -> float:
         r"""
@@ -41,7 +41,7 @@ class BrierScoreEvaluator(Evaluator):
 
         Returns:
             `float`: The Brier Score.
-        """
+        r"""
         # Normalize prediction
         try:
             f = float(prediction)
@@ -73,7 +73,7 @@ class BrierScoreEvaluator(Evaluator):
 
         Returns:
             `EvaluationResult`: The structured result.
-        """
+        r"""
         s = self.score(prediction, ground_truth)
         return EvaluationResult(
             subject_id=subject_id,
@@ -94,7 +94,7 @@ class ExpectedCalibrationErrorEvaluator(Evaluator):
     weighted by the number of samples in the bin.
 
     Formula: $ECE = \sum_{b=1}^B \frac{n_b}{N} |acc(b) - conf(b)|$
-    """
+    r"""
 
     def __init__(self, num_bins: int = 10):
         self.num_bins = num_bins
@@ -103,7 +103,7 @@ class ExpectedCalibrationErrorEvaluator(Evaluator):
         r"""
         ECE is a set-level metric, not meaningful for a single item.
         Returns the Brier score as a proxy for singular evaluation.
-        """
+        r"""
         return BrierScoreEvaluator().score(prediction, ground_truth)
 
     def evaluate(self, prediction: Any, ground_truth: Any, subject_id: str) -> EvaluationResult:
@@ -121,7 +121,7 @@ class ExpectedCalibrationErrorEvaluator(Evaluator):
             `Tuple[float, List[ReliabilityBin]]`:
                 - The scalar ECE score.
                 - The list of reliability bins (for plotting).
-        """
+        r"""
         bin_size = 1.0 / self.num_bins
         bins: List[List[EvaluationResult]] = [[] for _ in range(self.num_bins)]
 

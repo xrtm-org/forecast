@@ -45,7 +45,7 @@ def parse_json_markdown(text: str, default: Optional[Any] = None) -> Any:
         >>> print(data['confidence'])
         0.8
         ```
-    """
+    r"""
     try:
         # 1. Try to find content inside markdown fences
         pattern = r"```(?:json)?\s*([\{\[].*?[\}\]])\s*```"

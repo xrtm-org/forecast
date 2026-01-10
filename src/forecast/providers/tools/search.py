@@ -35,7 +35,7 @@ class TavilySearchTool(Tool):
         api_key (`str`, *optional*):
             The Tavily API key. If not provided, it will be read from the
             `TAVILY_API_KEY` environment variable.
-    """
+    r"""
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("TAVILY_API_KEY")
@@ -83,7 +83,7 @@ class TavilySearchTool(Tool):
 
         Returns:
             `Any`: The JSON response from the Tavily API, or an error message.
-        """
+        r"""
         query = str(kwargs.get("query", ""))
         # Apply Temporal Sandboxing
         query = self._apply_temporal_filters(query, temporal_context)

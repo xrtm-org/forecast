@@ -47,7 +47,7 @@ class MockOrchestrator(Orchestrator):
 
 @pytest.mark.asyncio
 async def test_brier_and_ece_verification(tmp_path):
-    print(">>> Starting Verification for v0.2.1 Calibration Suite")
+    print(">>> Starting Verification for Calibration Suite")
 
     # ... [setup code omitted for brevity] ...
 

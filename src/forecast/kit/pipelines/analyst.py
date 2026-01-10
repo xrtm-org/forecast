@@ -30,9 +30,9 @@ logger = logging.getLogger(__name__)
 
 
 class GenericAnalystPipeline:
-    """
+    r"""
     Standardized pipeline for fetching a question and generating an analyst forecast.
-    """
+    r"""
 
     def __init__(
         self,
@@ -71,7 +71,7 @@ class GenericAnalystPipeline:
         return None
 
     async def run(self, subject_id: str, on_progress: Optional[Callable] = None) -> BaseGraphState:
-        """Runs the pipeline for a specific subject (e.g. question slug/ID)."""
+        r"""Runs the pipeline for a specific subject (e.g. question slug/ID)."""
         state = BaseGraphState(subject_id=subject_id)
         final_state = await self.orchestrator.run(state, entry_node="ingestion", on_progress=on_progress)
 

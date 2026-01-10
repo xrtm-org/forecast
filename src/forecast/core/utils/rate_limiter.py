@@ -53,14 +53,14 @@ if filled_tokens >= requested then
 else
     return 0
 end
-"""
+r"""
 
 
 class TokenBucket:
-    """
+    r"""
     Token Bucket Rate Limiter with Redis backend and In-Memory fallback.
     Ensures that we don't exceed a defined rate (requests per minute).
-    """
+    r"""
 
     def __init__(self, redis_url: Optional[str], key: str, rate: float, capacity: float):
         self.redis_url = redis_url
@@ -89,7 +89,7 @@ class TokenBucket:
                 logger.warning(f"[RATE-LIMITER] Redis connection failed, falling back to In-Memory: {e}")
 
     async def acquire(self, tokens: int = 1):
-        """Blocks until enough tokens are available (Async)."""
+        r"""Blocks until enough tokens are available (Async)."""
         if self.use_redis:
             while True:
                 try:
@@ -118,7 +118,7 @@ class TokenBucket:
             await asyncio.sleep(1.0)
 
     def acquire_sync(self, tokens: int = 1):
-        """Blocks until enough tokens are available (Sync)."""
+        r"""Blocks until enough tokens are available (Sync)."""
         if self.use_redis:
             import redis as redis_sync
 

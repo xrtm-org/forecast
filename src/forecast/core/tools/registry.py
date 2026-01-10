@@ -29,7 +29,7 @@ class ToolRegistry:
     `ToolRegistry` simplifies agent interaction with Python functions by managing
     their metadata and providing standardized access to their JSON schemas for
     LLM function calling.
-    """
+    r"""
 
     def __init__(self, config: Optional[ToolConfig] = None):
         self.config = config or ToolConfig()
@@ -43,7 +43,7 @@ class ToolRegistry:
         Args:
             tool (`Tool`):
                 The tool object to register.
-        """
+        r"""
         if tool.name in self._tools:
             logger.warning(f"Overwriting tool: {tool.name}")
         self._tools[tool.name] = tool
@@ -56,7 +56,7 @@ class ToolRegistry:
         Args:
             skill (`Skill`):
                 The skill object to register.
-        """
+        r"""
         if skill.name in self._skills:
             logger.warning(f"Overwriting skill: {skill.name}")
         self._skills[skill.name] = skill
@@ -73,7 +73,7 @@ class ToolRegistry:
                 Override for the function name.
             description (`str`, *optional*):
                 Override for the function docstring.
-        """
+        r"""
         tool = FunctionTool(fn, name=name, description=description)
         self.register_tool(tool)
 
@@ -104,7 +104,7 @@ class ToolRegistry:
 
         Returns:
             `List[Dict[str, Any]]`: A list of metadata dictionaries.
-        """
+        r"""
         available = []
         for name, tool in self._tools.items():
             available.append({"name": name, "type": "tool", "description": tool.description})
@@ -118,7 +118,7 @@ class ToolRegistry:
 
         Returns:
             `List[Dict[str, Any]]`: A list of dictionaries matching LLM tool-calling formats.
-        """
+        r"""
         specs = []
         for tool in self._tools.values():
             specs.append({"name": tool.name, "description": tool.description, "parameters": tool.parameters_schema})

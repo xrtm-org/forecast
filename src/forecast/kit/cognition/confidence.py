@@ -31,7 +31,7 @@ class ConfidenceStrategy(ABC):
 
     Strategies define how verbal confidence and raw logprobs are synthesized
     into a final `ConfidenceMetrics` object.
-    """
+    r"""
 
     @abstractmethod
     def evaluate(self, verbal: float, logprobs: Optional[List[Dict[str, Any]]]) -> ConfidenceMetrics:
@@ -39,11 +39,11 @@ class ConfidenceStrategy(ABC):
 
 
 class StandardHybridStrategy(ConfidenceStrategy):
-    """
+    r"""
     Standard implementation:
     - Signal Strength = exp(mean(logprobs))
     - Hybrid = Weighted average of Verbal and Signal.
-    """
+    r"""
 
     def __init__(self, verbal_weight: float = 0.3, aggregation: Literal["mean", "min", "max"] = "mean"):
         self.verbal_weight = verbal_weight
@@ -99,9 +99,9 @@ class StandardHybridStrategy(ConfidenceStrategy):
 
 
 class ConfidenceEstimator:
-    """
+    r"""
     Standardizes how LLM 'confidence' is calculated across different models.
-    """
+    r"""
 
     def __init__(self, strategy: Optional[ConfidenceStrategy] = None):
         self.strategy = strategy or StandardHybridStrategy()

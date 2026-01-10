@@ -32,7 +32,7 @@ class ToolAgent(Agent):
             The function or tool to be wrapped. Can be synchronous or asynchronous.
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the function's `__name__`.
-    """
+    r"""
 
     def __init__(self, fn: Callable, name: Optional[str] = None):
         super().__init__(name or fn.__name__)
@@ -55,7 +55,7 @@ class ToolAgent(Agent):
 
         Returns:
             `Any`: The return value of the wrapped function.
-        """
+        r"""
         # Handling for both async and sync functions
         if inspect.iscoroutinefunction(self.fn):
             if isinstance(input_data, dict):

@@ -17,7 +17,7 @@ import os
 
 import pytest
 
-from examples.kit.pipelines.custom_sentiment_workflow import run_custom_pipeline
+from examples.kit.pipelines.custom_sentiment_workflow.run_custom_sentiment_workflow import run_custom_pipeline
 
 
 @pytest.mark.asyncio

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class AnalystOutput(BaseModel):
     r"""
     Internal schema for structured output from the Forecasting Analyst.
-    """
+    r"""
 
     confidence: float = Field(..., ge=0, le=1)
     reasoning: str
@@ -45,13 +45,13 @@ class ForecastingAnalyst(LLMAgent):
     Note: This is a **Reference Implementation**. Domain experts are encouraged
     to fork and customize the persona, few-shot examples, and structural constraints
     for specific forecasting niches.
-    """
+    r"""
 
     async def run(self, input_data: Union[str, ForecastQuestion], **kwargs) -> ForecastOutput:
-        """
+        r"""
         Processes a ForecastQuestion (or a raw string) and returns a ForecastOutput.
         Demonstrates how to use skills if they are present.
-        """
+        r"""
         if isinstance(input_data, str):
             input_data = ForecastQuestion(
                 id="quick-query",
@@ -77,7 +77,7 @@ class ForecastingAnalyst(LLMAgent):
         - confidence: (float 0-1)
         - reasoning: (narrative text)
         - causal_chain: (list of {{'event': string, 'probability': float, 'description': string}})
-        """
+        r"""
 
         response = await self.model.generate_content_async(prompt)
         parsed = self.parse_output(response.text, schema=AnalystOutput)

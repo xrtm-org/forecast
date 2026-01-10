@@ -30,38 +30,38 @@ StateT = TypeVar("StateT", bound=BaseGraphState)
 
 
 class ScenarioManager(Generic[StateT]):
-    """
+    r"""
     Manages the execution of parallel scenarios (counterfactuals) from a common base state.
 
     This implements the "Scenario Branching" pattern where a single initial state
     is cloned and mutated into multiple branches (e.g., "Control", "Treatment A", "Treatment B")
     which are then executed concurrently.
-    """
+    r"""
 
     def __init__(self, orchestrator: Orchestrator[StateT]):
-        """
+        r"""
         Args:
             orchestrator: The orchestrator instance (graph definition) to use for execution.
                           The same graph topology is used for all branches.
-        """
+        r"""
         self.orchestrator = orchestrator
         self.branches: Dict[str, Dict[str, Any]] = {}
 
     def add_branch(self, name: str, overrides: Dict[str, Any] | None = None) -> None:
-        """
+        r"""
         Registers a new branch for execution.
 
         Args:
             name: Unique identifier for the branch (e.g., "control", "no_search").
             overrides: Dictionary of state fields to override for this branch.
-        """
+        r"""
         if name in self.branches:
             raise ValueError(f"Branch '{name}' already exists.")
 
         self.branches[name] = overrides or {}
 
     async def run_all(self, initial_state: StateT) -> Dict[str, StateT]:
-        """
+        r"""
         Executes all registered branches in parallel using the orchestrator.
 
         Args:
@@ -69,7 +69,7 @@ class ScenarioManager(Generic[StateT]):
 
         Returns:
             A dictionary mapping branch names to their final states.
-        """
+        r"""
         if not self.branches:
             logger.warning("No branches registered. Returning empty result.")
             return {}

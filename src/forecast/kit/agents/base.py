@@ -20,6 +20,7 @@ from typing import Any, Dict, Optional, TypeVar
 
 from pydantic import BaseModel
 
+from forecast.core.memory.graph import FactStore
 from forecast.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -41,11 +42,12 @@ class Agent(abc.ABC):
     Args:
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the class name.
-    """
+    r"""
 
     def __init__(self, name: Optional[str] = None):
         self.name = name or self.__class__.__name__
         self.skills: Dict[str, Any] = {}
+        self.fact_store: Optional[FactStore] = None
         self._skills_lock = threading.Lock()
 
     @classmethod
@@ -67,7 +69,7 @@ class Agent(abc.ABC):
 
         Returns:
             `Agent`: A fully initialized agent instance.
-        """
+        r"""
         import inspect
 
         from forecast.providers.inference.factory import ModelFactory
@@ -97,7 +99,7 @@ class Agent(abc.ABC):
             >>> agent = Agent(name="Researcher")
             >>> agent.add_skill(web_search_skill)
             ```
-        """
+        r"""
         with self._skills_lock:
             self.skills[skill.name] = skill
             logger.debug(f"Agent {self.name} equipped with skill: {skill.name}")
@@ -112,9 +114,20 @@ class Agent(abc.ABC):
 
         Returns:
             `Optional[Any]`: The skill instance if found, else `None`.
-        """
+        r"""
         with self._skills_lock:
             return self.skills.get(name)
+
+    def set_fact_store(self, fact_store: FactStore) -> None:
+        r"""
+        Connects the agent to an institutional FactStore (Knowledge Graph).
+
+        Args:
+            fact_store (`FactStore`):
+                The FactStore instance to use for institutional memory.
+        r"""
+        self.fact_store = fact_store
+        logger.debug(f"Agent {self.name} connected to FactStore.")
 
     @abc.abstractmethod
     async def run(self, input_data: Any, **kwargs) -> Any:
@@ -132,7 +145,7 @@ class Agent(abc.ABC):
 
         Returns:
             `Any`: The result of the agent's execution.
-        """
+        r"""
         pass
 
     def get_info(self) -> Dict[str, Any]:
@@ -141,7 +154,7 @@ class Agent(abc.ABC):
 
         Returns:
             `Dict[str, Any]`: A dictionary containing 'name', 'type', and 'version'.
-        """
+        r"""
         return {
             "name": self.name,
             "type": self.__class__.__name__,

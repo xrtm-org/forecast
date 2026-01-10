@@ -30,10 +30,10 @@ __all__ = ["Audit", "auditor"]
 
 
 class Audit:
-    """
+    r"""
     Captures full reasoning chains and metadata for every agentic decision.
     Creates an immutable record of why an action was taken.
-    """
+    r"""
 
     def __init__(self, log_dir: str = "logs/audit", config: Optional[TelemetryConfig] = None):
         self.log_dir = log_dir
@@ -47,10 +47,10 @@ class Audit:
         timestamp: Optional[datetime] = None,
         extra_metadata: Optional[Dict[str, Any]] = None,
     ) -> str:
-        """
+        r"""
         Saves the reasoning chain to a signed JSON file.
         Returns the filepath of the saved log.
-        """
+        r"""
         log_ts = timestamp or datetime.now(timezone.utc)
         file_ts = log_ts.strftime("%Y%m%d_%H%M%S")
         filename = f"{file_ts}_{subject_id}.json"
@@ -101,10 +101,10 @@ class Audit:
             return ""
 
     def generate_execution_report(self, state: Any, output: Any) -> str:
-        """
+        r"""
         Generates a human-readable 'Double-Trace' report.
         Combines Structural Trace (nodes) and Logical Trace (Bayesian chains).
-        """
+        r"""
         report = [
             "# Forecast Execution Report",
             f"Subject: {state.subject_id}",

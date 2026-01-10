@@ -36,7 +36,7 @@ class Backtester:
             The agent instance to be tested.
         evaluator (`Evaluator`):
             The metric implementation to use for scoring.
-    """
+    r"""
 
     def __init__(self, agent: Agent, evaluator: Evaluator):
         self.agent = agent
@@ -52,7 +52,7 @@ class Backtester:
 
         Returns:
             `EvaluationReport`: A high-level summary of the agent's performance.
-        """
+        r"""
         results: List[EvaluationResult] = []
         total_score = 0.0
 

@@ -33,7 +33,7 @@ class LeakageGuardian:
     The Guardian scans tool outputs (stored in `node_reports`) for dates and facts
     that post-date the `reference_time`. It uses a fast LLM for semantic verification
     and redaction.
-    """
+    r"""
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class LeakageGuardian:
     async def __call__(self, state: BaseGraphState, report_progress: Callable) -> Optional[str]:
         r"""
         Executes the redaction logic on the current state.
-        """
+        r"""
         if not state.temporal_context or not state.temporal_context.is_backtest:
             return None
 
@@ -106,6 +106,6 @@ RULE: Keep all information occurring on or before {ref_date} untouched.
 TEXT:
 {text}
 REDACTED TEXT:
-"""
+r"""
         response = await self.provider.generate_content_async(prompt)
         return response.text.strip()

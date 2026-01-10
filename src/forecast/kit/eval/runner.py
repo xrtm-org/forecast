@@ -40,7 +40,7 @@ class BacktestInstance(BaseModel):
         resolution (`ForecastResolution`):
         reference_time (`datetime`):
             The point in time to which the system should be "rewound".
-    """
+    r"""
 
     question: ForecastQuestion
     resolution: ForecastResolution
@@ -72,7 +72,7 @@ class BacktestRunner:
             The starting node in the graph.
         concurrency (`int`, *optional*, defaults to `5`):
             Maximum number of concurrent backtest simulations.
-    """
+    r"""
 
     def __init__(
         self,
@@ -141,7 +141,7 @@ class BacktestRunner:
 
         Returns:
             EvaluationResult: The scoring outcome.
-        """
+        r"""
         # 1. Extract prediction (defaulting to 0.5)
         prediction_val = 0.5
 
@@ -197,7 +197,7 @@ class BacktestRunner:
 
         Returns:
             `EvaluationReport`: The aggregated performance metrics.
-        """
+        r"""
         logger.info(f"Starting backtest '{dataset.name}' with {len(dataset.items)} instances.")
 
         tasks = [self._run_single(item) for item in dataset.items]

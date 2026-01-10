@@ -28,7 +28,7 @@ class SQLSkill(Tool):
     By default, it uses a local SQLite connection but can be configured for other backends.
     This tool is essential for institutional analysts who need to query structured
     relational data.
-    """
+    r"""
 
     def __init__(self, db_url: str = ":memory:", name: str = "sql_query"):
         self._db_url = db_url
@@ -66,7 +66,7 @@ class SQLSkill(Tool):
 
         Returns:
             `Any`: A list of dictionaries representing the rows, or an error message.
-        """
+        r"""
         query = kwargs.get("query")
         if not query or not isinstance(query, str):
             return "Error: 'query' argument is required and must be a string."
@@ -121,7 +121,7 @@ class PandasSkill(Tool):
 
     Useful for complex aggregations, transformations, and statistical analysis
     that raw SQL alone cannot handle easily.
-    """
+    r"""
 
     def __init__(self, name: str = "pandas_analyze"):
         self._name = name
@@ -166,7 +166,7 @@ class PandasSkill(Tool):
 
         Returns:
             `Any`: The result of the pandas analysis or an error message.
-        """
+        r"""
         data = kwargs.get("data")
         operation = kwargs.get("operation")
         column = kwargs.get("column")

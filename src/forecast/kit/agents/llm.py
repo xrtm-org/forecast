@@ -40,7 +40,7 @@ class LLMAgent(Agent):
             The provider used to perform LLM inference (e.g., Gemini, OpenAI).
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the class name.
-    """
+    r"""
 
     def __init__(self, model: InferenceProvider, name: Optional[str] = None):
         super().__init__(name)
@@ -57,7 +57,7 @@ class LLMAgent(Agent):
 
         Returns:
             `List[Any]`: A list of tool instances compatible with the agent's logic.
-        """
+        r"""
         if tool_names is None:
             # Return all wrapped tool objects
             return [tool_registry.get_tool(name) for name in tool_registry.list_tools()]
@@ -98,7 +98,7 @@ class LLMAgent(Agent):
             >>> print(user.name)
             'Alice'
             ```
-        """
+        r"""
         parsed = parse_json_markdown(text)
         if parsed is None:
             return default if default is not None else {}
@@ -121,7 +121,7 @@ class LLMAgent(Agent):
         Note:
             Base `LLMAgent` does not implement specific prompting logic.
             Subclasses must implement this method to define their persona and workflow.
-        """
+        r"""
         raise NotImplementedError("LLMAgent subclasses must implement run")
 
 

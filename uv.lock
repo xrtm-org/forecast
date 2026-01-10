@@ -5966,6 +5966,7 @@ name = "xrtm-forecast"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
+    { name = "click" },
     { name = "freezegun" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -6074,6 +6075,7 @@ requires-dist = [
     { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.1.0" },
     { name = "bitsandbytes", marker = "extra == 'transformers'", specifier = ">=0.41.0" },
     { name = "chromadb", marker = "extra == 'memory'", specifier = ">=0.4.0" },
+    { name = "click", specifier = ">=8.0.0" },
     { name = "freezegun", specifier = ">=1.2.0" },
     { name = "google-genai", marker = "extra == 'google'", specifier = ">=0.1.0" },
     { name = "llama-cpp-python", marker = "extra == 'llama-cpp'", specifier = ">=0.2.0" },

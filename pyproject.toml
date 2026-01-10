@@ -17,8 +17,12 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "aiohttp>=3.9.0",
     "rich>=13.0.0",
-    "freezegun>=1.2.0"
+    "freezegun>=1.2.0",
+    "click>=8.0.0"
 ]
+
+[project.scripts]
+forecast = "forecast.cli.main:cli"
 
 [project.urls]
 Repository = "https://github.com/xrtm-org/forecast"
@@ -108,3 +112,4 @@ ignore = ["E501"]
 python_version = "3.11"
 ignore_missing_imports = true
 strict = false
+explicit_package_bases = true

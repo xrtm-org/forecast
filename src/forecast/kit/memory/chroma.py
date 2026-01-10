@@ -25,9 +25,9 @@ __all__ = ["ChromaProvider"]
 
 
 class ChromaProvider(BaseVectorStore):
-    """
+    r"""
     Standard implementation of ChromaDB for the forecast library.
-    """
+    r"""
 
     def __init__(self, collection_name: str, persist_directory: Optional[str] = None):
         self.collection_name = collection_name

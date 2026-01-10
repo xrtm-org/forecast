@@ -19,7 +19,7 @@ High-level factory functions for creating pre-configured agent specialists.
 These 'Assistant' factories represent the 'Practical Shell' of the xrtm-forecast
 platform, providing ergonomic shortcuts for common use cases while maintaining
 the abstract integrity of the core engine.
-"""
+r"""
 
 import logging
 from typing import Optional
@@ -46,7 +46,7 @@ def create_forecasting_analyst(
 
     Returns:
         `ForecastingAnalyst`: A fully wired specialist agent.
-    """
+    r"""
     logger.debug(f"Creating pre-configured ForecastingAnalyst with model: {model_id}")
 
     # Resolver logic: ModelFactory handles strings or Config objects
@@ -75,7 +75,7 @@ def create_local_analyst(
 
     Returns:
         `ForecastingAnalyst`: A private specialist agent.
-    """
+    r"""
     logger.info(f"Creating local ForecastingAnalyst from: {model_path}")
 
     # Use 'hf:' prefix to force local resolution in ModelFactory

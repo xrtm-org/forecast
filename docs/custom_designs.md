@@ -47,7 +47,7 @@ final_state = await orchestrator.run(state, entry_node="research")
 ```
 
 ## 4. Real-World Example
-See [custom_sentiment_workflow.py](examples/kit/pipelines/custom_sentiment_workflow.py) for a complete, runnable example featuring:
+See [custom_sentiment_workflow.py](examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py) for a complete, runnable example featuring:
 - Custom Pydantic result schemas.
 - Conditional branching (Sentiment -> Trend check).
 - Multi-agent orchestration.

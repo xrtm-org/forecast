@@ -17,7 +17,7 @@ import os
 
 import pytest
 
-from examples.kit.features.external_strand_tools import main as run_external_tools_example
+from examples.kit.features.external_strand_tools.run_external_strand_tools import main as run_external_tools_example
 
 
 @pytest.mark.asyncio

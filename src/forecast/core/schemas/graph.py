@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class TemporalContext(BaseModel):
     r"""
     Metadata for temporal sandboxing during backtests.
-    """
+    r"""
 
     reference_time: datetime = Field(description="The 'frozen' point in time for the forecast.")
     is_backtest: bool = Field(default=False, description="Whether the run is a historical backtest.")
@@ -57,7 +57,7 @@ class BaseGraphState(BaseModel):
             An ordered record of the agent/node sequence executed.
         temporal_context (`Optional[TemporalContext]`):
             Context for temporal sandboxing, defining the reference time.
-    """
+    r"""
 
     subject_id: str = Field(description="The unique identifier for the subject being analyzed.")
 

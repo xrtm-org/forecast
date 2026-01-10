@@ -26,9 +26,9 @@ __all__ = ["LocalDataSource"]
 
 
 class LocalDataSource(DataSource):
-    """
+    r"""
     DataSource implementation that reads from a local JSON file.
-    """
+    r"""
 
     def __init__(self, file_path: str):
         self.file_path = file_path

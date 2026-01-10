@@ -37,7 +37,7 @@ class Orchestrator(Generic[StateT]):
     Args:
         config (`GraphConfig`, *optional*):
             The configuration for the graph engine. If `None`, defaults are used.
-    """
+    r"""
 
     def __init__(self, config: Optional[GraphConfig] = None):
         self.config = config or GraphConfig()
@@ -64,7 +64,7 @@ class Orchestrator(Generic[StateT]):
 
         Returns:
             `Orchestrator`: A pre-configured orchestrator instance.
-        """
+        r"""
         config = GraphConfig()
         if max_cycles is not None:
             config.max_cycles = max_cycles
@@ -77,7 +77,7 @@ class Orchestrator(Generic[StateT]):
         Args:
             name (`str`): The unique identifier for the node.
             func (`Callable`): The function to execute.
-        """
+        r"""
         self.nodes[name] = func
 
     def register_node(self, name: str, func: Callable) -> None:
@@ -91,7 +91,7 @@ class Orchestrator(Generic[StateT]):
         Args:
             from_node (`str`): The starting node.
             to_node (`str`): The destination node.
-        """
+        r"""
         self.edges[from_node] = to_node
 
     def set_entry_point(self, node_name: str) -> None:
@@ -119,7 +119,7 @@ class Orchestrator(Generic[StateT]):
             # Wire the graph to enter this group
             orch.add_edge("start", "run_workers")
             ```
-        """
+        r"""
         self.parallel_groups[group_name] = node_names
 
     async def run(
@@ -164,7 +164,7 @@ class Orchestrator(Generic[StateT]):
             print(final_state.execution_path)
             # Output: ['ingestion', 'next']
             ```
-        """
+        r"""
         self.stopwatch = stopwatch
 
         async def report_progress(
@@ -265,7 +265,7 @@ class Orchestrator(Generic[StateT]):
                 The state object where usage statistics are accumulated.
             agent_output (`Any`):
                 The output from an agent execution, which may contain 'usage' metadata.
-        """
+        r"""
         usage = {}
         if hasattr(agent_output, "usage"):
             usage = agent_output.usage

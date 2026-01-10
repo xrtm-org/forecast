@@ -31,7 +31,7 @@ class SliceAnalytics:
 
     This utility enables "Slicing" - the ability to look at model performance
     on specific sub-sets of the data (e.g., "Performance on Tag:Science" vs "Tag:Politics").
-    """
+    r"""
 
     @staticmethod
     def compute_slices(results: List[EvaluationResult]) -> Dict[str, EvaluationReport]:
@@ -49,7 +49,7 @@ class SliceAnalytics:
             `Dict[str, EvaluationReport]`:
                 A dictionary mapping slice names (e.g., "tag:science") to their
                 respective `EvaluationReport` objects.
-        """
+        r"""
         slices: Dict[str, List[EvaluationResult]] = {}
 
         # 1. Group by keys

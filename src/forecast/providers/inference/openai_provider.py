@@ -34,7 +34,7 @@ class OpenAIProvider(InferenceProvider):
     Args:
         config (`OpenAIConfig`):
             Configuration object containing the API key, model ID, and optional base URL.
-    """
+    r"""
 
     def __init__(self, config: OpenAIConfig, **kwargs: Any):
         r"""
@@ -43,7 +43,7 @@ class OpenAIProvider(InferenceProvider):
         Args:
             config (`OpenAIConfig`): Explicit OpenAI configuration.
             **kwargs: Additional provider-specific options.
-        """
+        r"""
         self.config = config
         self.model_id = config.model_id
         self.knowledge_cutoff = config.knowledge_cutoff
@@ -83,7 +83,7 @@ class OpenAIProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         # Cast to Any to satisfy strict mypy checks on the Union definition
         messages = cast(Any, self._normalize_messages(prompt or kwargs.get("messages")))
 
@@ -151,7 +151,7 @@ class OpenAIProvider(InferenceProvider):
         raise ProviderError(f"OpenAI generation failed: Max tool turns ({max_tool_turns}) exceeded.")
 
     async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[Dict[str, Any]]:
-        """Executes tool calls and returns OpenAI-formatted tool results."""
+        r"""Executes tool calls and returns OpenAI-formatted tool results."""
         results = []
         import json
 
@@ -212,7 +212,7 @@ class OpenAIProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
 
         response = self.sync_client.chat.completions.create(
@@ -233,7 +233,7 @@ class OpenAIProvider(InferenceProvider):
         return ModelResponse(text=choice.message.content or "", raw=response, usage=usage)
 
     async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
-        """Streaming implementation."""
+        r"""Streaming implementation."""
         messages = self._normalize_messages(messages)
         stream = await self.client.chat.completions.create(
             model=self.model_id,
@@ -261,7 +261,7 @@ class OpenAIProvider(InferenceProvider):
 
         Returns:
             `AsyncIterable[Any]`: An async generator of response chunks.
-        """
+        r"""
         return self._stream_generator(messages, **kwargs)
 
 

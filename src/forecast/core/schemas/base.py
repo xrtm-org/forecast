@@ -29,7 +29,7 @@ __all__ = [
 
 
 class ReasoningSchema(BaseModel):
-    """Standardized unit of agentic thought."""
+    r"""Standardized unit of agentic thought."""
 
     claim: str = Field(description="The primary assertion or recommendation.")
     evidence: List[str] = Field(description="Key data points or facts supporting the claim.")
@@ -42,7 +42,7 @@ class ReasoningSchema(BaseModel):
 
 
 class Attribution(BaseModel):
-    """Standardized metadata for agent contributions."""
+    r"""Standardized metadata for agent contributions."""
 
     primary_driver: str
     associated_agent: str
@@ -50,7 +50,7 @@ class Attribution(BaseModel):
 
 
 class ConfidenceMetrics(BaseModel):
-    """Standardized metadata for LLM confidence calibration."""
+    r"""Standardized metadata for LLM confidence calibration."""
 
     verbal_confidence: float = 0.0
     signal_strength: float = 0.0
@@ -60,7 +60,7 @@ class ConfidenceMetrics(BaseModel):
 
 
 class CausalLink(BaseModel):
-    """A single edge in a reasoning graph."""
+    r"""A single edge in a reasoning graph."""
 
     source: str
     target: str
@@ -68,14 +68,14 @@ class CausalLink(BaseModel):
 
 
 class CausalPath(BaseModel):
-    """A series of links forming a logical trajectory."""
+    r"""A series of links forming a logical trajectory."""
 
     steps: List[str]
     links: List[CausalLink] = Field(default_factory=list)
 
 
 class RippleEffect(BaseModel):
-    """A second-order impact of an event."""
+    r"""A second-order impact of an event."""
 
     trigger: str
     impact: str
@@ -83,10 +83,10 @@ class RippleEffect(BaseModel):
 
 
 class EpisodicExperience(BaseModel):
-    """
+    r"""
     A single unit of learning. Represents a reasoning lifecycle.
     Decoupled from 'ticker' for library usage.
-    """
+    r"""
 
     id: str = Field(description="Unique ID for this experience.")
     timestamp: str = Field(description="ISO format timestamp.")

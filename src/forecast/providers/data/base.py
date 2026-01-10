@@ -26,7 +26,7 @@ class DataSource(abc.ABC):
     `DataSource` implementations are responsible for retrieving `ForecastQuestion`
     objects from external environments (e.g., Prediction Markets, Local Databases,
     or APIs).
-    """
+    r"""
 
     @abc.abstractmethod
     async def fetch_questions(self, query: Optional[str] = None, limit: int = 5) -> List[ForecastQuestion]:
@@ -41,7 +41,7 @@ class DataSource(abc.ABC):
 
         Returns:
             `List[ForecastQuestion]`: A list of questions ready for processing.
-        """
+        r"""
         pass
 
     @abc.abstractmethod
@@ -55,7 +55,7 @@ class DataSource(abc.ABC):
 
         Returns:
             `Optional[ForecastQuestion]`: The question object if found, else `None`.
-        """
+        r"""
         pass
 
 

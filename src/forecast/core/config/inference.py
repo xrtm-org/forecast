@@ -30,7 +30,7 @@ __all__ = [
 
 
 class ProviderConfig(BaseModel):
-    """Base configuration for any inference provider."""
+    r"""Base configuration for any inference provider."""
 
     model_id: str = Field(..., description="The unique identifier for the model (e.g. 'gpt-4o')")
     api_key: Optional[SecretStr] = Field(
@@ -47,19 +47,19 @@ class ProviderConfig(BaseModel):
 
 
 class GeminiConfig(ProviderConfig):
-    """Specific configuration for Google Gemini."""
+    r"""Specific configuration for Google Gemini."""
 
     redis_url: Optional[str] = None
 
 
 class OpenAIConfig(ProviderConfig):
-    """Specific configuration for OpenAI or compatible backends."""
+    r"""Specific configuration for OpenAI or compatible backends."""
 
     base_url: str = "https://api.openai.com/v1"
 
 
 class HFConfig(ProviderConfig):
-    """Configuration for local Hugging Face models."""
+    r"""Configuration for local Hugging Face models."""
 
     device: str = "cpu"  # cpu, cuda, mps
     quantization: Optional[str] = None  # 4bit, 8bit
@@ -68,7 +68,7 @@ class HFConfig(ProviderConfig):
 
 
 class VLLMConfig(ProviderConfig):
-    """Configuration for vLLM high-throughput local serving."""
+    r"""Configuration for vLLM high-throughput local serving."""
 
     tensor_parallel_size: int = 1
     gpu_memory_utilization: float = 0.9
@@ -76,13 +76,13 @@ class VLLMConfig(ProviderConfig):
 
 
 class XLMConfig(HFConfig):
-    """Specific configuration for XLM (Local Encoder) specialists."""
+    r"""Specific configuration for XLM (Local Encoder) specialists."""
 
     use_fast_tokenizer: bool = True
 
 
 class LlamaCppConfig(ProviderConfig):
-    """Configuration for CPU-optimized local inference via Llama-CPP."""
+    r"""Configuration for CPU-optimized local inference via Llama-CPP."""
 
     n_ctx: int = 2048
     n_threads: Optional[int] = None

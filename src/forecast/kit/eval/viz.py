@@ -41,7 +41,7 @@ class ReliabilityCurveData:
             The fraction of positives (true outcome frequency) in each bin.
         ece (`float`):
             The calculated Expected Calibration Error.
-    """
+    r"""
 
     prob_pred: np.ndarray
     prob_true: np.ndarray
@@ -49,7 +49,7 @@ class ReliabilityCurveData:
 
 
 def compute_calibration_curve(y_true: List[int], y_prob: List[float], n_bins: int = 10) -> ReliabilityCurveData:
-    """
+    r"""
     Computes the calibration curve (reliability diagram) data.
 
     Args:
@@ -59,7 +59,7 @@ def compute_calibration_curve(y_true: List[int], y_prob: List[float], n_bins: in
 
     Returns:
         ReliabilityCurveData with bin coordinates and ECE score.
-    """
+    r"""
     # Use numpy for efficient binning
     y_true_arr = np.array(y_true)
     y_prob_arr = np.array(y_prob)
@@ -104,10 +104,10 @@ def compute_calibration_curve(y_true: List[int], y_prob: List[float], n_bins: in
 def plot_reliability_diagram(
     data: ReliabilityCurveData, title: str = "Reliability Diagram", save_path: Optional[str] = None
 ) -> Any:
-    """
+    r"""
     Plots the reliability diagram using Matplotlib/Seaborn.
     Safely handles missing dependencies.
-    """
+    r"""
     try:
         import matplotlib.pyplot as plt
         import seaborn as sns
@@ -156,7 +156,7 @@ class ReliabilityDiagram:
         data = rd.compute(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8])
         rd.plot(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8], save_path="reliability.png")
         ```
-    """
+    r"""
 
     def __init__(self, n_bins: int = 10):
         self.n_bins = n_bins

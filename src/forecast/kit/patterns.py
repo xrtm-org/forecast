@@ -61,7 +61,7 @@ def create_debate_graph(
     r"""
     Creates a pre-wired `GraphAgent` that executes a debate between two agents.
     ...
-    """
+    r"""
 
     # 1. Define the Graph State (Atomic)
     # We use the standard BaseGraphState.
@@ -108,7 +108,7 @@ def create_fanout_graph(workers: list[Agent], aggregator: Agent, name: str = "Fa
 
     Returns:
         `GraphAgent`: Configured graph.
-    """
+    r"""
     orchestrator: Orchestrator[BaseGraphState] = Orchestrator()
 
     # 1. Add ALL nodes (Workers + Aggregator)

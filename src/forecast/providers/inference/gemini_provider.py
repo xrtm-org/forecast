@@ -40,7 +40,7 @@ class GeminiProvider(InferenceProvider):
     Args:
         config (`GeminiConfig`):
             Explicit configuration object containing the API key and model IDs.
-    """
+    r"""
 
     def __init__(self, config: GeminiConfig, **kwargs: Any):
         r"""
@@ -49,7 +49,7 @@ class GeminiProvider(InferenceProvider):
         Args:
             config (`GeminiConfig`): Explicit Gemini configuration.
             **kwargs: Additional provider-specific options.
-        """
+        r"""
         self.config = config
         self.knowledge_cutoff = config.knowledge_cutoff
         # tier logic moved to internal or config if needed
@@ -77,7 +77,7 @@ class GeminiProvider(InferenceProvider):
             )
 
     def mask_prompt(self, prompt: str) -> str:
-        """Removes dates and sensitive patterns to prevent bias."""
+        r"""Removes dates and sensitive patterns to prevent bias."""
         import re
 
         masked = re.sub(r"202[0-5]", "YEAR_X", prompt)
@@ -108,7 +108,7 @@ class GeminiProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         import random
 
         if not self.supports_tools and tools:
@@ -331,7 +331,7 @@ class GeminiProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         import random
 
         if not self.supports_tools and tools:
@@ -577,7 +577,7 @@ class GeminiProvider(InferenceProvider):
 
         Returns:
             `AsyncIterable[Any]`: An async generator of response chunks.
-        """
+        r"""
         return self._stream_generator(messages, **kwargs)
 
 

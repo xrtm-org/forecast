@@ -23,18 +23,18 @@ __all__ = ["EpisodicLearner"]
 
 
 class EpisodicLearner:
-    """
+    r"""
     Bridges episodic memory with live agent execution.
     Retrieves relevant lessons learned from the past to inject into LLM prompts.
-    """
+    r"""
 
     def __init__(self, memory: UnifiedMemory):
         self.memory = memory
 
     def get_lessons_for_subject(self, subject_id: str, n_results: int = 3) -> str:
-        """
+        r"""
         Retrieves the top N similar experiences for a subject and formats them for prompt injection.
-        """
+        r"""
         try:
             # Query for the subject specifically or similar event types
             query = f"Past performance and lessons for {subject_id}"

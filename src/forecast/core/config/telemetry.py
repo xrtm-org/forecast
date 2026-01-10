@@ -21,7 +21,7 @@ from forecast.version import __version__
 
 
 class TelemetryConfig(BaseModel):
-    """Configuration for tracking, logging, and performance monitoring."""
+    r"""Configuration for tracking, logging, and performance monitoring."""
 
     enable_masking: bool = Field(default=True, description="Whether to mask sensitive data (dates, names).")
     pii_patterns: List[str] = Field(default_factory=list, description="Extra regex patterns for custom masking.")

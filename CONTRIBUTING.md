@@ -72,6 +72,12 @@ If you prefer to run locally:
         """
 ```
 
+
+## Naming Conventions
+- **Modules**: `snake_case` (e.g., `utils.py`).
+- **Classes**: `PascalCase` (e.g., `AgentFactory`).
+- **Scripts**: Runnable scripts (especially examples) must start with `run_` (e.g., `run_glue.py`).
+
 ## Release Process
 1. Update version in `src/forecast/version.py`.
 2. Tag the release in git: `git tag -a v0.2.1 -m "Release v0.2.1"`.

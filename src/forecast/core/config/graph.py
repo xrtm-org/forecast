@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 
 class GraphConfig(BaseModel):
-    """Configuration for the Orchestrator reasoning engine."""
+    r"""Configuration for the Orchestrator reasoning engine."""
 
     max_cycles: int = Field(default=3, description="Maximum number of state-machine iterations.")
     entry_node: str = Field(default="ingestion", description="Initial node to start execution from.")

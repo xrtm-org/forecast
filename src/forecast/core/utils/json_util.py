@@ -21,14 +21,14 @@ __all__ = ["robust_clean", "safe_json_dumps"]
 
 
 def robust_clean(obj: Any) -> Any:
-    """
+    r"""
     Recursively cleans objects for JSON serializability.
     Handles:
     - Pydantic models (v1 & v2)
     - NaNs and Infs (converts to None)
     - Non-serializable objects (converts to str)
     - Strips internal keys (starting with _)
-    """
+    r"""
     if obj is None:
         return None
 
@@ -54,5 +54,5 @@ def robust_clean(obj: Any) -> Any:
 
 
 def safe_json_dumps(obj: Any, **kwargs) -> str:
-    """Combines robust_clean and json.dumps."""
+    r"""Combines robust_clean and json.dumps."""
     return json.dumps(robust_clean(obj), **kwargs)

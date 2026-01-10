@@ -27,9 +27,9 @@ __all__ = ["PolymarketSource"]
 
 
 class PolymarketSource(DataSource):
-    """
+    r"""
     DataSource implementation that fetches from the Polymarket Gamma API.
-    """
+    r"""
 
     API_BASE = "https://gamma-api.polymarket.com"
 
@@ -68,9 +68,9 @@ class PolymarketSource(DataSource):
             return None
 
     def _normalize(self, item: Dict[str, Any]) -> ForecastQuestion:
-        """
+        r"""
         Normalizes Polymarket Gamma API event data into a ForecastQuestion.
-        """
+        r"""
         # Polymarket 'events' often have 'markets' inside.
         # For simplicity, we use the event title and description.
         return ForecastQuestion(

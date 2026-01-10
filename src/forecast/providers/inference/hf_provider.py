@@ -34,7 +34,7 @@ class HuggingFaceProvider(InferenceProvider):
     Args:
         config (`HFConfig`):
             Configuration object detailing model path, device, and quantization.
-    """
+    r"""
 
     def __init__(self, config: HFConfig):
         self.config = config
@@ -108,7 +108,7 @@ class HuggingFaceProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         return await asyncio.to_thread(self.generate_content, prompt, output_logprobs, **kwargs)
 
     def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> ModelResponse:
@@ -125,7 +125,7 @@ class HuggingFaceProvider(InferenceProvider):
 
         Returns:
             `ModelResponse`: The standardized model response.
-        """
+        r"""
         self._ensure_initialized()
 
         # Extract generation parameters from kwargs
@@ -166,7 +166,7 @@ class HuggingFaceProvider(InferenceProvider):
 
         Returns:
             `AsyncIterable[Any]`: An async generator of response chunks.
-        """
+        r"""
         self._ensure_initialized()
         assert self._tokenizer is not None, "Tokenizer must be initialized"
         assert self._model is not None, "Model must be initialized"

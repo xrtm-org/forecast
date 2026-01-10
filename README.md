@@ -89,12 +89,12 @@ if __name__ == "__main__":
 - **Architecture**: [The "Lego" Design](docs/architecture.md)
 - **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
 - **Examples**: Check the [examples/](examples/) directory:
-    - [examples/kit/minimal_agent.py](examples/kit/minimal_agent.py): One-line agent setup.
-    - [examples/kit/local_analyst.py](examples/kit/local_analyst.py): Private reasoning with HF models.
-    - [examples/kit/features/tiered_reasoning.py](examples/kit/features/tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
-    - [examples/kit/features/enterprise_data.py](examples/kit/features/enterprise_data.py): Integrated SQL and Pandas analytics.
-    - [examples/kit/features/discovery.py](examples/kit/features/discovery.py): Dynamic skill discovery.
-    - [examples/kit/backtest_workflow.py](examples/kit/backtest_workflow.py): Historical backtesting with temporal sandboxing.
+    - [examples/kit/minimal_agent.py](examples/kit/minimal_agent/run_minimal_agent.py): One-line agent setup.
+    - [examples/kit/local_analyst.py](examples/kit/local_analyst/run_local_analyst.py): Private reasoning with HF models.
+    - [examples/kit/features/tiered_reasoning.py](examples/kit/features/tiered_reasoning/run_tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
+    - [examples/kit/features/enterprise_data.py](examples/kit/features/enterprise_data/run_enterprise_data.py): Integrated SQL and Pandas analytics.
+    - [examples/kit/features/discovery.py](examples/kit/features/discovery/run_discovery.py): Dynamic skill discovery.
+    - [examples/kit/backtest_workflow.py](examples/kit/backtest_workflow/run_backtest_workflow.py): Historical backtesting with temporal sandboxing.
 
 ## Contributing
 

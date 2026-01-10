@@ -19,7 +19,7 @@ Standardized exception definitions for the xrtm-forecast platform.
 This module provides a unified hierarchy of error classes that ensure consistent
 unwinding and reporting across all platform components, from inference providers
 to autonomous agents.
-"""
+r"""
 
 
 class ForecastError(Exception):
@@ -33,7 +33,7 @@ class ProviderError(ForecastError):
     Raised when an inference provider fails to process a request.
 
     This can occur due to API outages, content filtering, or rate limits.
-    """
+    r"""
 
     pass
 
@@ -44,7 +44,7 @@ class SkillError(ForecastError):
 
     Indicates that a high-level agent capability encountered an unrecoverable
     error during its internal process.
-    """
+    r"""
 
     pass
 
@@ -55,7 +55,7 @@ class ConfigurationError(ForecastError):
 
     Typically encountered during initialization when API keys are missing
     or environment variables are invalid.
-    """
+    r"""
 
     pass
 
@@ -65,7 +65,7 @@ class GraphError(ForecastError):
     Raised when the orchestrator encounters a structural or logic error.
 
     Used for cyclic dependencies, unknown nodes, or state-machine failures.
-    """
+    r"""
 
     pass
 

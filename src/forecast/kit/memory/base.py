@@ -27,7 +27,7 @@ class BaseVectorStore(ABC):
     `BaseVectorStore` provides a unified contract for different Vector Database
     backends (e.g., Chroma, Pinecone, FAISS), enabling seamless RAG (Retrieval-Augmented
     Generation) workflows.
-    """
+    r"""
 
     @abstractmethod
     def upsert(self, ids: List[str], documents: List[str], metadatas: List[Dict[str, Any]]):
@@ -41,7 +41,7 @@ class BaseVectorStore(ABC):
                 The raw text content to be embedded and stored.
             metadatas (`List[Dict[str, Any]]`):
                 Key-value pairs associated with each document for filtering.
-        """
+        r"""
         pass
 
     @abstractmethod
@@ -57,14 +57,14 @@ class BaseVectorStore(ABC):
 
         Returns:
             `Dict[str, Any]`: The raw response from the vector store containing documents and scores.
-        """
+        r"""
         pass
 
 
 class MemoryRegistry:
     r"""
     A central registry for managing and swapping Vector Store providers at runtime.
-    """
+    r"""
 
     _providers: Dict[str, BaseVectorStore] = {}
 

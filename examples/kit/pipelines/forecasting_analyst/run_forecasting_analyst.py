@@ -49,7 +49,7 @@ async def run_showcase():
     provider = ModelFactory.get_provider(config)
 
     # 2. Setup Data Source (Local mode for stability)
-    data_source = LocalDataSource("examples/data/polymarket_sample.json")
+    data_source = LocalDataSource("examples/kit/pipelines/forecasting_analyst/data/polymarket_sample.json")
 
     # 3. Setup Agent & Pipeline
     analyst = ForecastingAnalyst(model=provider)

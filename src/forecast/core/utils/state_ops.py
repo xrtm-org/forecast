@@ -24,7 +24,7 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def clone_state(state: T, overrides: Dict[str, Any] | None = None) -> T:
-    """
+    r"""
     Creates a deep copy of a Pydantic state model and applies overrides.
 
     This ensures that branches are fully isolated from each other. Modifications
@@ -40,7 +40,7 @@ def clone_state(state: T, overrides: Dict[str, Any] | None = None) -> T:
 
     Raises:
         ValueError: If overrides contains keys that are not in the state model.
-    """
+    r"""
     # 1. Deep copy the model to ensure mutable containers (lists, dicts) are distinct
     new_state = state.model_copy(deep=True)
 

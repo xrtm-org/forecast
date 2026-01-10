@@ -24,7 +24,7 @@ class Anonymizer:
 
     Ensures that PII (Personally Identifiable Information) and other sensitive
     data are redacted before logging or auditing.
-    """
+    r"""
 
     def scrub_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         # Basic pass-through for now

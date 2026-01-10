@@ -37,7 +37,7 @@ class ModelFactory:
 
     `ModelFactory` decouples the creation of providers from their specific
     implementations, using `ProviderConfig` objects to drive the instantiation logic.
-    """
+    r"""
 
     @staticmethod
     def get_provider(
@@ -47,7 +47,7 @@ class ModelFactory:
         api_key: Optional[SecretStr] = None,
         **kwargs,
     ) -> InferenceProvider:
-        """
+        r"""
         Creates and returns a provider instance.
 
         Args:
@@ -64,7 +64,7 @@ class ModelFactory:
 
         Returns:
             `InferenceProvider`: An instantiated provider.
-        """
+        r"""
         from forecast.core.exceptions import ConfigurationError
 
         # Ergonomic Shortcut: string input

@@ -34,7 +34,7 @@ class MetadataBase(BaseModel):
             The version of the data source providing the information.
         raw_data (`Dict[str, Any]`, *optional*):
             The original raw payload for auditing or reprocessing.
-    """
+    r"""
 
     model_config = ConfigDict(extra="allow")
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -60,7 +60,7 @@ class ForecastQuestion(BaseModel):
             Detailed context, background information, or specific forecasting rules.
         metadata (`MetadataBase`):
             Operational metadata associated with the question.
-    """
+    r"""
 
     id: str = Field(..., description="Unique identifier for the question")
     title: str = Field(..., description="The main question or content to forecast")
@@ -79,7 +79,7 @@ class CausalNode(BaseModel):
             The estimated probability of this specific event occurring.
         description (`str`, *optional*):
             A narrative explanation of why this event is included in the chain.
-    """
+    r"""
 
     event: str = Field(..., description="The assumption or event in the chain")
     probability: Optional[float] = Field(None, ge=0, le=1)
@@ -107,7 +107,7 @@ class ForecastOutput(BaseModel):
             The names of the platform components (Agents, Skills) that processed this.
         metadata (`Dict[str, Any]`):
             Diagnostic metadata (latency, token usage, cost).
-    """
+    r"""
 
     question_id: str
     confidence: float = Field(..., ge=0, le=1, description="Probability of the primary outcome")
@@ -134,7 +134,7 @@ class ForecastResolution(BaseModel):
             The timestamp when the outcome was finalized.
         metadata (`Dict[str, Any]`):
             Source verification info and resolution method.
-    """
+    r"""
 
     question_id: str
     outcome: str = Field(..., description="The final winning outcome or value")

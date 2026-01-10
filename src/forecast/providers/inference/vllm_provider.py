@@ -24,10 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class VLLMProvider(InferenceProvider):
-    """
+    r"""
     Provider implementation for high-throughput local inference via vLLM.
     Requires 'vllm' extra to be installed.
-    """
+    r"""
 
     def __init__(self, config: VLLMConfig):
         self.config = config

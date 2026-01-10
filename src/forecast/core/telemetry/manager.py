@@ -43,7 +43,7 @@ class TelemetryManager:
     Args:
         log_dir (`str`, *optional*, defaults to `"logs/telemetry"`):
             The directory where telemetry traces will be exported.
-    """
+    r"""
 
     def __init__(self, log_dir: str = "logs/telemetry", config: Optional[TelemetryConfig] = None):
         self.log_dir = log_dir
@@ -71,7 +71,7 @@ class TelemetryManager:
 
         Returns:
             `str`: The unique identifier for the new trace.
-        """
+        r"""
         tid = trace_id or uuid.uuid4().hex
         trace = Trace(trace_id=tid)
         _current_trace_var.set(trace)
@@ -95,7 +95,7 @@ class TelemetryManager:
 
         Returns:
             `TelemetrySpan`: The newly created span instance.
-        """
+        r"""
         trace = self.current_trace
         if not trace:
             self.start_trace()
@@ -125,7 +125,7 @@ class TelemetryManager:
                 The final status of the span (OK, ERROR).
             status_message (`str`, *optional*):
                 An optional message describing the status.
-        """
+        r"""
         stack = self.span_stack
         if not stack:
             logger.warning("Attempted to end a span but none are active in this context.")
@@ -144,7 +144,7 @@ class TelemetryManager:
                 The name of the event.
             attributes (`Dict`, *optional*):
                 Metadata associated with the event.
-        """
+        r"""
         stack = self.span_stack
         if not stack:
             logger.warning("Attempted to add an event but no span is active in this context.")
@@ -163,7 +163,7 @@ class TelemetryManager:
 
         Returns:
             `str`: The absolute path to the exported trace file.
-        """
+        r"""
         trace = self.current_trace
         if not trace:
             logger.warning("Attempted to export trace but no trace is active.")
@@ -203,7 +203,7 @@ class trace_context:
         ...     # All telemetry within this block is isolated
         ...     agent.run(...)
         ```
-    """
+    r"""
 
     def __init__(
         self,

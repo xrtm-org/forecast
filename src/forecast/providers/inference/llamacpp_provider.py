@@ -24,10 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class LlamaCppProvider(InferenceProvider):
-    """
+    r"""
     Provider implementation for CPU-optimized local inference via Llama-CPP-Python.
     Supports GGUF models. Requires 'llama-cpp' extra.
-    """
+    r"""
 
     def __init__(self, config: LlamaCppConfig):
         self.config = config

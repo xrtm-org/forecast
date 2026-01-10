@@ -24,10 +24,10 @@ __all__ = ["TokenStreamContext"]
 
 
 class TokenStreamContext:
-    """
+    r"""
     Singleton circular buffer to store the last N LLM interactions.
     Used for live debugging, compliance verification, and visualization.
-    """
+    r"""
 
     _instance = None
     _buffer: deque
@@ -47,7 +47,7 @@ class TokenStreamContext:
         latency_ms: float,
         component_id: str = "unknown",
     ):
-        """Push a new interaction record into the stream."""
+        r"""Push a new interaction record into the stream."""
         record = {
             "timestamp": time.time(),
             "id": f"{int(time.time() * 1000)}",
@@ -63,7 +63,7 @@ class TokenStreamContext:
         self._buffer.append(record)
 
     def get_history(self) -> List[Dict[str, Any]]:
-        """Return the current buffer as a list."""
+        r"""Return the current buffer as a list."""
         return list(self._buffer)
 
     def clear(self):

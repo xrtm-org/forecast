@@ -34,7 +34,7 @@ class SpanKind(str, Enum):
 class TelemetryEvent(BaseModel):
     r"""
     A discrete event occurring within a reasoning span (e.g., a log, error, or data arrival).
-    """
+    r"""
 
     name: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -44,7 +44,7 @@ class TelemetryEvent(BaseModel):
 class TelemetrySpan(BaseModel):
     r"""
     A single unit of work within a trace, providing granular observability into agent execution.
-    """
+    r"""
 
     name: str
     context: Dict[str, str] = Field(
@@ -96,7 +96,7 @@ class TelemetrySpan(BaseModel):
 class Trace(BaseModel):
     r"""
     A collection of spans representing a single, end-to-end reasoning flow.
-    """
+    r"""
 
     trace_id: str
     spans: List[TelemetrySpan] = Field(default_factory=list)

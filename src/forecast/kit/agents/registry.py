@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class AgentRegistry:
-    """
+    r"""
     Handles explicit registration and discovery of specialist agents.
     Enables modular, multi-agent reasoning swarms.
-    """
+    r"""
 
     def __init__(self):
         self._agents: Dict[str, Agent] = {}
@@ -57,7 +57,7 @@ class AgentRegistry:
             # Retrieval
             agent = registry.get_agent("expertanalyst")
             ```
-        """
+        r"""
         if isinstance(agent, type):
             # If it's a class, we'll instantiate it if we can
             # but usually we want instances registered with specific configs
@@ -73,11 +73,11 @@ class AgentRegistry:
         logger.info(f"[REGISTRY] Registered agent: {name.upper()}")
 
     def get_agent(self, name: str) -> Optional[Agent]:
-        """Retrieves an agent by name."""
+        r"""Retrieves an agent by name."""
         return self._agents.get(name.lower())
 
     def list_agents(self) -> List[str]:
-        """Returns a list of all registered agent names."""
+        r"""Returns a list of all registered agent names."""
         return list(self._agents.keys())
 
     # Compatibility Aliases for legacy specialist support

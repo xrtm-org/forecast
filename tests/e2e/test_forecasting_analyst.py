@@ -28,7 +28,7 @@ from forecast.providers.inference.factory import ModelFactory
 @pytest.mark.asyncio
 async def test_analyst_pipeline_e2e():
     """
-    Validates the full v0.2.1 pipeline flow using local data.
+    Validates the full pipeline flow using local data.
     """
     # 1. Setup (Mock-like setup but using real provider if key exists, otherwise we'd need mocks)
     api_key = os.getenv("GEMINI_API_KEY")

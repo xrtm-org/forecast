@@ -34,7 +34,7 @@ class EvaluationResult(BaseModel):
             The value produced by the agent/model.
         metadata (`Dict[str, Any]`):
             Additional context about the evaluation (e.g., timestamp, version).
-    """
+    r"""
 
     subject_id: str
     score: float
@@ -52,7 +52,7 @@ class ReliabilityBin(BaseModel):
         mean_prediction (`float`): Average predicted confidence in this bin.
         mean_ground_truth (`float`): Average actual outcome (accuracy) in this bin.
         count (`int`): Number of predictions falling into this bin.
-    """
+    r"""
 
     bin_center: float
     mean_prediction: float
@@ -66,7 +66,7 @@ class Evaluator(Protocol):
 
     Implementations of this protocol provide the mathematical or logical basis
     for assessing forecast quality.
-    """
+    r"""
 
     def score(self, prediction: Any, ground_truth: Any) -> float:
         r"""
@@ -80,7 +80,7 @@ class Evaluator(Protocol):
 
         Returns:
             `float`: The calculated score.
-        """
+        r"""
         ...
 
     def evaluate(self, prediction: Any, ground_truth: Any, subject_id: str) -> EvaluationResult:
@@ -97,7 +97,7 @@ class Evaluator(Protocol):
 
         Returns:
             `EvaluationResult`: A structured container for the evaluation details.
-        """
+        r"""
         ...
 
 
@@ -135,7 +135,7 @@ class EvaluationReport(BaseModel):
         )
         print(report.model_dump_json(indent=2))
         ```
-    """
+    r"""
 
     metric_name: str
     mean_score: float
@@ -150,7 +150,7 @@ class EvaluationReport(BaseModel):
     def to_json(self, path: Union[str, Path]) -> None:
         r"""
         Exports the report to a JSON file.
-        """
+        r"""
         with open(path, "w") as f:
             f.write(self.model_dump_json(indent=2))
 
@@ -158,7 +158,7 @@ class EvaluationReport(BaseModel):
         r"""
         Converts results to a pandas DataFrame (if pandas is installed).
         Returns a DataFrame or raises ImportError.
-        """
+        r"""
         try:
             import pandas as pd
 

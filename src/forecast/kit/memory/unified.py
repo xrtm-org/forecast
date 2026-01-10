@@ -26,10 +26,10 @@ __all__ = ["Memory"]
 
 
 class Memory:
-    """
+    r"""
     Unified entry point for agentic Knowledge Base and RAG.
     Provider-agnostic via MemoryRegistry.
-    """
+    r"""
 
     provider: BaseVectorStore
 
@@ -51,7 +51,7 @@ class Memory:
             self.provider = p
 
     def store_experience(self, exp: EpisodicExperience):
-        """Saves a rich EpisodicExperience object to the vector store."""
+        r"""Saves a rich EpisodicExperience object to the vector store."""
         try:
             document_text = (
                 f"Event: {exp.event_type} | Subject: {exp.subject_id}\n"
@@ -82,7 +82,7 @@ class Memory:
             logger.error(f"[MEMORY] Failed to store experience: {e}")
 
     def retrieve_similar(self, query: str, n_results: int = 3) -> List[str]:
-        """Returns a list of matching document strings."""
+        r"""Returns a list of matching document strings."""
         try:
             results = self.provider.query(query_texts=[query], n_results=n_results)
             if results and "documents" in results and results["documents"] and len(results["documents"]) > 0:
@@ -93,7 +93,7 @@ class Memory:
             return []
 
     def query_formatted(self, query: str, n_results: int = 3) -> str:
-        """Returns a formatted string summary of similar memories."""
+        r"""Returns a formatted string summary of similar memories."""
         try:
             results = self.provider.query(query_texts=[query], n_results=n_results)
             if not results or not results.get("documents") or not results["documents"][0]:

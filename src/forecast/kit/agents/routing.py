@@ -44,7 +44,7 @@ class RoutingAgent(Agent):
             A custom map of route names to agents/providers.
         name (`str`, *optional*):
             Logical name of the router.
-    """
+    r"""
 
     def __init__(
         self,
@@ -86,7 +86,7 @@ class RoutingAgent(Agent):
             >>> router = RoutingAgent(fast_tier=hf_provider, smart_tier=gemini_provider)
             >>> result = await router.run("Summarize this text.")
             ```
-        """
+        r"""
         # 1. Classification Step
         complexity_prompt = f"""
         Classify the following task complexity as 'FAST' or 'SMART'.
@@ -96,7 +96,7 @@ class RoutingAgent(Agent):
         Task: {str(input_data)[:800]}
 
         Response: [FAST/SMART]
-        """
+        r"""
 
         try:
             decision_resp = await self.router_model.run(complexity_prompt)

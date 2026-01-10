@@ -23,10 +23,10 @@ __all__ = ["GraphAgent"]
 
 
 class GraphAgent(Agent):
-    """
+    r"""
     Agent that encapsulates a sub-graph (Orchestrator).
     Enables 'Composite Nodes' where an agent internally runs a whole pipeline.
-    """
+    r"""
 
     def __init__(self, orchestrator: Orchestrator, entry_node: Optional[str] = None, name: Optional[str] = None):
         super().__init__(name)
@@ -34,10 +34,10 @@ class GraphAgent(Agent):
         self.entry_node = entry_node
 
     async def run(self, input_data: Any, **kwargs) -> Any:
-        """
+        r"""
         Runs the internal orchestrator.
         Converts input_data into a BaseGraphState context.
-        """
+        r"""
         # Create a fresh state for the sub-graph
         state = BaseGraphState(subject_id=f"subgraph_{self.name}")
         state.context = {"input": input_data, **kwargs}

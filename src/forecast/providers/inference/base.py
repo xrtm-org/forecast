@@ -25,7 +25,7 @@ class InferenceProvider(ABC):
     `InferenceProvider` standardizes the interface for interacting with various
     LLM SDKs (e.g., Gemini, OpenAI, Anthropic, Hugging Face). This allows the rest
     of the platform to remain agnostic to the specific backend being used.
-    """
+    r"""
 
     knowledge_cutoff: Optional[datetime] = None
 
@@ -44,7 +44,7 @@ class InferenceProvider(ABC):
 
         Returns:
             `ModelResponse`: A unified response object containing text and metadata.
-        """
+        r"""
         pass
 
     async def run(self, prompt: str, **kwargs) -> "ModelResponse":
@@ -57,7 +57,7 @@ class InferenceProvider(ABC):
 
         Returns:
             `ModelResponse`: The model's response.
-        """
+        r"""
         return await self.generate_content_async(prompt, **kwargs)
 
     @property
@@ -67,21 +67,21 @@ class InferenceProvider(ABC):
 
         Returns:
             `bool`: `True` if the provider supports tool use, else `False`.
-        """
+        r"""
         return True
 
     @abstractmethod
     def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs) -> Any:
         r"""
         Synchronously generates content from the LLM (for non-async environments).
-        """
+        r"""
         pass
 
     @abstractmethod
     def stream(self, messages: List[Dict[str, str]], **kwargs) -> AsyncIterable[Any]:
         r"""
         Opens a streaming connection to the LLM for token-by-token generation.
-        """
+        r"""
         pass
 
 
@@ -98,7 +98,7 @@ class ModelResponse:
             Token statistics (prompt, completion, and total).
         logprobs (`Optional[List[Dict[str, Any]]]`):
             Optional token-level log probabilities if requested.
-    """
+    r"""
 
     def __init__(
         self,
@@ -106,11 +106,13 @@ class ModelResponse:
         raw: Any = None,
         usage: Optional[Dict[str, int]] = None,
         logprobs: Optional[List[Dict[str, Any]]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ):
         self.text = text
         self.raw = raw
         self.usage = usage or {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         self.logprobs = logprobs
+        self.metadata = metadata or {}
 
 
 __all__ = ["InferenceProvider", "ModelResponse"]

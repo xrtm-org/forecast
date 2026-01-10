@@ -21,10 +21,10 @@ __all__ = ["ControlService"]
 
 
 class ControlService:
-    """
+    r"""
     Manages the global execution state (PAUSE/RESUME/HALT) of an agent swarm.
     Uses Redis as the source of truth to allow external control (CLI/Dashboard).
-    """
+    r"""
 
     KEY_SYSTEM_STATUS = "FORECAST_CONTROL_STATUS"
     STATUS_RUNNING = "RUNNING"
@@ -42,7 +42,7 @@ class ControlService:
             self.redis = None
 
     def is_paused(self) -> bool:
-        """Returns True if the system is globally paused."""
+        r"""Returns True if the system is globally paused."""
         if not self.redis:
             return False
         try:
@@ -51,7 +51,7 @@ class ControlService:
             return False
 
     def is_halted(self) -> bool:
-        """Returns True if the system is globally halted (critical stop)."""
+        r"""Returns True if the system is globally halted (critical stop)."""
         if not self.redis:
             return False
         try:
@@ -60,19 +60,19 @@ class ControlService:
             return False
 
     def pause(self):
-        """Set state to PAUSED."""
+        r"""Set state to PAUSED."""
         if self.redis:
             self.redis.set(self.key, self.STATUS_PAUSED)
             logger.warning(f"[CONTROL] Swarm set to PAUSED ({self.key})")
 
     def resume(self):
-        """Set state to RUNNING."""
+        r"""Set state to RUNNING."""
         if self.redis:
             self.redis.set(self.key, self.STATUS_RUNNING)
             logger.info(f"[CONTROL] Swarm set to RUNNING ({self.key})")
 
     def halt(self):
-        """Set state to HALTED."""
+        r"""Set state to HALTED."""
         if self.redis:
             self.redis.set(self.key, self.STATUS_HALTED)
             logger.error(f"[CONTROL] Swarm set to HALTED ({self.key})")

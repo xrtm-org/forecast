@@ -31,7 +31,7 @@ class WebSearchSkill(BaseSkill):
     Args:
         search_tool (`Tool`, *optional*):
             An optional search tool instance to use. Defaults to `TavilySearchTool`.
-    """
+    r"""
 
     def __init__(self, search_tool: Optional[Tool] = None):
         self._search_tool = search_tool or TavilySearchTool()
@@ -62,7 +62,7 @@ class WebSearchSkill(BaseSkill):
             >>> skill = WebSearchSkill()
             >>> result = await skill.execute(query="latest AI news")
             ```
-        """
+        r"""
         query = kwargs.get("query", "")
         # Standard workflow: Search -> Parse -> Return
         # In a more advanced version, this would include query expansion/refinement.

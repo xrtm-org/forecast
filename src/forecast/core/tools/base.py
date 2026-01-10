@@ -31,7 +31,7 @@ class Tool(abc.ABC):
     `Tool` defines the interface for deterministic Python functions that agents
     can invoke. It is designed to be compatible with modern tool-calling protocols
     (e.g., UTCP).
-    """
+    r"""
 
     @property
     @abc.abstractmethod
@@ -69,7 +69,7 @@ class Tool(abc.ABC):
 
         Returns:
             `Any`: The result of the tool execution.
-        """
+        r"""
         pass
 
     def _apply_temporal_filters(self, query: str, temporal_context: Optional["TemporalContext"] = None) -> str:
@@ -82,7 +82,7 @@ class Tool(abc.ABC):
 
         Returns:
             `str`: The query with temporal filters applied.
-        """
+        r"""
         if not temporal_context or not temporal_context.is_backtest:
             return query
 
@@ -104,7 +104,7 @@ class StrandToolWrapper(Tool):
     Args:
         strand_tool (`Any`):
             The Strands tool instance to wrap.
-    """
+    r"""
 
     def __init__(self, strand_tool: Any):
         self._tool = strand_tool
@@ -148,7 +148,7 @@ class FunctionTool(Tool):
             Overrides the function's name.
         description (`str`, *optional*):
             Overrides the function's docstring.
-    """
+    r"""
 
     def __init__(self, fn: Callable, name: Optional[str] = None, description: Optional[str] = None):
         self.fn = fn

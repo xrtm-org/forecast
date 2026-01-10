@@ -26,7 +26,7 @@ class Skill(Protocol):
     Unlike atomic Tools, Skills typically orchestrate multiple tools or sub-processes
     to achieve a broader goal (e.g., "Web Research" consists of searching,
     crawling, and summarizing).
-    """
+    r"""
 
     @property
     def name(self) -> str:
@@ -49,7 +49,7 @@ class Skill(Protocol):
 
         Returns:
             `Any`: The result of the skill execution.
-        """
+        r"""
         ...
 
 
@@ -59,7 +59,7 @@ class BaseSkill(abc.ABC):
 
     Developers implementing new skills should inherit from this class to ensure
     compatibility with the platform's agent and registry systems.
-    """
+    r"""
 
     @property
     @abc.abstractmethod
@@ -82,7 +82,7 @@ class FunctionalSkill(BaseSkill):
 
     This class enables functional programming patterns within the engine by
     providing a standard `Skill` interface for naked functions.
-    """
+    r"""
 
     def __init__(self, func: Callable, name: str, description: str):
         self._func = func
@@ -117,7 +117,7 @@ def skill(name: str, description: Optional[str] = None):
 
     Returns:
         `Callable`: The decorator function.
-    """
+    r"""
 
     def decorator(func):
         desc = description or func.__doc__ or "No description provided."

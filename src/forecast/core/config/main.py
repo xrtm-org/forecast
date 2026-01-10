@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     Settings are automatically loaded from environment variables with an optional
     `FORECAST_` prefix (e.g., `FORECAST_GEMINI_API_KEY`).
-    """
+    r"""
 
     model_config = SettingsConfigDict(
         env_prefix="FORECAST_",

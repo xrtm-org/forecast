@@ -35,7 +35,7 @@ class TraceReplayer:
     This class enables "Offline Evaluation" by loading serialized graph states
     and re-running the evaluation logic without incurring the cost of re-generating
     the LLM outputs.
-    """
+    r"""
 
     @staticmethod
     def save_trace(state: BaseGraphState, path: str) -> None:
@@ -45,7 +45,7 @@ class TraceReplayer:
         Args:
             state: The completed graph state.
             path: The file path to save the trace to.
-        """
+        r"""
         try:
             json_str = state.model_dump_json(indent=2)
             with open(path, "w", encoding="utf-8") as f:
@@ -65,7 +65,7 @@ class TraceReplayer:
 
         Returns:
             BaseGraphState: The reconstructed state object.
-        """
+        r"""
         try:
             with open(path, "r", encoding="utf-8") as f:
                 json_str = f.read()
@@ -101,7 +101,7 @@ class TraceReplayer:
             `EvaluationResult`:
                 The scoring outcome from the offline replay, including metadata
                 marking it as a replay.
-        """
+        r"""
         # 1. Load Trace
         state = self.load_trace(trace_path)
 

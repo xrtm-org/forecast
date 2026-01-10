@@ -21,7 +21,7 @@ from forecast.version import __version__
 
 
 class ToolConfig(BaseModel):
-    """Configuration for external tools and skill execution."""
+    r"""Configuration for external tools and skill execution."""
 
     timeout: int = Field(default=30, description="Global timeout for tool execution in seconds.")
     tavily_api_key: Optional[SecretStr] = Field(default=None, description="API key for web search capabilities.")
