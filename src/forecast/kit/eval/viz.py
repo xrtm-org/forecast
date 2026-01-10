@@ -42,6 +42,7 @@ class ReliabilityCurveData:
         ece (`float`):
             The calculated Expected Calibration Error.
     """
+
     prob_pred: np.ndarray
     prob_true: np.ndarray
     ece: float
@@ -150,7 +151,7 @@ class ReliabilityDiagram:
     Example:
         ```python
         from forecast.kit.eval.viz import ReliabilityDiagram
-        
+
         rd = ReliabilityDiagram(n_bins=10)
         data = rd.compute(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8])
         rd.plot(y_true=[1, 0, 1], y_prob=[0.9, 0.1, 0.8], save_path="reliability.png")

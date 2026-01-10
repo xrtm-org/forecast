@@ -26,6 +26,7 @@ from forecast.core.schemas.graph import BaseGraphState
 # Inherit from BaseGraphState to keep required fields like subject_id and context.
 class ResearchState(BaseGraphState):
     r"""Custom state container for the researcher agent workflow."""
+
     query: str
     findings: List[str] = Field(default_factory=list)
     is_complete: bool = False

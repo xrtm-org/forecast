@@ -20,21 +20,19 @@ Institutional-grade parallelized agentic reasoning engine.
 - **The Kit (`/kit`)**: Importable "Instruments" (Agents, Skills, Evaluators) for standard use cases.
 - **Providers (`/providers`)**: Concrete connectors for cloud and local inference backends.
 
-## Installation
-
 ### From PyPI (Stable)
+
 ```bash
-# Standard Institutional Install (Cloud + Core)
+# Tier 1: Core Engine (Minimal / Pure Foundation)
 pip install xrtm-forecast
 
-# Hardware-Specific Local Inference
+# Tier 2: Standard Workbench (Cloud + Kit + Data)
+pip install "xrtm-forecast[standard]"
+
+# Tier 3: Hardware Lab (Standard + Local Engine)
 pip install "xrtm-forecast[transformers]"  # PyTorch + HuggingFace
 pip install "xrtm-forecast[vllm]"          # High-throughput serving
 pip install "xrtm-forecast[llama-cpp]"     # CPU-optimized GGUF
-pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
-
-# Researcher Kit (Enhanced Data/Viz)
-pip install "xrtm-forecast[data,viz,memory]"
 ```
 
 ### From Source (Latest)

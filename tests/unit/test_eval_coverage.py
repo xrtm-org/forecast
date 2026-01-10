@@ -137,7 +137,6 @@ def test_backtester_edge_cases():
     backtester = Backtester(agent, evaluator)
 
     # Empty dataset
-    report = pytest.mark.asyncio(backtester.run([]))
     # Note: Using asyncio run for the coroutine
     import asyncio
 

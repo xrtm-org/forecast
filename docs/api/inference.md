@@ -1,10 +1,15 @@
-# Inference API
+# Inference
+1. **Cloud-Native**: Using `standard` install.
+2. **Local-First**: Using specific hardware extras (e.g., `transformers`, `vllm`).
 
-Standardized interface for interacting with various LLM providers.
+```bash
+# Cloud Providers
+pip install "xrtm-forecast[standard]"
 
-::: forecast.providers.inference.factory.ModelFactory
-    options:
-      show_root_heading: true
+# Local Providers
+pip install "xrtm-forecast[vllm]"
+```
+
 ::: forecast.providers.inference.base.InferenceProvider
     options:
       show_root_heading: true

@@ -18,11 +18,10 @@ Institutional-grade parallelized agentic reasoning engine.
 
 ### Installation
 
-For development, we recommend using the provided Dev Container or `uv`:
+For develTo use the Researcher Kit (Pandas, SQL, Visualization, Vector Memory), install the **Standard** workbench:
 
 ```bash
-# Using uv
-uv sync --all-extras
+pip install "xrtm-forecast[standard]"
 ```
 
 ### Basic Usage
