@@ -1,82 +1,72 @@
-# xrtm-forecast
+<!---
+Copyright 2026 XRTM Team. All rights reserved.
 
-Institutional-grade parallelized agentic reasoning engine.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-## Overview
-`xrtm-forecast` is an institutional-grade, domain-agnostic intelligence engine. It provides a framework for:
-- **Inference Layer**: Standardized provider interfaces for Gemini, OpenAI, and local Hugging Face models.
-- **Tiered Reasoning**: Composite `RoutingAgent` for cost-optimized task dispatching.
-- **Reasoning Graph**: A pluggable state-machine orchestrator for multi-agent workflows.
-- **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
-- **Skill Protocol**: Composable behaviors (e.g., Search, SQL, Pandas) that agents can dynamically equip.
-- **Observability**: OTel-native structured telemetry and institutional execution reports.
-- **Evaluation**: Built-in Backtest Engine for large-scale accuracy metrics (Brier Score, ECE).
-- **Temporal Sandboxing**: Multi-layered protection (PiT Tools, Clock Mocking, Leakage Guardian) to prevent look-ahead bias in historical backtests.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-## Architectural Design: "Pure Core / The Kit"
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 
-`xrtm-forecast` is designed for modularity using a strict three-tier architecture:
-- **The Core (`/core`)**: Zero-dependency protocol layer and state-machine orchestrator.
-- **The Kit (`/kit`)**: Importable "Instruments" (Agents, Skills, Evaluators) for standard use cases.
-- **Providers (`/providers`)**: Concrete connectors for cloud and local inference backends.
+<p align="center">
+    <br>
+    <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square" alt="License">
+    <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
+    <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
+    <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
+</p>
 
-### From PyPI (Stable)
+<h1 align="center">xrtm-forecast</h1>
 
+<h3 align="center">
+    <p>Professional engine for generative forecasting and agentic reasoning</p>
+</h3>
+
+`xrtm-forecast` acts as the rigorous backbone for state-of-the-art agentic workflows, bridging the gap between rapid prototyping and mission-critical deployment.
+
+It centralizes the "Reasoning Graph" definition so that agent behaviors are deterministic and auditable. `forecast` is the pivot across the ecosystem: if a provider is supported, it can be plugged into any agent topology (Orchestrator, Debate, Consensus) without changing business logic.
+
+We pledge to uphold research-grade transparency: strict typing, zero-tolerance verification, and rigorous double-trace auditability for every decision made by an AI.
+
+## Installation
+
+### Standard Installation (Cloud + Core)
 ```bash
-# Tier 1: Core Engine (Minimal / Pure Foundation)
 pip install xrtm-forecast
+```
 
-# Tier 2: Standard Workbench (Cloud + Kit + Data)
-pip install "xrtm-forecast[standard]"
-
-# Tier 3: Hardware Lab (Standard + Local Engine)
+### Hardware-Specific Local Inference
+```bash
 pip install "xrtm-forecast[transformers]"  # PyTorch + HuggingFace
 pip install "xrtm-forecast[vllm]"          # High-throughput serving
 pip install "xrtm-forecast[llama-cpp]"     # CPU-optimized GGUF
+pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
 ```
 
-### From Source (Latest)
-```bash
-pip install git+https://github.com/xrtm-org/forecast.git
-```
+## Quickstart
 
-## Configuration
-
-`xrtm-forecast` follows a decentralized configuration pattern. Global environment variables are used for infrastructure (API keys), while specific behaviors are controlled via module-level configuration classes.
-
-### 1. Environment Secrets
-
-Set your API keys in a `.env` file or environment:
-
-```bash
-# Core API Keys
-GEMINI_API_KEY=your_key_here
-OPENAI_API_KEY=your_key_here
-TAVILY_API_KEY=your_key_here
-```
-
-### 2. Component Configuration
-
-Each major module (`inference`, `graph`, `telemetry`, `tools`) has its own `config.py` defining its schema. This allows you to instantiate multiple components with different settings in the same process.
-
-## Quick Start
-
-`xrtm-forecast` is designed for high-end ergonomics. Use the pre-configured assistants to start forecasting in seconds:
+Get started with `xrtm-forecast` right away with the **Analyst** API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
 import asyncio
 from forecast import create_forecasting_analyst
 
 async def main():
-    # 1. Instantiate the analyst with a shortcut
-    # (API keys are automatically injected from your .env file)
+    # 1. Instantiate the analyst (API keys injected from env)
     agent = create_forecasting_analyst(model_id="gemini")
     
-    # 2. Execute reasoning on a complex probabilistic question
+    # 2. Execute reasoning loop
     result = await agent.run(
         "Will a general-purpose AI (AGI) be publicly announced before 2030?"
     )
     
+    # 3. Inspect the rigorous output
     print(f"Confidence: {result.confidence}")
     print(f"Reasoning: {result.reasoning}")
 
@@ -84,27 +74,57 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## Documentation & Examples
+## Why should I use xrtm-forecast?
 
-- **Architecture**: [The "Lego" Design](docs/architecture.md)
-- **Agent Registry**: [Pre-built & Core Agents](docs/agents_registry.md)
-- **Examples**: Check the [examples/](examples/) directory:
-    - [examples/kit/minimal_agent.py](examples/kit/minimal_agent/run_minimal_agent.py): One-line agent setup.
-    - [examples/kit/local_analyst.py](examples/kit/local_analyst/run_local_analyst.py): Private reasoning with HF models.
-    - [examples/kit/features/tiered_reasoning.py](examples/kit/features/tiered_reasoning/run_tiered_reasoning.py): Optimal routing between Fast/Smart tiers.
-    - [examples/kit/features/enterprise_data.py](examples/kit/features/enterprise_data/run_enterprise_data.py): Integrated SQL and Pandas analytics.
-    - [examples/kit/features/discovery.py](examples/kit/features/discovery/run_discovery.py): Dynamic skill discovery.
-    - [examples/kit/backtest_workflow.py](examples/kit/backtest_workflow/run_backtest_workflow.py): Historical backtesting with temporal sandboxing.
+1.  **Temporal Integrity (The Time Machine)**:
+    *   Most agent frameworks leak future data during backtests. `xrtm-forecast` has a **Temporal Sandboxing** engine that rigidly enforces cut-off dates for search and memory.
+    *   Verify your strategies against past market events with zero look-ahead bias.
 
-## Contributing
+2.  **Probabilistic Rigor**:
+    *   Agents are treated as calibrated instruments, not just chatbots. We support native **Brier Score** calculation, **Reliability Diagrams**, and **Confidence Interval** estimation out of the box.
 
-We welcome institutional-grade contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and our development workflow.
+3.  **Hybrid "Quant-Qual" Intelligence**:
+    *   Seamlessly mix fast statistical models (e.g., ARIMA, XGBoost) with slow, deliberative LLM Agents in the same graph.
+    *   Orchestrate complex "Consensus" topologies where multiple agents debate to reduce variance.
 
+4.  **Double-Trace Auditability**:
+    *   Forecasting requires accountability. We provide a dual-layer audit trail: **Structural** (OTel traces of execution flow) and **Logical** (reasoning snapshots) for every prediction.
 
----
+## Why shouldn't I use xrtm-forecast?
 
-## License
+*   You need a generic "Chat with PDF" or "Customer Support" bot. We are hyper-focused on **Forecasting** and **Research** workflows.
+*   You want "magic" autoscaling or loose typing. We prioritize correctness, repeatability, and type-safety over ease of prototyping.
+*   You don't care about backtesting or time-travel debugging.
 
-`xrtm-forecast` is open-source software licensed under the Apache-2.0 license. See the [LICENSE](LICENSE) file for more details.
+## Example Components
 
-Copyright © 2026 XRTM Team.
+`xrtm-forecast` comes with a comprehensive **Kit** of pre-built instruments. Expand the categories below to see examples.
+
+<details>
+<summary><b>Agents (Personas)</b></summary>
+
+*   **[Minimal Agent](examples/kit/minimal_agent/run_minimal_agent.py)**: The "Hello World" of reasoning.
+*   **[Forecasting Analyst](examples/kit/pipelines/forecasting_analyst/run_forecasting_analyst.py)**: A specialized researcher for binary market questions.
+*   **[Adversary (Red Team)](examples/kit/agents/adversary/run_adversary.py)**: An agent trained to find flaws in arguments.
+
+</details>
+
+<details>
+<summary><b>Topologies (Interaction Patterns)</b></summary>
+
+*   **[Debate](examples/kit/topologies/debate_demo/run_debate_demo.py)**: Two agents arguing for opposing sides before a judge.
+*   **[Consensus](examples/kit/topologies/consensus_demo/run_consensus_demo.py)**: Multiple agents varying in temperature converging on a decision.
+*   **[Orchestrator Basics](examples/core/orchestrator_basics/run_orchestrator_basics.py)**: Building a custom state machine from scratch.
+
+</details>
+
+<details>
+<summary><b>Capabilities (Skills)</b></summary>
+
+*   **[Discovery (Search)](examples/kit/features/discovery/run_discovery.py)**: Automated information retrieval.
+*   **[Streaming](examples/kit/features/streaming_demo/run_streaming_demo.py)**: Real-time token streaming for UIs.
+*   **[Calibration](examples/kit/features/calibration_demo/run_calibration_demo.py)**: Adjusting confidence intervals to match reality.
+*   **[Trace Replay](examples/kit/features/trace_replay/run_trace_replay.py)**: Re-running a saved execution for debugging.
+
+</details>
+

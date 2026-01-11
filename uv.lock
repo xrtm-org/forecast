@@ -5966,22 +5966,24 @@ name = "xrtm-forecast"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
+    { name = "anthropic" },
+    { name = "chromadb" },
     { name = "click" },
     { name = "freezegun" },
+    { name = "google-genai" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "openai" },
+    { name = "pandas" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "redis" },
     { name = "rich" },
+    { name = "seaborn" },
+    { name = "sqlalchemy" },
 ]
 
 [package.optional-dependencies]
-anthropic = [
-    { name = "anthropic" },
-]
-data = [
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "sqlalchemy" },
-]
 dev = [
     { name = "mkdocs" },
     { name = "mkdocs-material" },
@@ -5992,78 +5994,20 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
 ]
-google = [
-    { name = "google-genai" },
-]
 llama-cpp = [
-    { name = "chromadb" },
-    { name = "google-genai" },
     { name = "llama-cpp-python" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "seaborn" },
-    { name = "sqlalchemy" },
-]
-memory = [
-    { name = "chromadb" },
-]
-openai = [
-    { name = "openai" },
-]
-redis = [
-    { name = "redis" },
-]
-standard = [
-    { name = "chromadb" },
-    { name = "google-genai" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "seaborn" },
-    { name = "sqlalchemy" },
 ]
 transformers = [
     { name = "accelerate" },
     { name = "bitsandbytes" },
-    { name = "chromadb" },
-    { name = "google-genai" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "seaborn" },
     { name = "sentencepiece" },
-    { name = "sqlalchemy" },
     { name = "torch" },
     { name = "transformers" },
 ]
-viz = [
-    { name = "matplotlib" },
-    { name = "seaborn" },
-]
 vllm = [
-    { name = "chromadb" },
-    { name = "google-genai" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "seaborn" },
-    { name = "sqlalchemy" },
     { name = "vllm" },
 ]
 xlm = [
-    { name = "chromadb" },
-    { name = "google-genai" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "openai" },
-    { name = "pandas" },
-    { name = "seaborn" },
-    { name = "sqlalchemy" },
     { name = "torch" },
     { name = "transformers" },
 ]
@@ -6072,44 +6016,39 @@ xlm = [
 requires-dist = [
     { name = "accelerate", marker = "extra == 'transformers'", specifier = ">=0.26.0" },
     { name = "aiohttp", specifier = ">=3.9.0" },
-    { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.1.0" },
+    { name = "anthropic", specifier = ">=0.1.0" },
     { name = "bitsandbytes", marker = "extra == 'transformers'", specifier = ">=0.41.0" },
-    { name = "chromadb", marker = "extra == 'memory'", specifier = ">=0.4.0" },
+    { name = "chromadb", specifier = ">=0.4.0" },
     { name = "click", specifier = ">=8.0.0" },
     { name = "freezegun", specifier = ">=1.2.0" },
-    { name = "google-genai", marker = "extra == 'google'", specifier = ">=0.1.0" },
+    { name = "google-genai", specifier = ">=0.1.0" },
     { name = "llama-cpp-python", marker = "extra == 'llama-cpp'", specifier = ">=0.2.0" },
-    { name = "matplotlib", marker = "extra == 'viz'", specifier = ">=3.7.0" },
+    { name = "matplotlib", specifier = ">=3.7.0" },
     { name = "mkdocs", marker = "extra == 'dev'", specifier = ">=1.5.0" },
     { name = "mkdocs-material", marker = "extra == 'dev'", specifier = ">=9.4.0" },
     { name = "mkdocstrings", extras = ["python"], marker = "extra == 'dev'", specifier = ">=0.23.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "numpy", marker = "extra == 'data'", specifier = ">=1.24.0" },
-    { name = "openai", marker = "extra == 'openai'", specifier = ">=1.0.0" },
-    { name = "pandas", marker = "extra == 'data'", specifier = ">=2.0.0" },
+    { name = "numpy", specifier = ">=1.24.0" },
+    { name = "openai", specifier = ">=1.0.0" },
+    { name = "pandas", specifier = ">=2.0.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
-    { name = "redis", marker = "extra == 'redis'", specifier = ">=5.0.0" },
+    { name = "redis", specifier = ">=5.0.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "seaborn", marker = "extra == 'viz'", specifier = ">=0.12.0" },
+    { name = "seaborn", specifier = ">=0.12.0" },
     { name = "sentencepiece", marker = "extra == 'transformers'", specifier = ">=0.2.0" },
-    { name = "sqlalchemy", marker = "extra == 'data'", specifier = ">=2.0.0" },
+    { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "torch", marker = "extra == 'transformers'", specifier = ">=2.0.0" },
     { name = "torch", marker = "extra == 'xlm'", specifier = ">=2.0.0" },
     { name = "transformers", marker = "extra == 'transformers'", specifier = ">=4.40.0" },
     { name = "transformers", marker = "extra == 'xlm'", specifier = ">=4.40.0" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.3.0" },
-    { name = "xrtm-forecast", extras = ["data", "google", "memory", "openai", "viz"], marker = "extra == 'standard'" },
-    { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'llama-cpp'" },
-    { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'transformers'" },
-    { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'vllm'" },
-    { name = "xrtm-forecast", extras = ["standard"], marker = "extra == 'xlm'" },
 ]
-provides-extras = ["core", "google", "openai", "anthropic", "memory", "redis", "data", "viz", "standard", "transformers", "vllm", "llama-cpp", "xlm", "dev"]
+provides-extras = ["transformers", "vllm", "llama-cpp", "xlm", "dev"]
 
 [[package]]
 name = "yarl"
