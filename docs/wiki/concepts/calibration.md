@@ -1,7 +1,7 @@
 # Reliability & Calibration (v0.2.1)
 
 ## The Philosophy: "The Researcher's Workbench"
-In v0.2.1, we shifted from a narrow "Calibration Tool" to a broad **Research Platform**. We recognize that institutional researchers don't just want a Brier Score; they want the raw data to build their own custom metrics and visualizations.
+In v0.2.1, we shifted from a narrow "Calibration Tool" to a broad Research Platform. We recognize that institutional researchers don't just want a Brier Score; they want the raw data to build their own custom metrics and visualizations.
 
 ## Core Concepts
 
@@ -15,7 +15,7 @@ class Evaluator(Protocol):
 ```
 
 ### 2. Reliability Bins
-Instead of forcing a Matplotlib plot on users, we calculate the raw statistical **Reliability Bins**:
+Instead of forcing a Matplotlib plot on users, we calculate the raw statistical Reliability Bins:
 - **Bin Center**: The confidence bucket (e.g., 0.95).
 - **Mean Prediction**: The average confidence in that bucket.
 - **Mean Ground Truth**: The actual accuracy in that bucket.

@@ -5,11 +5,11 @@ The `Orchestrator` is the domain-agnostic engine that drives all agent workflows
 ## Key Concepts
 
 ### Stages (The "Functional Slots")
-A **Stage** (implemented as a `Node` in code) is a unit of execution—a "slot" in your workflow.
+A Stage (implemented as a `Node` in code) is a unit of execution—a "slot" in your workflow.
 *   **Agent Stages**: Powered by an LLM (e.g., "The Forecaster").
 *   **Utility Stages**: Pure Python functions (e.g., "The Math Model" or "The Data Fetcher").
 
-This distinction is what enables the **Quant-Agent Hybrid**: you can have a high-speed statistical model as one **Stage** and a creative reasoning agent as another in the same graph.
+This distinction is what enables the Quant-Agent Hybrid: you can have a high-speed statistical model as one Stage and a creative reasoning agent as another in the same graph.
 
 ```python
 # A Node can be a simple function
@@ -21,14 +21,14 @@ orch.add_node("math_step", calculate_brier_score)
 ```
 
 ### Edges
-An **Edge** defines the control flow.
+An Edge defines the control flow.
 ```python
 # Declarative wiring
 orch.add_edge("node_a", "node_b")
 ```
 
 ### Parallel Groups (New in v0.1.5)
-A **Parallel Group** allows multiple **Stages** to execute **concurrently**. The Orchestrator waits for *all* stages in the group to complete (Barrier Synchronization) before moving to the next step.
+A Parallel Group allows multiple Stages to execute concurrently. The Orchestrator waits for *all* stages in the group to complete (Barrier Synchronization) before moving to the next step.
 
 This is essential for high-throughput workflows where components don't depend on each other's immediate output.
 
@@ -48,7 +48,7 @@ orch.add_edge("run_all", "aggregator")
 
 ## Control Flow
 1.  **Entry Point**: The graph starts at `entry_point`.
-2.  **Execution**: The active **Stage** runs.
+2.  **Execution**: The active Stage runs.
 3.  **Transition**:
     *   If the stage code returns a `next_stage` string, execution jumps there.
     *   If it returns `None`, the Orchestrator checks the `edges` registry.

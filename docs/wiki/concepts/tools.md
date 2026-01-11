@@ -1,9 +1,9 @@
 # Tools & Skills
 
-In `xrtm-forecast`, we distinguish between **Tools** (low-level actions) and **Skills** (high-level capabilities).
+In `xrtm-forecast`, we distinguish between Tools (low-level actions) and Skills (high-level capabilities).
 
 ## 1. Tools (The "Scalpel")
-A **Tool** is a single, deterministic Python function. It is intended for granular tasks.
+A Tool is a single, deterministic Python function. It is intended for granular tasks.
 
 ```python
 from forecast.providers.tools import FunctionTool
@@ -16,7 +16,7 @@ stock_tool = FunctionTool(get_stock_price)
 ```
 
 ## 2. Skills (The "Ability")
-A **Skill** is a high-level **bundle**. It represents an agent's "professional training" in a specific domain. Skills often contain multiple tools and specific safety/logic checks.
+A Skill is a high-level bundle. It represents an agent's "professional training" in a specific domain. Skills often contain multiple tools and specific safety/logic checks.
 
 | Skill | Description |
 | :--- | :--- |

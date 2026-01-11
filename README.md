@@ -4,13 +4,13 @@ Institutional-grade parallelized agentic reasoning engine.
 
 ## Overview
 `xrtm-forecast` is an institutional-grade, domain-agnostic intelligence engine. It provides a framework for:
-- **Inference Layer**: Standardized provider interfaces for Gemini, OpenAI, and **local Hugging Face models**.
+- **Inference Layer**: Standardized provider interfaces for Gemini, OpenAI, and local Hugging Face models.
 - **Tiered Reasoning**: Composite `RoutingAgent` for cost-optimized task dispatching.
 - **Reasoning Graph**: A pluggable state-machine orchestrator for multi-agent workflows.
 - **Agent Core**: Standardized `Agent` base class for structured reasoning and parsing.
-- **Skill Protocol**: Composable behaviors (e.g., Search, **SQL**, **Pandas**) that agents can dynamically equip.
+- **Skill Protocol**: Composable behaviors (e.g., Search, SQL, Pandas) that agents can dynamically equip.
 - **Observability**: OTel-native structured telemetry and institutional execution reports.
-- **Evaluation**: Built-in **Backtest Engine** for large-scale accuracy metrics (Brier Score, ECE).
+- **Evaluation**: Built-in Backtest Engine for large-scale accuracy metrics (Brier Score, ECE).
 - **Temporal Sandboxing**: Multi-layered protection (PiT Tools, Clock Mocking, Leakage Guardian) to prevent look-ahead bias in historical backtests.
 
 ## Architectural Design: "Pure Core / The Kit"
@@ -105,6 +105,6 @@ We welcome institutional-grade contributions! Please see [CONTRIBUTING.md](CONTR
 
 ## License
 
-`xrtm-forecast` is open-source software licensed under the **Apache-2.0** license. See the [LICENSE](LICENSE) file for more details.
+`xrtm-forecast` is open-source software licensed under the Apache-2.0 license. See the [LICENSE](LICENSE) file for more details.
 
 Copyright © 2026 XRTM Team.

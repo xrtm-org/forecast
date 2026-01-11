@@ -1,6 +1,6 @@
 # Agents
 
-An **Agent** is the primary "actor" in the `xrtm-forecast` system. It simulates a human analyst or worker.
+An Agent is the primary "actor" in the `xrtm-forecast` system. It simulates a human analyst or worker.
 
 ## Anatomy of an Agent
 An Agent connects three components:
@@ -29,9 +29,9 @@ agent = LLMAgent(model=provider, name="Alice", role="Researcher")
 3.  **Output**: Returns a result or tool call.
 
 ## Agents as Stages
-While an Agent is an object, it is often consumed as a **Stage** in an Orchestrator graph. 
+While an Agent is an object, it is often consumed as a Stage in an Orchestrator graph. 
 
 We use **Topologies** to wrap agents automatically so they can communicate via the `GraphState`.
 
-*   **One Brain, Many Slots**: You can use the same Agent object in multiple different **Stages** (e.g., as a "Debater" and then as a "Summary Writer").
-*   **Context Passing**: When an Agent runs as a **Stage**, it reads its input from `state.context` and writes its results back to it.
+*   **One Brain, Many Slots**: You can use the same Agent object in multiple different Stages (e.g., as a "Debater" and then as a "Summary Writer").
+*   **Context Passing**: When an Agent runs as a Stage, it reads its input from `state.context` and writes its results back to it.

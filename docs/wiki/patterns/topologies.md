@@ -3,7 +3,7 @@
 The `forecast.kit.patterns` module provides pre-wired architectural patterns for reasoning. Instead of manually wiring every edge in an `Orchestrator`, you can use these factories to instantiate robust, institutional-grade topologies.
 
 ## Philosophy
-We adhere to the **"Pure Core, Practical Shell"** philosophy:
+We adhere to the "Pure Core, Practical Shell" philosophy:
 *   **Pure Core**: The `Orchestrator` engine handles execution, state, and parallelism.
 *   **Practical Shell**: Topologies are just factory functions that configure the core engine. They do not introduce new runtime logic.
 
@@ -12,7 +12,7 @@ We adhere to the **"Pure Core, Practical Shell"** philosophy:
 ### 1. Debate Topology
 *Factory*: `create_debate_graph()`
 
-The Debate topology wires three agents into a structured argumentative loop. This pattern is essential for **Consensus Building** and **Adversarial Verification**.
+The Debate topology wires three agents into a structured argumentative loop. This pattern is essential for Consensus Building and Adversarial Verification.
 
 ```mermaid
 graph LR
@@ -39,7 +39,7 @@ result = await graph.run("Thesis: Inflation is transitory.")
 ### 2. Fan-Out Topology
 *Factory*: `create_fanout_graph()`
 
-The Fan-Out topology executes N worker **Stages** **in parallel** (concurrently) and then aggregates their results. This is critical for **Horizontal Scaling** (e.g., analyzing 50 stock tickers at once).
+The Fan-Out topology executes N worker Stages **in parallel** (concurrently) and then aggregates their results. This is critical for **Horizontal Scaling** (e.g., analyzing 50 stock tickers at once).
 
 ```mermaid
 graph LR
