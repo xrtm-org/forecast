@@ -19,6 +19,7 @@ import time
 from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 from forecast.core.config.graph import GraphConfig
+from forecast.core.runtime import AsyncRuntime
 from forecast.core.schemas.graph import BaseGraphState
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,8 @@ class Orchestrator(Generic[StateT]):
         # Declarative Edges: {"from_node_name": "to_node_name"}
         # This allows us to wire the graph externally.
         self.edges: Dict[str, str] = {}
+        # Conditional Edges: {"from_node": (condition_func, route_map)}
+        self.conditional_edges: Dict[str, tuple] = {}
         # Parallel Execution Groups: {"group_name": ["node1", "node2"]}
         self.parallel_groups: Dict[str, list[str]] = {}
         self.entry_point: Optional[str] = None
@@ -97,6 +100,24 @@ class Orchestrator(Generic[StateT]):
     def set_entry_point(self, node_name: str) -> None:
         r"""Sets the starting node for the graph execution."""
         self.entry_point = node_name
+
+    def add_conditional_edge(
+        self,
+        from_node: str,
+        condition: Callable[[BaseGraphState], str],
+        route_map: Dict[str, str],
+    ) -> None:
+        r"""
+        Adds a logic-based routing step.
+
+        Args:
+            from_node (`str`): The source node.
+            condition (`Callable[[BaseGraphState], str]`):
+                A function that inspects the state and returns a routing key.
+            route_map (`Dict[str, str]`):
+                A mapping from the routing key to the next node name.
+        r"""
+        self.conditional_edges[from_node] = (condition, route_map)
 
     def add_parallel_group(self, group_name: str, node_names: list[str]) -> None:
         r"""
@@ -219,14 +240,20 @@ class Orchestrator(Generic[StateT]):
 
                 # Execute all workers in parallel
                 if tasks:
+                    # Spawn properly named tasks for telemetry
+                    wrapped_tasks = []
+                    for i, t_coro in enumerate(tasks):
+                        task_name = f"{active_node}:worker_{i}"
+                        wrapped_tasks.append(AsyncRuntime.spawn(t_coro, name=task_name))
+
                     # Temporal Sandboxing: Mock System Clock
                     if state.temporal_context and state.temporal_context.is_backtest:
                         from freezegun import freeze_time
 
                         with freeze_time(state.temporal_context.reference_time):
-                            results = await asyncio.gather(*tasks, return_exceptions=True)
+                            results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
                     else:
-                        results = await asyncio.gather(*tasks, return_exceptions=True)
+                        results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
 
                     for i, res in enumerate(results):
                         if isinstance(res, Exception):
@@ -244,9 +271,24 @@ class Orchestrator(Generic[StateT]):
                 break
 
             # If the node didn't explicitly return a next step (or returned None),
-            # check the declarative edge registry.
+            # check the declarative edge registry, prioritizing conditional edges.
             if next_node is None:
-                next_node = self.edges.get(active_node)
+                # 1. Check valid conditional edges
+                if active_node in self.conditional_edges:
+                    condition_func, route_map = self.conditional_edges[active_node]
+                    try:
+                        route_key = condition_func(state)
+                        next_node = route_map.get(route_key)
+                        if not next_node:
+                            logger.warning(
+                                f"[GRAPH] Condition returned '{route_key}' but no mapping found for node '{active_node}'"
+                            )
+                    except Exception as e:
+                        logger.error(f"[GRAPH] Conditional edge logic failed for '{active_node}': {e}")
+
+                # 2. If no conditional match (or no condition), fall back to static edge
+                if next_node is None:
+                    next_node = self.edges.get(active_node)
 
             active_node = next_node
             state.cycle_count += 1

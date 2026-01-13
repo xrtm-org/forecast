@@ -15,7 +15,7 @@
 
 from typing import Any, List, Tuple, Union
 
-from forecast.core.eval.definitions import EvaluationResult, Evaluator, ReliabilityBin
+from forecast.core.eval.definitions import BrierDecomposition, EvaluationResult, Evaluator, ReliabilityBin
 
 
 class BrierScoreEvaluator(Evaluator):
@@ -82,6 +82,59 @@ class BrierScoreEvaluator(Evaluator):
             prediction=prediction,
             metadata={"metric": "Brier Score"},
         )
+
+    def compute_decomposition(self, results: List[EvaluationResult], num_bins: int = 10) -> BrierDecomposition:
+        r"""
+        Decomposes the Brier Score into Reliability, Resolution, and Uncertainty.
+
+        BS = Reliability - Resolution + Uncertainty
+
+        Args:
+            results (`List[EvaluationResult]`):
+                The list of evaluation results.
+            num_bins (`int`):
+                Number of bins for calibration analysis.
+
+        Returns:
+            `BrierDecomposition`: The components of the score.
+        """
+        # Reuse ECE evaluator for binning
+        ece_eval = ExpectedCalibrationErrorEvaluator(num_bins=num_bins)
+        _, bins = ece_eval.compute_calibration_data(results)
+
+        total_count = len(results)
+        if total_count == 0:
+            return BrierDecomposition(reliability=0.0, resolution=0.0, uncertainty=0.0, score=0.0)
+
+        # 1. Uncertainty: o_bar * (1 - o_bar)
+        # o_bar is the base rate (overall average outcome)
+        all_outcomes = []
+        for r in results:
+            if isinstance(r.ground_truth, str):
+                o = 1.0 if r.ground_truth.lower() in ["yes", "1", "true", "won", "pass"] else 0.0
+            else:
+                o = 1.0 if r.ground_truth else 0.0
+            all_outcomes.append(o)
+
+        o_bar = sum(all_outcomes) / total_count
+        uncertainty = o_bar * (1.0 - o_bar)
+
+        # 2. Reliability: (1/N) * sum(n_k * (f_k - o_k)^2)
+        reliability = 0.0
+
+        # 3. Resolution: (1/N) * sum(n_k * (o_k - o_bar)^2)
+        resolution = 0.0
+
+        for b in bins:
+            w_k = b.count / total_count
+            # Reliability term for bin k
+            reliability += w_k * (b.mean_prediction - b.mean_ground_truth) ** 2
+            # Resolution term for bin k
+            resolution += w_k * (b.mean_ground_truth - o_bar) ** 2
+
+        score = reliability - resolution + uncertainty
+
+        return BrierDecomposition(reliability=reliability, resolution=resolution, uncertainty=uncertainty, score=score)
 
 
 class ExpectedCalibrationErrorEvaluator(Evaluator):

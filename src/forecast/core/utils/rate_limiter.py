@@ -19,6 +19,8 @@ import threading
 import time
 from typing import Optional
 
+from forecast.core.runtime import AsyncRuntime
+
 logger = logging.getLogger(__name__)
 
 __all__ = ["TokenBucket"]
@@ -103,7 +105,7 @@ class TokenBucket:
                     logger.error(f"[RATE-LIMITER] Redis error in acquire: {e}. Switching to In-Memory.")
                     self.use_redis = False
                     break
-                await asyncio.sleep(1.0)
+                await AsyncRuntime.sleep(1.0)
 
         # Fallback to In-Memory logic
         while True:
@@ -115,7 +117,7 @@ class TokenBucket:
                 if self._tokens >= tokens:
                     self._tokens -= tokens
                     return
-            await asyncio.sleep(1.0)
+            await AsyncRuntime.sleep(1.0)
 
     def acquire_sync(self, tokens: int = 1):
         r"""Blocks until enough tokens are available (Sync)."""

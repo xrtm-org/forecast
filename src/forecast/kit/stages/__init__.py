@@ -13,6 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from forecast.kit.stages.guardian import LeakageGuardian
+from forecast.core.stages.guardian import LeakageGuardian
 
 __all__ = ["LeakageGuardian"]

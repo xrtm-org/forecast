@@ -38,7 +38,7 @@ async def test_analyst_pipeline_e2e():
     config = GeminiConfig(model_id="gemini-2.0-flash-lite", api_key=SecretStr(api_key))
     provider = ModelFactory.get_provider(config)
 
-    data_source = LocalDataSource("examples/data/polymarket_sample.json")
+    data_source = LocalDataSource("examples/kit/pipelines/forecasting_analyst/data/polymarket_sample.json")
     analyst = ForecastingAnalyst(model=provider)
     pipeline = GenericAnalystPipeline(data_source=data_source, analyst=analyst)
 

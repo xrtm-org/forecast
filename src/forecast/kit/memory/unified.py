@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Optional
 
 from forecast.core.schemas.base import EpisodicExperience
 from forecast.kit.memory.base import BaseVectorStore, MemoryRegistry
-from forecast.kit.memory.chroma import ChromaProvider
+from forecast.providers.memory.chroma_store import ChromaProvider
 
 logger = logging.getLogger(__name__)
 

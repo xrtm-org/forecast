@@ -17,8 +17,8 @@ import logging
 import re
 from typing import Callable, List, Optional
 
+from forecast.core.interfaces import InferenceProvider
 from forecast.core.schemas.graph import BaseGraphState
-from forecast.providers.inference.base import InferenceProvider
 
 __all__ = ["LeakageGuardian"]
 

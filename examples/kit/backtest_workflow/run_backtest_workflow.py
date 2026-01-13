@@ -20,7 +20,7 @@ from datetime import datetime
 from forecast.core.config.inference import OpenAIConfig
 from forecast.core.orchestrator import Orchestrator
 from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.kit.stages.guardian import LeakageGuardian
+from forecast.core.stages.guardian import LeakageGuardian
 from forecast.providers.inference.openai_provider import OpenAIProvider
 from forecast.providers.tools.search import TavilySearchTool
 

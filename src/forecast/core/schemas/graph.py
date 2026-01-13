@@ -28,6 +28,19 @@ class TemporalContext(BaseModel):
     is_backtest: bool = Field(default=False, description="Whether the run is a historical backtest.")
     strict_mode: bool = Field(default=True, description="If True, tools MUST support PiT mode.")
 
+    def now(self) -> datetime:
+        r"""Returns the current effective time (simulated or real)."""
+        if self.is_backtest:
+            # We trust that freezegun is active if the orchestrator did its job,
+            # but for safety/clarity, we return reference_time in strict logic.
+            return self.reference_time
+        return datetime.now()
+
+    @property
+    def today_str(self) -> str:
+        r"""Returns YYYY-MM-DD string of the effective time."""
+        return self.now().strftime("%Y-%m-%d")
+
 
 class BaseGraphState(BaseModel):
     r"""

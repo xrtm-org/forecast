@@ -51,7 +51,7 @@ pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
 
 ## Quickstart
 
-Get started with `xrtm-forecast` right away with the **Analyst** API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
+Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
 import asyncio
@@ -74,37 +74,60 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+## Roadmap
+
+To understand our vision for "Institutional Grade" forecasting, including our focus on Time Travel (Chronos), Calibration, and Dynamic Trajectories (Sentinel), please read our **[Strategic Roadmap](ROADMAP.md)**.
+
+## Key Features (v0.3.0)
+
+*   **Institutional Grade Physics**:
+    *   **Chronos Protocol**: Time-travel safe backtesting using `TemporalContext` and `freezegun`.
+    *   **Sentinel Protocol**: Forecast trajectories (`ForecastTrajectory`) to track probability over time.
+    *   **Calibration**: Native `PlattScaler` and Brier Score decomposition for rigorous probability.
+*   **Advanced Reasoning**:
+    *   **Recursive Consensus**: Peer-review topology that loops until confidence threshold is met.
+    *   **Fact-Checking**: Dedicated `FactCheckerAgent` to verify claims against external tools.
+    *   **Orchestrator**: Async graph engine with conditional edge support.
+*   **Safety & Compliance**:
+    *   **Async Runtime**: Managed event loop facade.
+    *   **Provider Interface**: Swap out OpenAI for Anthropic, Gemini, or vLLM with zero code changes.
+    *   **Sovereign Memory**: Abstracted vector storage (ChromaDB) for RAG pipelines.
+
 ## Why should I use xrtm-forecast?
 
 1.  **Temporal Integrity (The Time Machine)**:
-    *   Most agent frameworks leak future data during backtests. `xrtm-forecast` has a **Temporal Sandboxing** engine that rigidly enforces cut-off dates for search and memory.
+    *   Most agent frameworks leak future data during backtests. `xrtm-forecast` has a Temporal Sandboxing engine that rigidly enforces cut-off dates for search and memory.
     *   Verify your strategies against past market events with zero look-ahead bias.
 
 2.  **Probabilistic Rigor**:
-    *   Agents are treated as calibrated instruments, not just chatbots. We support native **Brier Score** calculation, **Reliability Diagrams**, and **Confidence Interval** estimation out of the box.
+    *   Agents are treated as calibrated instruments, not just chatbots. We support native Brier Score calculation, Reliability Diagrams, and Confidence Interval estimation out of the box.
 
-3.  **Hybrid "Quant-Qual" Intelligence**:
+3.  **Double-Trace Auditability**:
+    *   Forecasting requires accountability. We provide a dual-layer audit trail: Structural (OTel traces of execution flow) and Logical (reasoning snapshots) for every prediction.
+
+4.  **Dynamic Trajectories (Sentinel Protocol)**:
+    *   Move beyond static snapshots. Our architecture supports continuous forecasting, allowing agents to ingest streaming news and output probability updates over time without expensive re-runs.
+
+5.  **Hybrid "Quant-Qual" Intelligence**:
     *   Seamlessly mix fast statistical models (e.g., ARIMA, XGBoost) with slow, deliberative LLM Agents in the same graph.
     *   Orchestrate complex "Consensus" topologies where multiple agents debate to reduce variance.
 
-4.  **Double-Trace Auditability**:
-    *   Forecasting requires accountability. We provide a dual-layer audit trail: **Structural** (OTel traces of execution flow) and **Logical** (reasoning snapshots) for every prediction.
-
 ## Why shouldn't I use xrtm-forecast?
 
-*   You need a generic "Chat with PDF" or "Customer Support" bot. We are hyper-focused on **Forecasting** and **Research** workflows.
+*   You need a generic "Chat with PDF" or "Customer Support" bot. We are hyper-focused on Forecasting and Research workflows.
 *   You want "magic" autoscaling or loose typing. We prioritize correctness, repeatability, and type-safety over ease of prototyping.
 *   You don't care about backtesting or time-travel debugging.
 
 ## Example Components
 
-`xrtm-forecast` comes with a comprehensive **Kit** of pre-built instruments. Expand the categories below to see examples.
+`xrtm-forecast` comes with a comprehensive Kit of pre-built instruments. Expand the categories below to see examples.
 
 <details>
 <summary><b>Agents (Personas)</b></summary>
 
 *   **[Minimal Agent](examples/kit/minimal_agent/run_minimal_agent.py)**: The "Hello World" of reasoning.
 *   **[Forecasting Analyst](examples/kit/pipelines/forecasting_analyst/run_forecasting_analyst.py)**: A specialized researcher for binary market questions.
+*   **[Fact Checker](src/forecast/kit/agents/fact_checker.py)**: An agent that verifies claims against tools.
 *   **[Adversary (Red Team)](examples/kit/agents/adversary/run_adversary.py)**: An agent trained to find flaws in arguments.
 
 </details>

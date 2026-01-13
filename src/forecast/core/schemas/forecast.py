@@ -142,4 +142,35 @@ class ForecastResolution(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Source info, verification method")
 
 
-__all__ = ["MetadataBase", "ForecastQuestion", "CausalNode", "ForecastOutput", "ForecastResolution"]
+class TimeSeriesPoint(BaseModel):
+    r"""A single point in a forecast trajectory."""
+
+    timestamp: datetime = Field(description="The timestamp of the prediction update.")
+    value: float = Field(description="The probability or value at this time.", ge=0, le=1)
+
+
+class ForecastTrajectory(BaseModel):
+    r"""
+    The collection of probability updates over time for a single question.
+
+    This schema represents the "Sentinel Protocol" - tracking how a forecast's
+    confidence evolves as new information becomes available (Dynamic Forecasting).
+    """
+
+    question_id: str
+    points: List[TimeSeriesPoint] = Field(
+        default_factory=list, description="Chronological list of probability updates."
+    )
+    final_confidence: Optional[float] = Field(None, description="The most recent probability value.")
+    rationale_history: List[str] = Field(default_factory=list, description="The evolution of reasoning over time.")
+
+
+__all__ = [
+    "MetadataBase",
+    "ForecastQuestion",
+    "CausalNode",
+    "ForecastOutput",
+    "ForecastResolution",
+    "TimeSeriesPoint",
+    "ForecastTrajectory",
+]

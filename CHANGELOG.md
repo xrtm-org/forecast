@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-01-13
+
+### Added
+- **Chronos Protocol (Backtest Integrity)**: Introduced `TemporalContext` and `GuardianTool` to enforce strict point-in-time safety during time-travel simulations and backtests.
+- **Sentinel Protocol (Trajectory Forecasting)**: Standardized `ForecastTrajectory` and `TimeSeriesPoint` schemas for tracking the evolution of probability distributions over time.
+- **Recursive Consensus Topology**: Implemented the `RecursiveConsensus` pattern for iterative agent refinement with supervisor feedback loops.
+- **Fact-Checker Agent**: New specialist agent for automated claim extraction and multi-tool verification.
+- **Async Runtime Facade**: Added `AsyncRuntime` as a safety layer for managing background tasks and preventing asyncio common pitfalls.
+
+### Changed
+- **Institutional Alignment (The Big Shuffle)**: Reorganized `/core` and `/kit` to strictly separate platform physics from application templates.
+- **Conditional Routing**: Enhanced the `Orchestrator` with first-class `conditional_edge` support for state-dependent logic.
+- **Documentation Standards**: Enforced mandatory Apache 2.0 license headers and structured docstrings across 100% of the codebase via automated auditing.
+
+### Fixed
+- **Rate-Limiting Stability**: Hardened the Redis-based rate limiter to support `AsyncRuntime` sleeping.
+- **E2E Path Integrity**: Resolved relative path regressions in pipeline data ingestion after the architectural move.
+
 ## [0.2.1] - 2026-01-09
 
 ### Added

@@ -60,6 +60,25 @@ class ReliabilityBin(BaseModel):
     count: int
 
 
+class BrierDecomposition(BaseModel):
+    r"""
+    The three-component decomposition of the Brier Score.
+
+    BS = Reliability - Resolution + Uncertainty
+
+    Attributes:
+        reliability (`float`): Measures calibration (lower is better).
+        resolution (`float`): Measures ability to distinguish outcomes (higher is better).
+        uncertainty (`float`): The uncertainty of the environment (base rate varience).
+        score (`float`): The total Brier Score.
+    """
+
+    reliability: float
+    resolution: float
+    uncertainty: float
+    score: float
+
+
 class Evaluator(Protocol):
     r"""
     A structural protocol defining how to score agent predictions against ground truth.
@@ -167,4 +186,4 @@ class EvaluationReport(BaseModel):
             raise ImportError("Pandas is required for to_pandas(). Install it with `pip install pandas`.")
 
 
-__all__ = ["EvaluationResult", "Evaluator", "EvaluationReport", "ReliabilityBin"]
+__all__ = ["EvaluationResult", "Evaluator", "EvaluationReport", "ReliabilityBin", "BrierDecomposition"]

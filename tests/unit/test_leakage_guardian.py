@@ -19,7 +19,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.kit.stages.guardian import LeakageGuardian
+from forecast.core.stages.guardian import LeakageGuardian
 from forecast.providers.inference.base import ModelResponse
 
 

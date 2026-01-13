@@ -47,18 +47,7 @@ def clone_state(state: T, overrides: Dict[str, Any] | None = None) -> T:
     # 2. Apply overrides if provided
     if overrides:
         # Validate keys first
-        valid_keys = (
-            new_state.model_fields.keys()
-            if hasattr(new_state, "model_fields")
-            else new_state.__class__.model_fields.keys()
-        )
-
-        # Pydantic v2 prefer accessing via class or checking dict
-        # Actually better to just use getattr/setattr and let pydantic validate type if we wanted,
-        # but here we just want to ensure the key exists.
-
-        # Best practice for V2 instance:
-        # valid_keys = new_state.__class__.model_fields.keys()
+        valid_keys = new_state.__class__.model_fields.keys()
         for key, value in overrides.items():
             if key not in valid_keys:
                 raise ValueError(f"Cannot override unknown state field: '{key}'")

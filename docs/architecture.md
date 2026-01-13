@@ -26,6 +26,8 @@ These are the Shapes. They define mechanical behavior, not business logic.
 ### 2. Specialist Implementations (`src/forecast/kit/agents/specialists/*.py`)
 These are the Roles. They are built by inheriting from the abstractions above.
 - **`ForecastingAnalyst`**: A pre-built persona that uses Bayesian reasoning to solve problems.
+- **`FactCheckerAgent`**: A dedicated agent for NLI-based claim verification (`src/forecast/kit/agents/fact_checker.py`).
+- **`RecursiveConsensus`**: A topology for peer review and loop-back (`src/forecast/kit/topologies/consensus.py`).
 - **`Generic Agent + Skills`**: We prefer equipping standard agents with skills over creating rigid subclasses.
 
 ---
@@ -38,6 +40,13 @@ The `Orchestrator` is the state machine. It doesn't "think"—it just moves the 
 ### 2. The Inference Layer (`src/forecast/providers/inference/`)
 Standardizes LLM communication. Whether you use Gemini, OpenAI, or a local model, the agent only sees the `InferenceProvider` interface.
 
+### 2a. The Async Runtime (`src/forecast/core/runtime.py`)
+To ensure "Institutional Grade" safety and performance, we do not use raw `asyncio`.
+- **`AsyncRuntime` Facade**: Wraps `legacy` asyncio.
+- **Orphan Prevention**: Enforces named tasks for telemetry.
+- **Time Travel**: Prepares the system for Chronos by wrapping `sleep()` calls.
+- **High Performance**: Automatically installs `uvloop` if available.
+
 ### 3. The Skill Layer (`src/forecast/kit/skills/`)
 Contains the **Skill Registry**.
 
@@ -47,6 +56,10 @@ To keep the system modular, we strictly distinguish between:
 *   The Skill (`src/forecast/kit/skills/`): A high-level behavior that *uses* tools (e.g., `MarketResearchSkill`). It manages retries, error handling, and prompt logic.
 
 *Rule: Agents possess Skills. Skills control Tools.*
+
+### 4. Protocols & Physics
+- **Chronos (Time)**: `TemporalContext` acts as the single source of truth for time. The `GuardianTool` wrapper enforces this by blocking non-PiT tools during backtests.
+- **Sentinel (Space)**: `ForecastTrajectory` captures the *evolution* of a probability over time, not just the final snapshot.
 
 ## Data Flow & Traceability
 
@@ -70,9 +83,6 @@ graph TD
 
 ## Directory Map
 
-- `src/forecast/core/`: The "Bus" and Interfaces (Orchestrator, Protocols).
-- `src/forecast/kit/agents/`: Pre-built agents and structural shapes.
-- `src/forecast/kit/skills/`: High-level behaviors (Strategy & Composition).
-- `src/forecast/kit/eval/`: Evaluation metrics and analytics.
-- `src/forecast/providers/inference/`: Model transport and rate limiting.
-- `src/forecast/providers/tools/`: Atomic primitives (Drivers & APIs).
+- `src/forecast/core/`: The "Bus", Interfaces, and Physics (Orchestrator, Runtime, Guardian).
+- `src/forecast/kit/`: The Applied Layer (Agents, Skills, Topologies).
+- `src/forecast/providers/`: The Hardware Layer (Inference, Memory, Tools).

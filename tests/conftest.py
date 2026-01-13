@@ -13,7 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+from pathlib import Path
+
 import pytest
+
+# Automatic Environment Loading (OSS Best Practice)
+# usage: pytest ... (no wrapper script needed)
+env_path = Path(".env")
+if env_path.exists():
+    with open(env_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 
 def pytest_addoption(parser):
