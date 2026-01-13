@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2026-01-13
+## [0.3.1] - 2026-01-13
+
+### Changed
+- **Async Runtime Standardization**: Promoted `AsyncRuntime` to a top-level export and updated all user-facing documentation/examples to use the managed runtime instead of raw `asyncio`.
+- **Strategic Roadmap Synchronization**: Fully reconciled the Master Implementation Plan and public Roadmap with the latest "Institutional Grade" strategic research logs.
+
+### Added
+- **"Show & Prove" Assets**: Created self-contained demonstration scripts for the `FactChecker` and `Adversary` agents to ensure 100% feature-parity in documentation.
+- **TaskGroup Support**: Enhanced the `AsyncRuntime` with native `TaskGroup` support for structured concurrency in Python 3.11+.
+
 
 ### Added
 - **Chronos Protocol (Backtest Integrity)**: Introduced `TemporalContext` and `GuardianTool` to enforce strict point-in-time safety during time-travel simulations and backtests.
