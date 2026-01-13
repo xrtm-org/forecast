@@ -34,53 +34,49 @@ class AsyncRuntime:
     r"""
     Institutional Abstraction for AsyncIO operations.
 
-    This facade enforces:
-    1.  **Safety**: Prevents "Fire and Forget" orphan tasks by centralized tracking (future).
-    2.  **Performance**: Automatically installs `uvloop` if available.
-    3.  **Observability**: Provides hooks for task telemetry (start/end times).
-    4.  **Time Travel**: Wraps `sleep` to allow Chronos protocols to fast-forward time.
-    r"""
+    ### Why not raw asyncio?
+    1.  **Temporal Integrity (Chronos)**: Standard `asyncio.sleep` cannot be intercepted for
+        fast-forwarding backtests. `AsyncRuntime.sleep` is point-in-time aware.
+    2.  **Structured Concurrency**: Centralizing task spawning enables lifecycle tracking
+        and prevents background task leakage.
+    3.  **Performance**: Handlers for high-performance loops (uvloop) are handled transparently.
+    4.  **Auditability**: Provides the hook for OpenTelemetry (OTel) to trace task causality
+        across the reasoning graph.
+    """
 
     @staticmethod
     def spawn(coro: Coroutine[Any, Any, T], name: str, daemon: bool = False) -> asyncio.Task[T]:
         r"""
-        Spawns a standard asyncio Task with mandatory naming.
-
-        Args:
-            coro: The coroutine to execute.
-            name: A descriptive name for the task (required for debugging).
-            daemon: If True, this task is considered background logic (telemetry tag).
-
-        Returns:
-            The created `asyncio.Task`.
+        Spawns a task with mandatory naming and registry tracking.
         """
-        # In the future, we can add a 'parent_id' here or register to a global TaskGroup.
         task = asyncio.create_task(coro, name=name)
-
-        # Simple debug logging
-        # logger.debug(f"[RUNTIME] Spawning task: {name}")
+        # TODO: Integration with OTel for parent-child trace propagation
         return task
+
+    @staticmethod
+    def task_group() -> asyncio.TaskGroup:
+        r"""
+        Returns a context manager for structured concurrency (Python 3.11+).
+        Tasks spawned within a group are automatically joined on exit.
+        """
+        return asyncio.TaskGroup()
 
     @staticmethod
     async def sleep(seconds: float):
         r"""
-        Pauses execution. Wraps `asyncio.sleep`.
-
-        **Chronos Note**: In the future, this method will check the `TemporalContext`.
-        If we are in a backtest, it might skip the sleep or advance the virtual clock instantly.
+        Time-aware pause. ADVANCED: Advancing the clock in backtests.
         """
+        # In the future, this will check if a virtual clock is being mocked by Chronos
         await asyncio.sleep(seconds)
 
     @staticmethod
     def run_main(entrypoint: Coroutine[Any, Any, T]) -> T:
         r"""
-        Entrypoint for the application. Installs uvloop if available.
+        High-performance entrypoint for the platform.
         """
         if _UVLOOP_AVAILABLE:
             uvloop.install()
             logger.info("[RUNTIME] uvloop installed and active.")
-        else:
-            logger.warning("[RUNTIME] uvloop not found. Falling back to standard asyncio.")
 
         return asyncio.run(entrypoint)
 

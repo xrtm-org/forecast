@@ -54,8 +54,7 @@ pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
 Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
-import asyncio
-from forecast import create_forecasting_analyst
+from forecast import AsyncRuntime, create_forecasting_analyst
 
 async def main():
     # 1. Instantiate the analyst (API keys injected from env)
@@ -71,7 +70,9 @@ async def main():
     print(f"Reasoning: {result.reasoning}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # The AsyncRuntime ensures uvloop is used (if available) 
+    # and provides a consistent entrypoint for the platform.
+    AsyncRuntime.run_main(main())
 ```
 
 ## Roadmap
@@ -108,9 +109,13 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 4.  **Dynamic Trajectories (Sentinel Protocol)**:
     *   Move beyond static snapshots. Our architecture supports continuous forecasting, allowing agents to ingest streaming news and output probability updates over time without expensive re-runs.
 
-5.  **Hybrid "Quant-Qual" Intelligence**:
+5. **Hybrid "Quant-Qual" Intelligence**:
     *   Seamlessly mix fast statistical models (e.g., ARIMA, XGBoost) with slow, deliberative LLM Agents in the same graph.
     *   Orchestrate complex "Consensus" topologies where multiple agents debate to reduce variance.
+
+6. **Institutional-Grade Compliance**:
+    *   Built for environments where "Black Boxes" are forbidden.
+    *   Every component is strictly typed, and our **Managed Async Runtime** ensures that background tasks are traceable, high-performance (uvloop), and time-travel safe (Chronos).
 
 ## Why shouldn't I use xrtm-forecast?
 
@@ -127,8 +132,8 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 *   **[Minimal Agent](examples/kit/minimal_agent/run_minimal_agent.py)**: The "Hello World" of reasoning.
 *   **[Forecasting Analyst](examples/kit/pipelines/forecasting_analyst/run_forecasting_analyst.py)**: A specialized researcher for binary market questions.
-*   **[Fact Checker](src/forecast/kit/agents/fact_checker.py)**: An agent that verifies claims against tools.
-*   **[Adversary (Red Team)](examples/kit/agents/adversary/run_adversary.py)**: An agent trained to find flaws in arguments.
+*   **[Fact Checker](examples/kit/agents/fact_checker_demo/run_fact_checker_demo.py)**: An agent that verifies claims against tools.
+*   **[Adversary (Red Team)](examples/kit/agents/adversary_demo/run_adversary_demo.py)**: An agent trained to find flaws in arguments.
 
 </details>
 

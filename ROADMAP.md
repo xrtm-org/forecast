@@ -19,32 +19,34 @@ We organize our roadmap into three distinct layers of maturity.
 
 ## II. Release Plan
 
-### v0.3.0: The "Holy Trinity" (Core Physics)
+### v0.3.0: The Core Physics (Released)
 *Focus: Establishing the fundamental scientific validity of the engine.*
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Chronos Protocol** | **Zero-Leakage Time Travel.** Enforcing rigorous `before_date` cutoffs on all tools to prevent look-head bias during backtests. | In Progress |
-| **Calibration Engine** | **Probabilistic Rigor.** Native support for Brier Scores, Reliability Diagrams, and **Platt Scaling** (based on AIA Paper) to cure LLM under-confidence. | Planned |
-| **Sentinel Protocol** | **Dynamic Trajectories.** Moving from static snapshots to continuous forecasting. Automatic "Delta Updates" via polling or event streams. | Planned |
+| **Chronos Protocol** | **Zero-Leakage Time Travel.** Enforced `before_date` cutoffs to prevent look-head bias during backtests. | **DONE** |
+| **Calibration Engine** | **Probabilistic Rigor.** Platt Scaling and Brier Scores. | **DONE** |
+| **Sentinel Protocol** | **Dynamic Trajectories.** Forecast Trajectories mapping confidence over time. | **DONE** |
+| **Recursive Consensus** | **Disagreement Resolution.** supervisor-led refinement loops. | **DONE** |
 
-### v0.4.0: The "Reasoning" Layer (Research Grade)
-*Focus: Replicating State-of-the-Art (SOTA) methodologies.*
-
-| Feature | Description | Status |
-| :--- | :--- | :--- |
-| **Recursive Consensus** | **Disagreement Resolution.** Implementing the "Agentic Supervisor" pattern (AIA 2025) to identify conflicts and trigger targeted re-research. | Concept |
-| **Adversarial Red Teaming** | **Anti-Sycophancy.** Dedicated "Devil's Advocate" loops to harden forecasts against groupthink before final aggregation. | Concept |
-| **Dossier Generator** | **Institutional Reporting.** Auto-generating audit-ready Markdown reports with causal graphs and disagreement traces. | Concept |
-
-### v0.5.x: The "Frontier" (Experimental)
-*Focus: Specialized tools for specific verticals. Contribution welcome.*
+### v0.4.0: The "Sovereign" Layer (Institutional Grade)
+*Focus: Trust, Auditability, and Anti-Manipulation.*
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Market Simulation** | **Agent-Based Modeling.** Simulating order books and slippage with heterogeneous agent populations. | Experimental |
-| **Causal Inference** | **Structure Learning.** Attempting to generate formal causal DAGs (Directed Acyclic Graphs) from reasoning traces. | Experimental |
-| **Prompt Compiler** | **DSPy Integration.** Automated genetic optimization of system prompts against a Brier Score loss function. | Experimental |
+| **Truth Protocol** | **Cryptographic Audit.** Merkle-ized reasoning chains for tamper-evident traces. | Planned |
+| **Epistemic Security** | **Anti-Manipulation.** source verification and cross-referencing to block "News Injection" attacks. | Planned |
+| **Dossier Generator** | **Institutional Reporting.** Auto-generating audit-ready research proofs. | Concept |
+
+### v0.5.0: The "Intelligence" Layer (Frontier)
+*Focus: Causal inference and automated optimization.*
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Causal Reasoning** | **DAG Generation.** Moving from text lists to formal Directed Acyclic Graphs (SCMs). | Experimental |
+| **Prompt Compiler** | **DSPy Integration.** Automated Brier-Score-driven optimization of system instructions. | Experimental |
+| **Centaur Workbench** | **Human-Loop.** Optimized UX for human-agent collaboration. | Concept |
+| **ABM Simulation** | **Market Dynamics.** Agent-based modeling for liquidity and impact analysis. | Experimental |
 
 ---
 
