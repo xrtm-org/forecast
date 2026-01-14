@@ -32,7 +32,7 @@ class Orchestrator(Generic[StateT]):
     A state-machine based engine for managing complex agent workflows.
 
     The `Orchestrator` is a domain-agnostic reasoning engine that processes a
-    `BaseGraphState` through a series of registered "nodes" (functions). It allows
+    `BaseGraphState` through a series of registered "stages" (functions). It allows
     for iterative reasoning, conditional branching, and global usage tracking.
 
     Args:
@@ -43,8 +43,8 @@ class Orchestrator(Generic[StateT]):
     def __init__(self, config: Optional[GraphConfig] = None):
         self.config = config or GraphConfig()
         self.max_cycles = self.config.max_cycles
-        # Registry of nodes (functions) that process the state
-        # format: {"node_name": callable}
+        # Registry of stages (functions) that process the state
+        # format: {"stage_name": callable}
         self.nodes: Dict[str, Callable] = {}
 
         # Declarative Edges: {"from_node_name": "to_node_name"}
@@ -67,6 +67,12 @@ class Orchestrator(Generic[StateT]):
 
         Returns:
             `Orchestrator`: A pre-configured orchestrator instance.
+
+        Example:
+            ```python
+            from forecast import Orchestrator
+            orch = Orchestrator.create_standard(max_cycles=5)
+            ```
         r"""
         config = GraphConfig()
         if max_cycles is not None:
@@ -75,11 +81,19 @@ class Orchestrator(Generic[StateT]):
 
     def add_node(self, name: str, func: Callable) -> None:
         r"""
-        Registers a processing node in the graph registry.
+        Registers a processing stage in the graph registry.
 
         Args:
-            name (`str`): The unique identifier for the node.
+            name (`str`): The unique identifier for the stage.
             func (`Callable`): The function to execute.
+
+        Returns:
+            `None`
+
+        Example:
+            ```python
+            orch.add_node("research", my_research_func)
+            ```
         r"""
         self.nodes[name] = func
 
@@ -89,16 +103,16 @@ class Orchestrator(Generic[StateT]):
 
     def add_edge(self, from_node: str, to_node: str) -> None:
         r"""
-        Adds a directed edge between two nodes.
+        Adds a directed edge between two stages.
 
         Args:
-            from_node (`str`): The starting node.
-            to_node (`str`): The destination node.
+            from_node (`str`): The starting stage.
+            to_node (`str`): The destination stage.
         r"""
         self.edges[from_node] = to_node
 
     def set_entry_point(self, node_name: str) -> None:
-        r"""Sets the starting node for the graph execution."""
+        r"""Sets the starting stage for the graph execution."""
         self.entry_point = node_name
 
     def add_conditional_edge(
@@ -121,15 +135,15 @@ class Orchestrator(Generic[StateT]):
 
     def add_parallel_group(self, group_name: str, node_names: list[str]) -> None:
         r"""
-        Registers a group of nodes to be executed in parallel.
+        Registers a group of stages to be executed in parallel.
 
-        A "Parallel Group" is a named execution step that triggers multiple nodes
-        concurrently. The Orchestrator waits for ALL nodes in the group to complete
+        A "Parallel Group" is a named execution step that triggers multiple stages
+        concurrently. The Orchestrator waits for ALL stages in the group to complete
         before proceeding to the next step.
 
         Args:
             group_name (`str`): The identifier for this parallel step.
-            node_names (`list[str]`): List of existing node names to execute.
+            node_names (`list[str]`): List of existing stage names to execute.
 
         Example:
             ```python
@@ -151,21 +165,21 @@ class Orchestrator(Generic[StateT]):
         stopwatch: Optional[Any] = None,
     ) -> BaseGraphState:
         r"""
-        Orchestrates the execution of the graph nodes starting from an entry point.
+        Orchestrates the execution of the graph stages starting from an entry point.
 
         This method manages the control flow of the graph, tracking the execution path,
-        cycle count, and total latency. It terminates when a node returns `None`
+        cycle count, and total latency. It terminates when a stage returns `None`
         or `max_cycles` is reached.
 
         Args:
             state (`BaseGraphState`):
                 The initial state object to be processed and evolved.
             entry_node (`str`, *optional*, defaults to `"ingestion"`):
-                The name of the first node to execute.
+                The name of the first stage to execute.
             on_progress (`Optional[Callable]`, *optional*):
                 A callback function for reporting progress during execution.
             stopwatch (`Optional[Any]`, *optional*):
-                An optional instrumentation utility for tracking timing across nodes.
+                An optional instrumentation utility for tracking timing across stages.
 
         Returns:
             `BaseGraphState`: The final evolved state after execution completes.
@@ -307,6 +321,9 @@ class Orchestrator(Generic[StateT]):
                 The state object where usage statistics are accumulated.
             agent_output (`Any`):
                 The output from an agent execution, which may contain 'usage' metadata.
+
+        Returns:
+            `None`
         r"""
         usage = {}
         if hasattr(agent_output, "usage"):

@@ -26,10 +26,14 @@ A composite brick that treats an entire sub-graph as a single agent.
 
 Pre-assembled kits designed for specific analytical missions.
 
-### 1. `ForecastingAnalyst` ([analyst.py](file:///workspace/forecast/src/forecast/kit/pipelines/forecasting_analyst.py))
-Our flagship analyst implementation.
-- **Role**: Bayesian-style probability estimation.
-- **Key Output**: High-fidelity logical traces and confidence scores.
+### 1. `ForecastingAnalyst` ([analyst.py](file:///workspace/forecast/src/forecast/kit/agents/specialists/analyst.py))
+Our flagship analyst implementation using Bayesian-style probability estimation.
+
+### 2. `FactCheckerAgent` ([fact_checker.py](file:///workspace/forecast/src/forecast/kit/agents/fact_checker.py))
+Dedicated specialist for Natural Language Inference (NLI) based claim verification.
+
+### 3. `AdversaryAgent` ([adversary.py](file:///workspace/forecast/src/forecast/kit/agents/specialists/adversary.py))
+Red-teaming specialist that identifies logical fallacies and biases in reasoning.
 
 ---
 

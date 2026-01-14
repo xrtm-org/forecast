@@ -1,5 +1,3 @@
-import asyncio
-
 # coding=utf-8
 # Copyright 2026 XRTM Team. All rights reserved.
 #
@@ -19,6 +17,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from forecast.core.orchestrator import Orchestrator
+from forecast.core.runtime import AsyncRuntime
 from forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution, MetadataBase
 from forecast.core.schemas.graph import BaseGraphState
 from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
@@ -77,4 +76,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    AsyncRuntime.run_main(main())

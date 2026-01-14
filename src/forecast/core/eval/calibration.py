@@ -124,8 +124,3 @@ class PlattScaler(BaseModel):
         self.b = data["b"]
         self.fitted = data["fitted"]
         return self
-
-        self.a = data["a"]
-        self.b = data["b"]
-        self.fitted = data["fitted"]
-        return self

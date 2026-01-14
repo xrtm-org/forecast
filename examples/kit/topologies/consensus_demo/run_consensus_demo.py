@@ -18,6 +18,7 @@ import logging
 import random
 from typing import Any
 
+from forecast.core.runtime import AsyncRuntime
 from forecast.core.schemas.graph import BaseGraphState
 from forecast.kit.topologies.consensus import RecursiveConsensus
 
@@ -119,4 +120,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    AsyncRuntime.run_main(main())

@@ -48,7 +48,21 @@ class AsyncRuntime:
     def spawn(coro: Coroutine[Any, Any, T], name: str, daemon: bool = False) -> asyncio.Task[T]:
         r"""
         Spawns a task with mandatory naming and registry tracking.
-        """
+
+        Args:
+            coro (`Coroutine[Any, Any, T]`): The coroutine to execute as a task.
+            name (`str`): A descriptive name for the task (used in telemetry).
+            daemon (`bool`, *optional*, defaults to `False`):
+                If `True`, the task is tracked as a background daemon.
+
+        Returns:
+            `asyncio.Task[T]`: The handle to the spawned task.
+
+        Example:
+            ```python
+            task = AsyncRuntime.spawn(my_coro(), name="research_task")
+            ```
+        r"""
         task = asyncio.create_task(coro, name=name)
         # TODO: Integration with OTel for parent-child trace propagation
         return task
@@ -57,8 +71,20 @@ class AsyncRuntime:
     def task_group() -> asyncio.TaskGroup:
         r"""
         Returns a context manager for structured concurrency (Python 3.11+).
-        Tasks spawned within a group are automatically joined on exit.
-        """
+
+        Tasks spawned within a group are automatically joined on exit. If any
+        task in the group fails, the remaining tasks are cancelled.
+
+        Returns:
+            `asyncio.TaskGroup`: The structured concurrency context manager.
+
+        Example:
+            ```python
+            async with AsyncRuntime.task_group() as tg:
+                tg.create_task(coro1())
+                tg.create_task(coro2())
+            ```
+        r"""
         return asyncio.TaskGroup()
 
     @staticmethod
@@ -73,7 +99,22 @@ class AsyncRuntime:
     def run_main(entrypoint: Coroutine[Any, Any, T]) -> T:
         r"""
         High-performance entrypoint for the platform.
-        """
+
+        Initializes the event loop (using `uvloop` if available) and runs
+        the provided entrypoint coroutine until completion.
+
+        Args:
+            entrypoint (`Coroutine[Any, Any, T]`): The main application coroutine.
+
+        Returns:
+            `T`: The result returned by the entrypoint coroutine.
+
+        Example:
+            ```python
+            if __name__ == "__main__":
+                AsyncRuntime.run_main(main())
+            ```
+        r"""
         if _UVLOOP_AVAILABLE:
             uvloop.install()
             logger.info("[RUNTIME] uvloop installed and active.")

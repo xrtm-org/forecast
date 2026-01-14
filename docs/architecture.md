@@ -60,6 +60,7 @@ To keep the system modular, we strictly distinguish between:
 ### 4. Protocols & Physics
 - **Chronos (Time)**: `TemporalContext` acts as the single source of truth for time. The `GuardianTool` wrapper enforces this by blocking non-PiT tools during backtests.
 - **Sentinel (Space)**: `ForecastTrajectory` captures the *evolution* of a probability over time, not just the final snapshot.
+- **Equilibrium (Calibration)**: The `PlattScaler` ensures that subjective confidence intervals match objective frequencies, curing LLM over-confidence.
 
 ## Data Flow & Traceability
 

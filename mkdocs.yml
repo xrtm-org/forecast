@@ -43,6 +43,7 @@ nav:
           - Agents: wiki/concepts/agents.md
           - Tools: wiki/concepts/tools.md
           - Orchestration: wiki/concepts/orchestration.md
+          - Calibration: wiki/concepts/calibration.md
       - Patterns:
           - Topologies: wiki/patterns/topologies.md
       - Standards:
@@ -52,6 +53,8 @@ nav:
       - Agents: api/agents.md
       - Skills: api/skills.md
       - Orchestration: api/orchestration.md
+      - Runtime: api/runtime.md
+      - Topologies: api/topologies.md
       - Inference: api/inference.md
       - Evaluation: api/evaluation.md
       - Memory: api/memory.md

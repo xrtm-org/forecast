@@ -15,6 +15,20 @@ The `agents` module contains the fundamental "Lego bricks" of the system.
     options:
       show_root_heading: true
 
+## Specialized Agents (Specialists)
+
+::: forecast.kit.agents.forecaster.ForecastingAnalyst
+    options:
+      show_root_heading: true
+
+::: forecast.kit.agents.fact_checker.FactCheckerAgent
+    options:
+      show_root_heading: true
+
+::: forecast.kit.agents.adversary.AdversaryAgent
+    options:
+      show_root_heading: true
+
 ::: forecast.kit.agents.registry.AgentRegistry
     options:
       show_root_heading: true

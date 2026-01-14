@@ -48,6 +48,19 @@ class LeakageGuardian:
     async def __call__(self, state: BaseGraphState, report_progress: Callable) -> Optional[str]:
         r"""
         Executes the redaction logic on the current state.
+
+        Args:
+            state (`BaseGraphState`): The state containing node reports to scan.
+            report_progress (`Callable`): A callback for telemetry updates.
+
+        Returns:
+            `Optional[str]`: Always returns `None`, as it modifies the state in-place.
+
+        Example:
+            ```python
+            guardian = LeakageGuardian(provider)
+            await guardian(state, report_progress)
+            ```
         r"""
         if not state.temporal_context or not state.temporal_context.is_backtest:
             return None
@@ -87,7 +100,16 @@ class LeakageGuardian:
         return None
 
     def _regex_pre_filter(self, text: str, ref_year: int) -> bool:
-        r"""Quick check to avoid LLM calls for obviously clean text."""
+        r"""
+        Quick check to avoid LLM calls for obviously clean text.
+
+        Args:
+            text (`str`): The content to scan for year patterns.
+            ref_year (`int`): The year limit. Anything greater is a potential leak.
+
+        Returns:
+            `bool`: `True` if high-risk temporal patterns are found.
+        """
         # Check for any year > ref_year (simplistic)
         # In a real tool, we'd look for more patterns.
         years = re.findall(r"\b20\d{2}\b", text)
@@ -97,7 +119,16 @@ class LeakageGuardian:
         return False
 
     async def _semantic_redaction(self, text: str, ref_date: str) -> str:
-        r"""Uses the provider to redact sentences referring to events after ref_date."""
+        r"""
+        Uses the provider to redact sentences referring to events after ref_date.
+
+        Args:
+            text (`str`): The leaking content.
+            ref_date (`str`): The ISO format reference date string.
+
+        Returns:
+            `str`: The redacted (safe) text.
+        """
         prompt = f"""
 SYSTEM: You are the Leakage Guardian. Your job is to prevent "Look-Ahead Bias" in historical backtests.
 TASK: Redact any information in the following text that mentions events, data, or results occurring AFTER {ref_date}.

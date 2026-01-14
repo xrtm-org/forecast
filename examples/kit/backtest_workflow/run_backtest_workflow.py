@@ -13,23 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import os
 from datetime import datetime
 
 from forecast.core.config.inference import OpenAIConfig
 from forecast.core.orchestrator import Orchestrator
+from forecast.core.runtime import AsyncRuntime
 from forecast.core.schemas.graph import BaseGraphState, TemporalContext
 from forecast.core.stages.guardian import LeakageGuardian
 from forecast.providers.inference.openai_provider import OpenAIProvider
 from forecast.providers.tools.search import TavilySearchTool
 
 
-async def forecasting_node(state, report):
-    r"""A demo node representing a forecaster utilizing the temporal sandbox."""
-    # This node simulates a forecaster using tools
+async def forecasting_stage(state, report):
+    r"""A demo stage representing a forecaster utilizing the temporal sandbox."""
+    # This stage simulates a forecaster using tools
     # It will automatically have datetime.now() mocked to 2024-06-15
-    print(f"\n[NODE] Reasoning at mocked time: {datetime.now()}")
+    print(f"\n[STAGE] Reasoning at mocked time: {datetime.now()}")
 
     # Simulate tool call (In a real scenario, this would be via an Agent)
     TavilySearchTool()
@@ -48,7 +48,7 @@ async def main():
 
     # 2. Setup Orchestrator
     orch = Orchestrator.create_standard()
-    orch.add_node("forecaster", forecasting_node)
+    orch.add_node("forecaster", forecasting_stage)
     orch.add_node("guardian", guardian)
     orch.set_entry_point("forecaster")
 
@@ -72,4 +72,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    AsyncRuntime.run_main(main())
