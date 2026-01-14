@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.3.2] - 2026-01-14
+
+### Changed
+- **Deep Institutional Hardening**: Reached 90%+ core coverage for `Orchestrator` (91%) and `AsyncRuntime` (97%).
+- **Terminology Standardization**: Unified graph execution terminology around "Stages" (Rule 17).
+- **Docstring Rigor**: Enforced strict Rule 2 (Hugging Face style) compliance across all public core interfaces.
+
+### Added
+- **Runtime Patterns Example**: Created `examples/core/runtime_patterns/` to demonstrate institutional structured concurrency.
+
 ## [0.3.1] - 2026-01-13
 
 ### Changed
