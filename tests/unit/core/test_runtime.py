@@ -29,7 +29,7 @@ class TestAsyncRuntime:
             return "done"
 
         task = AsyncRuntime.spawn(dummy(), name="test_task")
-        assert task.get_name() == "test_task"
+        assert "test_task" in task.get_name()
         res = await task
         assert res == "done"
 
@@ -42,7 +42,7 @@ class TestAsyncRuntime:
 
         task = AsyncRuntime.spawn(worker(), name="my_worker")
         name = await task
-        assert name == "my_worker"
+        assert "my_worker" in name
 
     @pytest.mark.asyncio
     async def test_sleep(self):

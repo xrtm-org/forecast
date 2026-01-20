@@ -46,7 +46,7 @@ async def test_runtime_spawn():
         await asyncio.sleep(0.1)
 
     task = AsyncRuntime.spawn(dummy(), name="VerificationTask")
-    assert task.get_name() == "VerificationTask"
+    assert "VerificationTask" in task.get_name()
     await task
 
 

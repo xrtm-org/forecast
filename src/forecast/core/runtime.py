@@ -15,7 +15,8 @@
 
 import asyncio
 import logging
-from typing import Any, Coroutine, TypeVar
+from contextvars import ContextVar
+from typing import Any, Coroutine, Optional, TypeVar
 
 try:
     import uvloop
@@ -28,6 +29,10 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
+
+# Hook for Chronos Protocol (Temporal Integrity)
+temporal_context_var: ContextVar[Optional[Any]] = ContextVar("temporal_context", default=None)
+r"""ContextVar holding the current `TemporalContext`, enabling 'Chronos-Sleep' bypass logic."""
 
 
 class AsyncRuntime:
@@ -45,9 +50,11 @@ class AsyncRuntime:
     """
 
     @staticmethod
-    def spawn(coro: Coroutine[Any, Any, T], name: str, daemon: bool = False) -> asyncio.Task[T]:
+    def spawn(
+        coro: Coroutine[Any, Any, T], name: str, parent_id: Optional[str] = None, daemon: bool = False
+    ) -> asyncio.Task[T]:
         r"""
-        Spawns a task with mandatory naming and registry tracking.
+        Spawns a task with mandatory naming and parent-child hierarchy tracking.
 
         Args:
             coro (`Coroutine[Any, Any, T]`): The coroutine to execute as a task.
@@ -63,8 +70,15 @@ class AsyncRuntime:
             task = AsyncRuntime.spawn(my_coro(), name="research_task")
             ```
         r"""
+        if not parent_id:
+            parent_id = AsyncRuntime.current_task_name()
+
         task = asyncio.create_task(coro, name=name)
-        # TODO: Integration with OTel for parent-child trace propagation
+        # In a real institutional deployment, we would register this in an OTel Span
+        # For now, we tag the task name with its parent for auditability
+        if parent_id and parent_id != "MainThread":
+            task.set_name(f"{parent_id}->{name}")
+
         return task
 
     @staticmethod
@@ -90,9 +104,19 @@ class AsyncRuntime:
     @staticmethod
     async def sleep(seconds: float):
         r"""
-        Time-aware pause. ADVANCED: Advancing the clock in backtests.
+        Time-aware pause. Supported by the Chronos Protocol.
+
+        In production (live) mode, this is a standard asyncio sleep.
+        In backtest mode, if a virtual clock is present, this may resolve
+        instantly or advance the virtual clock.
         """
-        # In the future, this will check if a virtual clock is being mocked by Chronos
+        # We check for a task-local or global override for backtesting
+        # This is the hook where the Guardian/Chronos logic attaches
+        context = temporal_context_var.get()
+        if context and getattr(context, "is_backtest", False):
+            logger.debug(f"[CHRONOS] Bypassing sleep of {seconds}s in backtest mode.")
+            return
+
         await asyncio.sleep(seconds)
 
     @staticmethod

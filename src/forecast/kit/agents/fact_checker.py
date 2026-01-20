@@ -98,3 +98,6 @@ class FactCheckerAgent(Agent):
         if reporter:
             await reporter(0, "FactCheck", "DONE", f"Verified {len(verification_log)} claims. Score: {score:.2f}")
         return state
+
+
+__all__ = ["FactCheckerAgent"]

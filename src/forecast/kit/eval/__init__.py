@@ -15,6 +15,7 @@
 
 from forecast.core.eval.definitions import EvaluationReport, EvaluationResult, Evaluator
 from forecast.kit.eval.backtester import Backtester
+from forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
 from forecast.kit.eval.metrics import BrierScoreEvaluator
 from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
 
@@ -27,4 +28,5 @@ __all__ = [
     "BacktestRunner",
     "BacktestInstance",
     "BacktestDataset",
+    "EpistemicEvaluator",
 ]
