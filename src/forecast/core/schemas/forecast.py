@@ -123,6 +123,9 @@ class ForecastOutput(BaseModel):
             Reference to the original `ForecastQuestion`.
         confidence (`float`):
             The final probability assigned to the primary outcome [0, 1].
+        uncertainty (`float`, *optional*):
+            The agent's self-reported uncertainty (variance proxy). Used for
+            Inverse Variance Weighting in ensemble aggregation. Range [0, 1].
         reasoning (`str`):
             The comprehensive narrative argument supporting the confidence score.
         logical_trace (`List[CausalNode]`):
@@ -135,6 +138,7 @@ class ForecastOutput(BaseModel):
 
     question_id: str
     confidence: float = Field(..., ge=0, le=1, description="Probability of the primary outcome")
+    uncertainty: Optional[float] = Field(None, ge=0, le=1, description="Self-reported uncertainty for IVW aggregation")
     reasoning: str = Field(..., description="Narrative reasoning for the forecast")
 
     logical_trace: List[CausalNode] = Field(

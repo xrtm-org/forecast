@@ -51,23 +51,19 @@ def inverse_variance_weighting(
 
     for p in predictions:
         val = p.confidence
-        # We need variance. Since ForecastOutput currently only has 'confidence',
-        # we infer uncertainty or would need to extend the schema.
-        # For now, we use a heuristic: closer to 0.5 = higher variance?
-        # Ideally, schemas should have explicit 'uncertainty' or 'std_dev'.
-        # TODO: Upgrade ForecastOutput schema to include 'variance'.
-        # Fallback: Assume uniform variance (simple average) if not present,
-        # or use "distance from extremum" as a proxy for conviction.
 
-        # Heuristic: Conviction proxy. High conviction (near 0 or 1) implies low variance.
-        # This is a simplification until schema upgrade.
-        dist = abs(val - 0.5) * 2  # 0..1 scale (0=uncertain, 1=certain)
-        # Invert conviction to get variance proxy.
-        # If conviction is 1.0, variance is low (e.g., 0.01).
-        # If conviction is 0.0, variance is high (e.g., 0.25).
-        variance = 0.25 * (1.0 - dist) + 0.01
+        # Prefer explicit uncertainty if provided
+        if p.uncertainty is not None:
+            variance = p.uncertainty
+        else:
+            # Heuristic fallback: Conviction proxy.
+            # High conviction (near 0 or 1) implies low variance.
+            dist = abs(val - 0.5) * 2  # 0..1 scale (0=uncertain, 1=certain)
+            # Invert conviction to get variance proxy.
+            variance = 0.25 * (1.0 - dist) + 0.01
 
-        weight = 1.0 / variance
+        # Prevent division by zero
+        weight = 1.0 / max(variance, 0.01)
         values.append(val)
         weights.append(weight)
 

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import logging
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from forecast.core.orchestrator import Orchestrator
 from forecast.core.schemas.graph import BaseGraphState
@@ -24,13 +24,14 @@ logger = logging.getLogger(__name__)
 
 class RecursiveConsensus:
     r"""
-    A topology that implements 'Recursive Peer Review'.
+    A topology that implements 'Recursive Peer Review' with optional Red Team.
 
     Flow:
     1. Parallel Analysis: Multiple agents generate independent forecasts.
     2. Aggregation: Results are combined (mean/weighted).
-    3. Supervisor Check: A meta-agent checks if the confidence > threshold.
-    4. Loop: If low confidence, loop back to analysis with 'critique' context.
+    3. Red Team (optional): A Devil's Advocate challenges the consensus.
+    4. Supervisor Check: A meta-agent checks if the confidence > threshold.
+    5. Loop: If low confidence, loop back to analysis with 'critique' context.
 
     Args:
         analyst_wrappers (`List[Callable]`):
@@ -39,6 +40,10 @@ class RecursiveConsensus:
              A callable that inspects the state so far and returns 'APPROVE' or 'REVISE'.
         aggregator_wrapper (`Callable`):
              A callable that combines analyst outputs into a single forecast.
+        red_team_wrapper (`Callable`, *optional*):
+             A callable that challenges the consensus (Devil's Advocate pattern).
+        max_cycles (`int`):
+             Maximum number of revision loops allowed.
     """
 
     def __init__(
@@ -46,11 +51,13 @@ class RecursiveConsensus:
         analyst_wrappers: List[Callable],
         supervisor_wrapper: Callable,
         aggregator_wrapper: Callable,
+        red_team_wrapper: Optional[Callable] = None,
         max_cycles: int = 3,
     ):
         self.analysts = analyst_wrappers
         self.supervisor = supervisor_wrapper
         self.aggregator = aggregator_wrapper
+        self.red_team = red_team_wrapper
         self.max_cycles = max_cycles
 
     def build_graph(self) -> Orchestrator:
@@ -68,20 +75,26 @@ class RecursiveConsensus:
         orch.add_node("aggregator", self.aggregator)
         orch.add_node("supervisor", self.supervisor)
 
-        # 3. Define Flow
+        # 3. Register Red Team (optional)
+        if self.red_team:
+            orch.add_node("red_team", self.red_team)
+
+        # 4. Define Flow
         # Entry -> Parallel Analysts
         orch.add_parallel_group("parallel_analysis", analyst_names)
         orch.set_entry_point("parallel_analysis")
         orch.add_edge("parallel_analysis", "aggregator")
-        orch.add_edge("aggregator", "supervisor")
 
-        # 4. Conditional Loop
+        # Wire Red Team if present: Aggregator -> RedTeam -> Supervisor
+        if self.red_team:
+            orch.add_edge("aggregator", "red_team")
+            orch.add_edge("red_team", "supervisor")
+        else:
+            orch.add_edge("aggregator", "supervisor")
+
+        # 5. Conditional Loop
         # Supervisor returns "APPROVE" or "REVISE"
         def check_revision(state: BaseGraphState) -> str:
-            # We assume the supervisor writes 'decision' to context or returns it
-            # For this topology, let's assume the supervisor's LAST return value is checking logic
-            # But Orchestrator logic is pre-computation.
-            # So the supervisor node function usually updates `state.context['decision']`
             return state.context.get("decision", "REVISE")
 
         orch.add_conditional_edge(
