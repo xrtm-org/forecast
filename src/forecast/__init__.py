@@ -15,7 +15,7 @@
 
 from forecast.core.orchestrator import Orchestrator
 from forecast.core.runtime import AsyncRuntime
-from forecast.core.schemas.graph import BaseGraphState
+from forecast.core.schemas.graph import BaseGraphState, TemporalContext
 from forecast.core.telemetry.audit import auditor
 from forecast.kit.agents import Agent, GraphAgent, LLMAgent, RoutingAgent, ToolAgent, registry
 from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
@@ -44,6 +44,7 @@ __all__ = [
     "SQLSkill",
     "PandasSkill",
     "AsyncRuntime",
+    "TemporalContext",
     "__version__",
     "__author__",
     "__contact__",

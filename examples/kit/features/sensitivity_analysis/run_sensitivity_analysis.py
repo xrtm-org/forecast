@@ -27,10 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 # 1. Define State
-class MarketState(BaseGraphState):
-    """Represents the state of a market prediction."""
+class SubjectState(BaseGraphState):
+    """Represents the state of a forecasting subject prediction."""
 
-    base_price: float = 100.0
+    base_value: float = 100.0
     sentiment_score: float = 0.5  # 0 to 1
     volatility_factor: float = 1.0
     final_forecast: float = 0.0
@@ -38,7 +38,7 @@ class MarketState(BaseGraphState):
 
 
 # 2. Define Stages (Nodes)
-async def analyze_sentiment(state: MarketState, on_progress=None) -> None:
+async def analyze_sentiment(state: SubjectState, on_progress=None) -> None:
     """Simulates an LLM analyzing news sentiment."""
     # In a real app, this would use an LLM provider
     logger.info(f"[{state.subject_id}] Analyzing sentiment...")
@@ -46,12 +46,12 @@ async def analyze_sentiment(state: MarketState, on_progress=None) -> None:
     return None
 
 
-async def calculate_forecast(state: MarketState, on_progress=None) -> None:
+async def calculate_forecast(state: SubjectState, on_progress=None) -> None:
     """Applies the model logic."""
     logger.info(f"[{state.subject_id}] Calculating forecast with vol={state.volatility_factor}...")
 
     impact = (state.sentiment_score - 0.5) * 50 * state.volatility_factor
-    state.final_forecast = state.base_price + impact
+    state.final_forecast = state.base_value + impact
 
     state.rationale += f"Forecast {state.final_forecast} (Impact: {impact})."
     return None
@@ -87,24 +87,24 @@ async def main():
         },
     )
 
-    # Scenario C: Bearish Crash
+    # Scenario C: Downward Trajectory
     manager.add_branch(
-        "Bearish_Crash", overrides={"subject_id": "crash-run", "volatility_factor": 2.0, "sentiment_score": 0.2}
+        "Downward_Trajectory", overrides={"subject_id": "crash-run", "volatility_factor": 2.0, "sentiment_score": 0.2}
     )
 
     # 6. Run Execution
-    initial_state = MarketState(subject_id="template", base_price=100.0, sentiment_score=0.5)
+    initial_state = SubjectState(subject_id="template", base_value=100.0, sentiment_score=0.5)
 
     print("\nRunning scenarios in parallel...")
     results = await manager.run_all(initial_state)
 
     # 7. Print Report
     print("\n--- 📊 Sensitivity Report ---")
-    print(f"{'Scenario':<20} | {'Price':<10} | {'Rationale'}")
+    print(f"{'Scenario':<20} | {'Value':<10} | {'Rationale'}")
     print("-" * 80)
 
     for name, state in results.items():
-        print(f"{name:<20} | ${state.final_forecast:<9.2f} | {state.rationale}")
+        print(f"{name:<20} | {state.final_forecast:<10.2f} | {state.rationale}")
 
 
 if __name__ == "__main__":

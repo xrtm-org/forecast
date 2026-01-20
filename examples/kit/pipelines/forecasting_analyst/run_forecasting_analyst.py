@@ -49,20 +49,20 @@ async def run_showcase():
     provider = ModelFactory.get_provider(config)
 
     # 2. Setup Data Source (Local mode for stability)
-    data_source = LocalDataSource("examples/kit/pipelines/forecasting_analyst/data/polymarket_sample.json")
+    data_source = LocalDataSource("examples/kit/pipelines/forecasting_analyst/data/subject_sample.json")
 
     # 3. Setup Agent & Pipeline
     analyst = ForecastingAnalyst(model=provider)
     pipeline = GenericAnalystPipeline(data_source=data_source, analyst=analyst)
 
-    # 4. Run for a specific market
-    target_market_id = "fed-rates-mar-2026"
+    # 4. Run for a specific subject
+    target_subject_id = "fed-rates-mar-2026"
 
     async def on_progress(p_id, phase, status, details, specialists=None):
         print(f"[{phase}] {status}: {details}")
 
-    print(f"\n>>> Starting Forecast for: {target_market_id}")
-    state = await pipeline.run(subject_id=target_market_id, on_progress=on_progress)
+    print(f"\n>>> Starting Forecast for: {target_subject_id}")
+    state = await pipeline.run(subject_id=target_subject_id, on_progress=on_progress)
 
     # 5. Output Results
     print("\n" + "=" * 50)

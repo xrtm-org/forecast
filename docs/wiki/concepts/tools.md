@@ -8,11 +8,11 @@ A Tool is a single, deterministic Python function. It is intended for granular t
 ```python
 from forecast.providers.tools import FunctionTool
 
-def get_stock_price(ticker: str):
-    """Fetches the latest EOD price."""
-    return 150.0
+def get_atmospheric_pressure(station_id: str):
+    """Fetches the latest EOD pressure reading."""
+    return 1013.25
 
-stock_tool = FunctionTool(get_stock_price)
+pressure_tool = FunctionTool(get_atmospheric_pressure)
 ```
 
 ## 2. Skills (The "Ability")
@@ -28,12 +28,12 @@ Use the `FunctionTool` wrapper or `tool_registry` to turn any Python function in
 ```python
 from forecast.providers.tools import FunctionTool
 
-def calculate_risk(portfolio_value: float, confidence: float = 0.95) -> float:
-    """Calculates Value at Risk (VaR)."""
+def calculate_variance(data_points: list[float]) -> float:
+    """Calculates the statistical variance of a dataset."""
     # ... logic ...
-    return 1000.0
+    return 25.0
 
-risk_tool = FunctionTool(calculate_risk)
+variance_tool = FunctionTool(calculate_variance)
 ```
 
 ## Security Note

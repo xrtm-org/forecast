@@ -13,3 +13,9 @@ Welcome to the `xrtm-forecast` API reference. This section provides detailed inf
 - **[Evaluation](evaluation.md)**: Benchmarking and accuracy metrics.
 - **[Memory](memory.md)**: Semantic and episodic storage.
 - **[Telemetry](telemetry.md)**: Observability and institutional auditing.
+
+## Advanced Modules (v0.4.x+)
+
+- **[Causal Interpretability](causal.md)**: DAG-based explanations and "What-If" analysis.
+- **[Optimization](optimization.md)**: Beta Calibration and DSPy-style prompt tuning.
+- **[Centaur Protocol](centaur.md)**: Human-in-the-Loop interventions.

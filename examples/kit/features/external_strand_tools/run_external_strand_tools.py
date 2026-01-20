@@ -29,17 +29,17 @@ class ExternalStrandTool:
     """A simulated tool following the @strands.tool protocol."""
 
     def __init__(self):
-        self.name = "get_market_sentiment"
-        self.description = "Calculates current market sentiment for a ticker based on simulation."
+        self.name = "get_subject_sentiment"
+        self.description = "Calculates current sentiment for a subject identifier based on simulation."
         self.spec = {
             "type": "object",
-            "properties": {"ticker": {"type": "string", "description": "Stock or crypto ticker."}},
-            "required": ["ticker"],
+            "properties": {"subject_id": {"type": "string", "description": "Subject or entity identifier."}},
+            "required": ["subject_id"],
         }
 
-    async def fn(self, ticker: str) -> str:
+    async def fn(self, subject_id: str) -> str:
         # Business logic from the external library
-        return f"Sentiment for {ticker} is moderately bullish (+0.65)."
+        return f"Sentiment for {subject_id} is positive (+0.65)."
 
 
 # --- INTEGRATION EXAMPLE ---
@@ -67,19 +67,19 @@ async def main():
     class ResearchAgent(LLMAgent):
         async def run(self, input_data: str, **kwargs):
             # Fetch tools by name from the registry
-            ticker = input_data
-            tools = self.get_tools(["get_market_sentiment"])
+            subject_id = input_data
+            tools = self.get_tools(["get_subject_sentiment"])
 
-            prompt = f"Using the available tools, analyze {ticker} and provide a summary."
+            prompt = f"Using the available tools, analyze {subject_id} and provide a summary."
 
-            print(f"[Agent] Running research mission for {ticker}...")
+            print(f"[Agent] Running research mission for {subject_id}...")
             # The model will automatically detect the tool schema and call it
             response = await self.model.generate_content_async(prompt, tools=tools)
             return response.text
 
     # 4. Execute the reasoning mission
     agent = ResearchAgent(model=model, name="Researcher")
-    result = await agent.run("ETH")
+    result = await agent.run("Global_Warming_2026")
 
     print("\n" + "=" * 50)
     print("FINAL AGENT REPORT (Using External Strand Tool):")

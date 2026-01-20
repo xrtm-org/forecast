@@ -79,12 +79,16 @@ if __name__ == "__main__":
 
 To understand our vision for "Institutional Grade" forecasting, including our focus on Time Travel (Chronos), Calibration, and Dynamic Trajectories (Sentinel), please read our **[Strategic Roadmap](ROADMAP.md)**.
 
-## Key Features (v0.3.0)
+## Key Features (v0.4.0)
 
+*   **Institutional Sovereignty**:
+    *   **Merkle Reasoning**: Every state transition is anchored via SHA-256 Merkle proofs.
+    *   **.xrtm Manifests**: Portable bundles containing full reasoning traces, telemetry, and hashes.
+    *   **Source Epistemics**: Automated `IntegrityGuardian` for domain-level trust evaluation.
 *   **Institutional Grade Physics**:
-    *   **Chronos Protocol**: Time-travel safe backtesting using `TemporalContext` and `freezegun`.
-    *   **Sentinel Protocol**: Forecast trajectories (`ForecastTrajectory`) to track probability over time.
-    *   **Calibration**: Native `PlattScaler` and Brier Score decomposition for rigorous probability.
+    *   **Chronos Protocol**: Time-travel safe backtesting with instant-sleep acceleration.
+    *   **Sentinel Protocol**: Forecast trajectories to track probability evolution.
+    *   **Calibration**: Native `PlattScaler` and Brier Score decomposition.
 *   **Advanced Reasoning**:
     *   **Recursive Consensus**: Peer-review topology that loops until confidence threshold is met.
     *   **Fact-Checking**: Dedicated `FactCheckerAgent` to verify claims against external tools.
@@ -98,7 +102,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 1.  **Temporal Integrity (The Time Machine)**:
     *   Most agent frameworks leak future data during backtests. `xrtm-forecast` has a Temporal Sandboxing engine that rigidly enforces cut-off dates for search and memory.
-    *   Verify your strategies against past market events with zero look-ahead bias.
+    *   Verify your strategies against past events with zero look-ahead bias.
 
 2.  **Probabilistic Rigor**:
     *   Agents are treated as calibrated instruments, not just chatbots. We support native Brier Score calculation, Reliability Diagrams, and Confidence Interval estimation out of the box.
@@ -131,7 +135,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 <summary><b>Agents (Personas)</b></summary>
 
 *   **[Minimal Agent](examples/kit/minimal_agent/run_minimal_agent.py)**: The "Hello World" of reasoning.
-*   **[Forecasting Analyst](examples/kit/pipelines/forecasting_analyst/run_forecasting_analyst.py)**: A specialized researcher for binary market questions.
+*   **[Forecasting Analyst](examples/kit/pipelines/forecasting_analyst/run_forecasting_analyst.py)**: A specialized researcher for binary forecasting subjects.
 *   **[Fact Checker](examples/kit/agents/fact_checker_demo/run_fact_checker_demo.py)**: An agent that verifies claims against tools.
 *   **[Adversary (Red Team)](examples/kit/agents/adversary_demo/run_adversary_demo.py)**: An agent trained to find flaws in arguments.
 
@@ -143,6 +147,8 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **[Debate](examples/kit/topologies/debate_demo/run_debate_demo.py)**: Two agents arguing for opposing sides before a judge.
 *   **[Consensus](examples/kit/topologies/consensus_demo/run_consensus_demo.py)**: Multiple agents varying in temperature converging on a decision.
 *   **[Orchestrator Basics](examples/core/orchestrator_basics/run_orchestrator_basics.py)**: Building a custom state machine from scratch.
+*   **[Epistemic Security](examples/core/run_epistemic_security.py)**: Source trust scoring and automated filtering.
+*   **[Chronos Acceleration](examples/core/run_chronos_sleep.py)**: Using virtual time to bypass real-world delays.
 
 </details>
 

@@ -45,7 +45,7 @@ class Skill(Protocol):
         Args:
             **kwargs:
                 Arbitrary keyword arguments representing the skill's parameters
-                (e.g., `query="market trends"`).
+                (e.g., `query="topic trends"`).
 
         Returns:
             `Any`: The result of the skill execution.

@@ -34,9 +34,9 @@ We organize our roadmap into three distinct layers of maturity.
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Truth Protocol** | **Cryptographic Audit.** Merkle-ized reasoning chains for tamper-evident traces. | Planned |
-| **Epistemic Security** | **Anti-Manipulation.** source verification and cross-referencing to block "News Injection" attacks. | Planned |
-| **Dossier Generator** | **Institutional Reporting.** Auto-generating audit-ready research proofs. | Concept |
+| **Truth Protocol** | **Cryptographic Audit.** Merkle-ized reasoning chains for tamper-evident traces. | **DONE** |
+| **Epistemic Security** | **Anti-Manipulation.** source verification and cross-referencing to block "News Injection" attacks. | In Progress |
+| **Dossier Generator** | **Institutional Reporting.** Auto-generating audit-ready research proofs via `.xrtm`. | **DONE** |
 
 ### v0.5.0: The "Intelligence" Layer (Frontier)
 *Focus: Causal inference and automated optimization.*

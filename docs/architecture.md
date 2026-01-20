@@ -53,7 +53,7 @@ Contains the **Skill Registry**.
 ### Taxonomy: Skills vs. Tools
 To keep the system modular, we strictly distinguish between:
 *   The Tool (`src/forecast/providers/tools/`): An atomic, stateless function (e.g., `GoogleSearch.execute()`). It wraps a specific driver or API.
-*   The Skill (`src/forecast/kit/skills/`): A high-level behavior that *uses* tools (e.g., `MarketResearchSkill`). It manages retries, error handling, and prompt logic.
+*   The Skill (`src/forecast/kit/skills/`): A high-level behavior that *uses* tools (e.g., `SubjectInquirySkill`). It manages retries, error handling, and prompt logic.
 
 *Rule: Agents possess Skills. Skills control Tools.*
 

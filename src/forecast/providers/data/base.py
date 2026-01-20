@@ -24,8 +24,8 @@ class DataSource(abc.ABC):
     Abstract interface for gathering or streaming forecasting workloads.
 
     `DataSource` implementations are responsible for retrieving `ForecastQuestion`
-    objects from external environments (e.g., Prediction Markets, Local Databases,
-    or APIs).
+    objects from external environments (e.g., External Information Systems,
+    Local Databases, or APIs).
     r"""
 
     @abc.abstractmethod

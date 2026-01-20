@@ -59,6 +59,9 @@ nav:
       - Evaluation: api/evaluation.md
       - Memory: api/memory.md
       - Telemetry: api/telemetry.md
+      - Causal Interpretability: api/causal.md
+      - Optimization: api/optimization.md
+      - Centaur Protocol (HITL): api/centaur.md
   - Resources:
       - Agents Registry: agents_registry.md
       - Custom Designs: custom_designs.md

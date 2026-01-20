@@ -78,6 +78,10 @@ If you prefer to run locally:
 - **Classes**: `PascalCase` (e.g., `AgentFactory`).
 - **Scripts**: Runnable scripts (especially examples) must start with `run_` (e.g., `run_glue.py`).
 
+## Agentic Engagement Rules
+1. **Sovereignty**: The Agent MUST NOT commit or push changes unless explicitly instructed by the USER.
+2. **Workflow Triggers**: Workflows (e.g. `/verify_and_push`, `/create_release`) MUST ONLY be triggered by the USER. Proactive execution by the Agent is strictly prohibited.
+
 ## Release Process
 1. Update version in `src/forecast/version.py`.
 2. Tag the release in git: `git tag -a v0.2.1 -m "Release v0.2.1"`.

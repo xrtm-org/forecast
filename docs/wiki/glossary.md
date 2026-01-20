@@ -26,7 +26,7 @@ An abstract interface allowing an Agent to acquire context from the outside worl
 
 ## Integration Patterns
 
-Often, a single piece of logic (like a "Statistical Model" or "Market Fetcher") can be used in two different ways. The choice depends on who is in charge.
+Often, a single piece of logic (like a "Statistical Model" or "Subject Fetcher") can be used in two different ways. The choice depends on who is in charge.
 
 ### The Instrument Pattern (Skill/Tool)
 The Agent is in charge. It decides *when* and *if* to call the logic during its reasoning loop.

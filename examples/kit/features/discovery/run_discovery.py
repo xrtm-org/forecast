@@ -25,13 +25,13 @@ from forecast.kit.skills.definitions import skill
 
 
 # 1. Define a custom skill with a single decorator
-@skill(name="market_sentiment_analyzer")
-async def analyze_sentiment(ticker: str):
+@skill(name="topic_sentiment_analyzer")
+async def analyze_sentiment(subject_id: str):
     """
-    Analyzes social and news sentiment for a given stock ticker.
+    Analyzes social and news sentiment for a given subject identifier.
     Returns a score between -1 and 1.
     """
-    print(f"[Skill] Analyzing sentiment for {ticker}...")
+    print(f"[Skill] Analyzing sentiment for {subject_id}...")
     # Mock logic
     return 0.75
 
@@ -47,10 +47,10 @@ async def main():
 
     # 3. Retrieve and execute the functional skill
     print("\n--- Executing Discovered Skill ---")
-    my_skill = tool_registry.get_skill("market_sentiment_analyzer")
+    my_skill = tool_registry.get_skill("topic_sentiment_analyzer")
     if my_skill:
-        result = await my_skill.execute(ticker="AAPL")
-        print(f"Result for AAPL: {result}")
+        result = await my_skill.execute(subject_id="climate-policy-2026")
+        print(f"Result for climate-policy: {result}")
 
 
 if __name__ == "__main__":

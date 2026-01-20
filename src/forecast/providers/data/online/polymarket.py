@@ -79,7 +79,7 @@ class PolymarketSource(DataSource):
             content=item.get("description", ""),
             metadata=MetadataBase(
                 tags=item.get("tags", []),
-                market_type="binary",  # Default for demo
+                subject_type="binary",  # Default for demo
                 source_version="polymarket-gamma-v1",
                 # Pass through raw data for expert agents
                 raw_data=item,
