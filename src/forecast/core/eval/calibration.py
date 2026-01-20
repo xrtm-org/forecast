@@ -124,3 +124,91 @@ class PlattScaler(BaseModel):
         self.b = data["b"]
         self.fitted = data["fitted"]
         return self
+
+
+class BetaScaler(BaseModel):
+    r"""
+    A probabilistic calibrator using Beta Calibration.
+
+    Beta calibration is more flexible than Platt scaling, allowing for both
+    asymmetric correction and superior handling of the 'S-curves' typical of
+    under-confident or over-confident LLMs.
+
+    Formula (Logit Space):
+        logit(p') = a * log(p) - b * log(1-p) + c
+
+    Attributes:
+        a (`float`): Scaling factor for the positive log-probability.
+        b (`float`): Scaling factor for the negative log-probability.
+        c (`float`): Intercept (bias) term.
+        fitted (`bool`): Whether the scaler has been fitted.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    a: float = 1.0
+    b: float = 1.0
+    c: float = 0.0
+    fitted: bool = False
+
+    def fit(self, y_true: List[int], y_prob: List[float]) -> "BetaScaler":
+        r"""
+        Fits the Beta calibration model to the given data.
+
+        We fit this by mapping (p) to a 2D feature space [log(p), -log(1-p)]
+        and training a Logistic Regression model.
+
+        Args:
+            y_true (`List[int]`): Ground truth binary labels.
+            y_prob (`List[float]`): Predicted probabilities [0, 1].
+
+        Returns:
+            `BetaScaler`: The fitted instance.
+        """
+        eps = 1e-15
+        p = np.clip(y_prob, eps, 1 - eps)
+
+        # X = [log(p), -log(1-p)]
+        x1 = np.log(p)
+        x2 = -np.log(1 - p)
+        X = np.stack([x1, x2], axis=1)
+
+        clf = LogisticRegression(C=1e10, solver="lbfgs")
+        clf.fit(X, y_true)
+
+        self.a = float(clf.coef_[0][0])
+        self.b = float(clf.coef_[0][1])
+        self.c = float(clf.intercept_[0])
+        self.fitted = True
+
+        return self
+
+    def transform(self, y_prob: Union[float, List[float]]) -> Union[float, List[float]]:
+        r"""
+        Applies the Beta calibration transformation.
+
+        Args:
+            y_prob (`float` or `List[float]`): Raw probability [0.0, 1.0].
+
+        Returns:
+            Calibrated probability or list of probabilities.
+        """
+        if not self.fitted:
+            return y_prob
+
+        is_scalar = isinstance(y_prob, (float, int))
+        y_prob_arr = np.array([y_prob]) if is_scalar else np.array(y_prob)
+
+        eps = 1e-15
+        p = np.clip(y_prob_arr, eps, 1 - eps)
+
+        # Apply Beta formula in logit space
+        scaled_logits = self.a * np.log(p) - self.b * np.log(1 - p) + self.c
+        p_calib = 1.0 / (1.0 + np.exp(-scaled_logits))
+
+        if is_scalar:
+            return float(p_calib[0])
+        return p_calib.tolist()
+
+
+__all__ = ["PlattScaler", "BetaScaler"]

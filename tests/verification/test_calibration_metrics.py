@@ -27,6 +27,7 @@ from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, Backtest
 
 class MockOrchestrator(Orchestrator):
     def __init__(self, predictions):
+        super().__init__()
         self.predictions = predictions  # Map subject_id -> confidence
         self.call_count = 0
 
@@ -49,8 +50,6 @@ class MockOrchestrator(Orchestrator):
 async def test_brier_and_ece_verification(tmp_path):
     print(">>> Starting Verification for Calibration Suite")
 
-    # ... [setup code omitted for brevity] ...
-
     dataset_items = []
 
     # Group A: High Confidence (0.9), Low Accuracy (0.0) -> High ECE
@@ -60,7 +59,7 @@ async def test_brier_and_ece_verification(tmp_path):
         q_id = f"q_overconf_{i}"
         dataset_items.append(
             BacktestInstance(
-                question=ForecastQuestion(id=q_id, title="Masked", metadata=MetadataBase(market_type="BINARY")),
+                question=ForecastQuestion(id=q_id, title="Masked", metadata=MetadataBase(subject_type="BINARY")),
                 resolution=ForecastResolution(question_id=q_id, outcome="0.0"),  # WRONG outcome
                 reference_time=datetime(2025, 1, 1),
                 tags=["group:overconfident"],
@@ -74,7 +73,7 @@ async def test_brier_and_ece_verification(tmp_path):
         outcome_val = "1.0" if i < 4 else "0.0"  # 4/5 = 80% accuracy
         dataset_items.append(
             BacktestInstance(
-                question=ForecastQuestion(id=q_id, title="Masked", metadata=MetadataBase(market_type="BINARY")),
+                question=ForecastQuestion(id=q_id, title="Masked", metadata=MetadataBase(subject_type="BINARY")),
                 resolution=ForecastResolution(question_id=q_id, outcome=outcome_val),
                 reference_time=datetime(2025, 1, 1),
                 tags=["group:calibrated"],
