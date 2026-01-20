@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.1] - 2026-01-20
+
+### Added
+- **Schema Upgrade**: Added `uncertainty` field to `ForecastOutput` for Inverse Variance Weighting.
+- **Inverse Variance Weighting**: Statistical aggregation method in `aggregation.py` for uncertainty-aware consensus.
+- **Red Team Integration**: Wired `RedTeamAgent` into `RecursiveConsensus` topology via optional `red_team_wrapper`.
+- **Adversarial Injector**: `AdversarialInjector` in `resilience.py` for epistemic stress-testing.
+- **Documentation**: API docs for Sentinel Protocol and Epistemic Security modules.
+- **Wiki Concepts**: Concept guides for Sentinel Protocol and Epistemic Security.
+
+### Changed
+- **mkdocs.yml**: Added navigation entries for new Sentinel and Security documentation.
+- **Master Plan**: Added Phase 9 documenting v0.4.1 precision and integration work.
+
+
 ## [0.4.0] - 2026-01-20
 
 ### Added
