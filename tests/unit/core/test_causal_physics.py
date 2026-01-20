@@ -53,11 +53,7 @@ def test_intervention_propagation():
     ]
 
     output = ForecastOutput(
-        question_id="test",
-        confidence=0.5,
-        reasoning="test",
-        logical_trace=nodes,
-        logical_edges=edges
+        question_id="test", confidence=0.5, reasoning="test", logical_trace=nodes, logical_edges=edges
     )
 
     engine = InterventionEngine()

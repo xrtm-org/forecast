@@ -45,8 +45,7 @@ class MockInferenceProvider:
         new_prob = max(0.0, min(1.0, new_prob))
 
         return MockResponse(
-            f"NEW_PROBABILITY: {new_prob:.2f}\n"
-            f"REASONING: Update #{self._call_count} - simulated market conditions."
+            f"NEW_PROBABILITY: {new_prob:.2f}\nREASONING: Update #{self._call_count} - simulated market conditions."
         )
 
 
@@ -86,7 +85,7 @@ async def main() -> None:
 
     # Register the watch with initial confidence
     print(f"📊 Registering watch for: {question.title}")
-    print(f"   Initial confidence: 50%")
+    print("   Initial confidence: 50%")
     print(f"   Max updates: {rules.max_updates}")
     print()
 

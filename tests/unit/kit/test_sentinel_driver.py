@@ -31,9 +31,7 @@ class MockInferenceProvider:
 
     async def generate(self, prompt: str) -> "MockResponse":
         self.call_count += 1
-        return MockResponse(
-            f"NEW_PROBABILITY: 0.65\nREASONING: Test update #{self.call_count}"
-        )
+        return MockResponse(f"NEW_PROBABILITY: 0.65\nREASONING: Test update #{self.call_count}")
 
 
 class MockResponse:

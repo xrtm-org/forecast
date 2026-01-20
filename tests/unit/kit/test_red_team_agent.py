@@ -25,7 +25,7 @@ class MockInferenceProvider:
 
     async def generate(self, prompt: str) -> "MockResponse":
         return MockResponse(
-            """COUNTER_ARGUMENT: The employment data is a lagging indicator. 
+            """COUNTER_ARGUMENT: The employment data is a lagging indicator.
 Historical patterns show that rate hikes often precede recessions.
 
 WEAKNESSES:
@@ -79,9 +79,7 @@ class TestRedTeamAgent:
     r"""Tests for RedTeamAgent functionality."""
 
     @pytest.mark.asyncio
-    async def test_challenge_generates_counter_argument(
-        self, mock_model: MockInferenceProvider
-    ) -> None:
+    async def test_challenge_generates_counter_argument(self, mock_model: MockInferenceProvider) -> None:
         r"""Test that challenge() generates a valid counter-argument."""
         agent = RedTeamAgent(model=mock_model)  # type: ignore
 
@@ -110,9 +108,7 @@ class TestRedTeamAgent:
         assert "Demolish" in aggressive_prompt
 
     @pytest.mark.asyncio
-    async def test_run_method_integration(
-        self, mock_model: MockInferenceProvider
-    ) -> None:
+    async def test_run_method_integration(self, mock_model: MockInferenceProvider) -> None:
         r"""Test that run() integrates with BaseGraphState."""
         from forecast.core.schemas.graph import BaseGraphState
 

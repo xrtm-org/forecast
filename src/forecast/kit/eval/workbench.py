@@ -35,11 +35,7 @@ class AnalystWorkbench:
     using the combined intelligence.
     """
 
-    def __init__(
-        self,
-        agents: List[LLMAgent],
-        name: str = "AnalystWorkbench"
-    ):
+    def __init__(self, agents: List[LLMAgent], name: str = "AnalystWorkbench"):
         self.agents = agents
         self.name = name
 

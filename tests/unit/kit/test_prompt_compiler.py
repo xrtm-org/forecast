@@ -40,7 +40,7 @@ async def test_brier_optimizer_loop():
     # 4. Simulation Data (Input, Pred, Truth)
     dataset = [
         ("Will AI win?", 0.9, 0),  # Error: Overconfident
-        ("Will humans win?", 0.1, 1), # Error: Underconfident
+        ("Will humans win?", 0.1, 1),  # Error: Underconfident
     ]
 
     # 5. Execute Optimization

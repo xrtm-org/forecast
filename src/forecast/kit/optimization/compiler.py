@@ -34,11 +34,7 @@ class BrierOptimizer:
     def __init__(self, optimizer_model: Any):
         self.optimizer_model = optimizer_model
 
-    async def optimize(
-        self,
-        agent: CompiledAgent,
-        dataset: List[Tuple[Any, float, int]]
-    ) -> PromptTemplate:
+    async def optimize(self, agent: CompiledAgent, dataset: List[Tuple[Any, float, int]]) -> PromptTemplate:
         r"""
         Analyzes performance and suggests an improved prompt template.
 
@@ -48,7 +44,7 @@ class BrierOptimizer:
                 Training data for the optimizer.
         """
         # 1. Collect statistics
-        total_error = sum((p - g)**2 for _, p, g in dataset) / len(dataset)
+        total_error = sum((p - g) ** 2 for _, p, g in dataset) / len(dataset)
 
         # 2. Format a request to the meta-optimizer LLM
         # This is a prototype of the DSPy "BootstrappedFewShot" or "MIPRO" approach
@@ -73,9 +69,7 @@ class BrierOptimizer:
 
         # 3. Create a new template
         return PromptTemplate(
-            instruction=new_instruction.strip(),
-            examples=agent.template.examples,
-            version=agent.template.version + 1
+            instruction=new_instruction.strip(), examples=agent.template.examples, version=agent.template.version + 1
         )
 
 

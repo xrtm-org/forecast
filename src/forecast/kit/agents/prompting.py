@@ -37,6 +37,7 @@ class PromptTemplate(BaseModel):
         examples (`List[Dict[str, str]]`): Few-shot examples for the LLM.
         version (`int`): Incremental version for optimization tracking.
     """
+
     instruction: str
     examples: List[Dict[str, str]] = Field(default_factory=list)
     version: int = 1
@@ -48,12 +49,7 @@ class CompiledAgent(LLMAgent):
     This allows an optimizer to modify the template to improve performance.
     """
 
-    def __init__(
-        self,
-        model: InferenceProvider,
-        template: PromptTemplate,
-        name: Optional[str] = None
-    ):
+    def __init__(self, model: InferenceProvider, template: PromptTemplate, name: Optional[str] = None):
         super().__init__(model, name)
         self.template = template
 

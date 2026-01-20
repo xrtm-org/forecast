@@ -222,7 +222,9 @@ class Orchestrator(Generic[StateT]):
                         state.node_reports[active_node] = res
 
                         # If the node returned a string, check if it's a valid next node
-                        if isinstance(res, str) and (res in self.nodes or res in self.parallel_groups or res.startswith("human:")):
+                        if isinstance(res, str) and (
+                            res in self.nodes or res in self.parallel_groups or res.startswith("human:")
+                        ):
                             next_node = res
                         else:
                             next_node = None
@@ -231,7 +233,7 @@ class Orchestrator(Generic[StateT]):
                         break
 
                     if active_node.startswith("human:"):
-                        pass # Fall through to common anchor logic if we move the human logic up
+                        pass  # Fall through to common anchor logic if we move the human logic up
 
                 # Native Primitive: Human Intervention
                 if active_node.startswith("human:"):
@@ -241,7 +243,9 @@ class Orchestrator(Generic[StateT]):
                     # We look for a HumanProvider in the context
                     provider: Optional[HumanProvider] = state.context.get("human_provider")
                     if not provider:
-                        logger.error("[GRAPH] Human intervention requested but no 'human_provider' found in state context.")
+                        logger.error(
+                            "[GRAPH] Human intervention requested but no 'human_provider' found in state context."
+                        )
                         break
 
                     human_val = await provider.get_human_input(prompt)

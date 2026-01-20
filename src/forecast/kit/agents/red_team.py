@@ -34,7 +34,7 @@ Example:
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -269,9 +269,7 @@ Remember: You are the Devil's Advocate. Your job is to CHALLENGE, not to agree.
         state.context["red_team_counter"] = counter.model_dump()
         state.node_reports[self.name] = counter.counter_argument
 
-        logger.info(
-            f"[RED_TEAM] Challenge generated (confidence: {counter.confidence_in_challenge:.0%})"
-        )
+        logger.info(f"[RED_TEAM] Challenge generated (confidence: {counter.confidence_in_challenge:.0%})")
 
         return state
 

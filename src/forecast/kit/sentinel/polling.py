@@ -118,9 +118,7 @@ class PollingDriver(SentinelDriver):
 
         # If initial confidence provided, add first point
         if initial_confidence is not None:
-            trajectory.points.append(
-                TimeSeriesPoint(timestamp=now, value=initial_confidence)
-            )
+            trajectory.points.append(TimeSeriesPoint(timestamp=now, value=initial_confidence))
 
         watched = WatchedQuestion(
             question=question,
@@ -181,9 +179,7 @@ class PollingDriver(SentinelDriver):
 
         return True
 
-    async def _perform_delta_update(
-        self, watched: WatchedQuestion
-    ) -> Optional[Tuple[float, str]]:
+    async def _perform_delta_update(self, watched: WatchedQuestion) -> Optional[Tuple[float, str]]:
         r"""
         Performs a delta update using the Bayesian update prompt.
 
@@ -206,7 +202,7 @@ QUESTION: {question.title}
 PREVIOUS ESTIMATE: {current_confidence:.1%}
 
 PREVIOUS REASONING:
-{trajectory.rationale_history[-1] if trajectory.rationale_history else 'Initial estimate.'}
+{trajectory.rationale_history[-1] if trajectory.rationale_history else "Initial estimate."}
 
 TASK: Consider if any new developments might have occurred since your last update.
 Update your probability estimate if warranted.
@@ -261,9 +257,7 @@ REASONING: <brief explanation of any change>
                 new_prob, reasoning = result
 
                 # Update trajectory
-                watched.trajectory.points.append(
-                    TimeSeriesPoint(timestamp=now, value=new_prob)
-                )
+                watched.trajectory.points.append(TimeSeriesPoint(timestamp=now, value=new_prob))
                 watched.trajectory.final_confidence = new_prob
                 if reasoning:
                     watched.trajectory.rationale_history.append(reasoning)
@@ -272,10 +266,7 @@ REASONING: <brief explanation of any change>
                 watched.update_count += 1
                 updated_count += 1
 
-                logger.info(
-                    f"[SENTINEL] Updated {watch_id}: {new_prob:.1%} "
-                    f"(update #{watched.update_count})"
-                )
+                logger.info(f"[SENTINEL] Updated {watch_id}: {new_prob:.1%} (update #{watched.update_count})")
 
         return updated_count
 
@@ -301,10 +292,7 @@ REASONING: <brief explanation of any change>
             updated = await self.run_once()
             cycle_count += 1
 
-            logger.debug(
-                f"[SENTINEL] Cycle {cycle_count} complete. "
-                f"Updated {updated}/{len(self._watches)} questions."
-            )
+            logger.debug(f"[SENTINEL] Cycle {cycle_count} complete. Updated {updated}/{len(self._watches)} questions.")
 
             # Wait for interval or stop signal
             try:

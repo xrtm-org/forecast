@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.0] - 2026-01-20
+
+### Added
+- **Phase 5: Merkle Sovereignty**: Hash-chained state transitions in Orchestrator for tamper-evident audit trails.
+- **Phase 5: Manifest Bundling**: `.xrtm` package format via `ManifestBundler` for portable research proofs.
+- **Phase 5: Sovereignty Verifier**: Cryptographic validation of research proof bundles.
+- **Phase 5: Epistemic Security**: Source verification with `TrustScore` and cross-reference checking.
+- **Phase 6: Causal DAGs**: `CausalNode` and `CausalEdge` schemas with `networkx` integration.
+- **Phase 6: Intervention Engine**: Do-calculus API for "What-If" analysis.
+- **Phase 7: Beta Calibration**: `BetaScaler` for asymmetric non-parametric error distributions.
+- **Phase 7: Prompt Optimization**: DSPy-style `BrierOptimizer` and `CompiledAgent` for automated prompt tuning.
+- **Phase 8: Centaur Protocol**: `HumanProvider` interface and `AnalystWorkbench` for human-AI collaborative forecasting.
+- **Phase 8: Bias Interceptor**: Cognitive bias auditor for human forecasters.
+- **Sentinel Protocol**: `PollingDriver` for dynamic forecasting with trajectory updates.
+- **Red Team Agent**: Devil's Advocate pattern for adversarial consensus hardening.
+- **Wiki Docs**: Concept guides for Temporal Integrity, Merkle Sovereignty, and Human-in-the-Loop.
+
+### Changed
+- **CONTRIBUTING.md**: Enhanced with three-layer architecture overview and key coding standards.
+- **Domain Agnosticism**: Standardized terminology to "Subject/Value" instead of "Market/Price".
+- **AsyncRuntime**: Added mandatory `parent_id` for task lineage tracking.
+
+
 ## [0.3.2] - 2026-01-14
 
 ### Changed

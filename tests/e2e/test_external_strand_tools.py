@@ -34,4 +34,4 @@ async def test_external_tools_e2e(capsys):
 
     captured = capsys.readouterr()
     assert "FINAL AGENT REPORT (Using External Strand Tool):" in captured.out
-    assert "[App] Ingesting external tool: get_market_sentiment" in captured.out
+    assert "[App] Ingesting external tool: get_subject_sentiment" in captured.out

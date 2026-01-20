@@ -22,11 +22,11 @@ how forecasts evolve over time.
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from forecast.core.schemas.forecast import ForecastQuestion, ForecastTrajectory, TimeSeriesPoint
+from forecast.core.schemas.forecast import ForecastQuestion, ForecastTrajectory
 
 
 class TriggerRules(BaseModel):

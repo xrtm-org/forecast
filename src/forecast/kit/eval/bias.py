@@ -46,7 +46,7 @@ class BiasInterceptor(Evaluator):
         "Pessimism Bias",
         "Status Quo Bias",
         "Framing Effect",
-        "Recency Bias"
+        "Recency Bias",
     ]
 
     def __init__(self, model: Any):
@@ -84,7 +84,7 @@ class BiasInterceptor(Evaluator):
             score=0.0,
             ground_truth=ground_truth,
             prediction=prediction,
-            metadata={"type": "bias_audit"}
+            metadata={"type": "bias_audit"},
         )
 
 

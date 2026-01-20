@@ -43,7 +43,7 @@ async def run_causal_demo():
         confidence=0.4,
         reasoning="Standard projection based on current regulatory trends.",
         logical_trace=nodes,
-        logical_edges=edges
+        logical_edges=edges,
     )
 
     print("\nInitial State:")

@@ -27,15 +27,15 @@ from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, Backtest
 # 1. Simple mock node that returns a confidence score based on the input
 async def predictor_node(state: BaseGraphState, on_progress: Optional[Callable] = None):
     r"""A mock predictor node that returns confidence based on query keywords."""
-    # Just echo a value or simple logic
-    query = state.node_reports.get("ingestion", "0.5")
+    # The runner stores question.title in context["question_title"]
+    query = state.context.get("question_title", "")
     try:
         # Mock logic: if the query contains 'high', confidence is 0.9, else 0.1
-        conf = 0.9 if "high" in query.lower() else 0.1
-        state.node_reports["predictor"] = {"confidence": conf}
+        conf = 0.9 if "high" in str(query).lower() else 0.1
+        # Return the dict - orchestrator will store it in node_reports["predictor"]
+        return {"confidence": conf}
     except Exception:
-        state.node_reports["predictor"] = {"confidence": 0.5}
-    return None  # End of graph
+        return {"confidence": 0.5}
 
 
 @pytest.fixture

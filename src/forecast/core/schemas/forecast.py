@@ -84,7 +84,9 @@ class CausalNode(BaseModel):
     event: str = Field(..., description="The assumption or event in the chain")
     probability: Optional[float] = Field(None, ge=0, le=1)
     description: Optional[str] = None
-    node_id: str = Field(default_factory=lambda: "node_" + str(datetime.now().timestamp()), description="Unique ID for graph operations")
+    node_id: str = Field(
+        default_factory=lambda: "node_" + str(datetime.now().timestamp()), description="Unique ID for graph operations"
+    )
 
 
 class CausalEdge(BaseModel):

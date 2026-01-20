@@ -94,11 +94,10 @@ class BacktestRunner:
                 subject_id=instance.question.id,
                 temporal_context=TemporalContext(reference_time=instance.reference_time, is_backtest=True),
             )
-            # Inject question info into metadata/context if needed
-            # For now, we assume nodes know how to extract query from somewhere or we put it in node_reports
-            state.node_reports["ingestion"] = instance.question.title
+            # Inject question info into context (not node_reports, which gets overwritten by orchestrator)
+            state.context["question_title"] = instance.question.title
             if instance.question.content:
-                state.node_reports["ingestion"] += f"\n\nContext: {instance.question.content}"
+                state.context["question_content"] = instance.question.content
 
             try:
                 # 2. Run the graph

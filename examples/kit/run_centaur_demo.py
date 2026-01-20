@@ -43,11 +43,13 @@ class CLIHumanProvider(HumanProvider):
 
 class MockResearchAgent(LLMAgent):
     r"""Mock agent that provides deterministic research."""
+
     async def run(self, state: BaseGraphState, *args, **kwargs) -> str:
         return f"Research from {self.name}: AI is progressing 20% faster than estimated."
 
 
-async def run_centaur_demo():
+async def run_centaur_demo() -> None:
+    r"""Run the Centaur Protocol demo with mock agents and CLI human input."""
     print("--- [THE CENTAUR PROTOCOL DEMO] ---")
 
     # 1. Setup Agents

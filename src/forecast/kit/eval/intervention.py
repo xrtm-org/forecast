@@ -35,11 +35,7 @@ class InterventionEngine:
     """
 
     @staticmethod
-    def apply_intervention(
-        output: ForecastOutput,
-        node_id: str,
-        new_probability: float
-    ) -> ForecastOutput:
+    def apply_intervention(output: ForecastOutput, node_id: str, new_probability: float) -> ForecastOutput:
         r"""
         Simulates the impact of an intervention on a specific reasoning node.
         Propagates the change through the causal graph using linear weighting.
@@ -74,7 +70,7 @@ class InterventionEngine:
                 node.probability = new_probability
                 break
         else:
-             raise ValueError(f"Node ID '{node_id}' not found in logical_trace.")
+            raise ValueError(f"Node ID '{node_id}' not found in logical_trace.")
 
         # 4. Propagate the change downstream
         # We use a simple linear propagation strategy:
@@ -99,7 +95,9 @@ class InterventionEngine:
 
                 # Simple linear accumulation (clamped 0-1)
                 # In a real Bayesian network, this would be more complex math
-                normalized_delta = (current_node.probability - (dg.nodes[current_id].get("probability") or 0.5)) * weight
+                normalized_delta = (
+                    current_node.probability - (dg.nodes[current_id].get("probability") or 0.5)
+                ) * weight
                 target_node.probability = max(0.0, min(1.0, old_target_prob + normalized_delta))
 
         # 5. Update final confidence if the graph has a sink node that represents the outcome

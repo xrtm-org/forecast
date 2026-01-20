@@ -40,7 +40,7 @@ async def test_human_intervention_orchestration():
         return "AI is bullish."
 
     orch.add_node("research", research_step)
-    orch.add_node(human_node, None) # Orchestrator handles human: nodes automatically
+    orch.add_node(human_node, None)  # Orchestrator handles human: nodes automatically
     orch.add_edge("research", human_node)
     orch.set_entry_point("research")
 

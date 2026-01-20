@@ -24,7 +24,8 @@ from forecast.core.eval.calibration import BetaScaler, PlattScaler
 from forecast.kit.eval.metrics import EvaluationResult, ExpectedCalibrationErrorEvaluator
 
 
-def run_beta_demo():
+def run_beta_demo() -> None:
+    r"""Demonstrate Beta vs Platt calibration on synthetic biased data."""
     print("--- [BETA CALIBRATION DEMO] ---")
 
     # 1. Generate Synthetic Biased Data (Over-confident Agent)
