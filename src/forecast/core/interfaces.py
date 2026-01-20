@@ -115,4 +115,26 @@ class InferenceProvider(ABC):
         pass
 
 
-__all__ = ["InferenceProvider", "ModelResponse"]
+class HumanProvider(ABC):
+    r"""
+    Abstract Base Class for Human-in-the-Loop intervention providers.
+
+    This interface allows the engine to request manual judgment or
+    clarification from an analyst during the execution of a graph.
+    """
+
+    @abstractmethod
+    async def get_human_input(self, prompt: str) -> str:
+        r"""
+        Requests judgment or feedback from a human analyst.
+
+        Args:
+            prompt (`str`): The question or context to present to the analyst.
+
+        Returns:
+            `str`: The analyst's provided reasoning or judgment.
+        """
+        pass
+
+
+__all__ = ["InferenceProvider", "ModelResponse", "HumanProvider"]
