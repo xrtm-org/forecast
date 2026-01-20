@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -28,8 +28,8 @@ class MetadataBase(BaseModel):
             The timestamp when the object was created (defaults to UTC now).
         tags (`List[str]`):
             A list of searchable strings for categorization.
-        market_type (`str`, *optional*):
-            The category of the forecast market (e.g., "BINARY", "SCALAR").
+        subject_type (`str`, *optional*):
+            The category of the forecasting subject (e.g., "BINARY", "SCALAR").
         source_version (`str`, *optional*):
             The version of the data source providing the information.
         raw_data (`Dict[str, Any]`, *optional*):
@@ -37,9 +37,9 @@ class MetadataBase(BaseModel):
     r"""
 
     model_config = ConfigDict(extra="allow")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     tags: List[str] = Field(default_factory=list)
-    market_type: Optional[str] = None
+    subject_type: Optional[str] = None
     source_version: Optional[str] = None
     raw_data: Optional[Dict[str, Any]] = None
 
@@ -49,7 +49,7 @@ class ForecastQuestion(BaseModel):
     The standardized input format for a forecasting task.
 
     `ForecastQuestion` is designed to be highly flexible, scaling from a simple
-    text prompt to a structured market event with complex metadata.
+    text prompt to a structured forecasting subject with complex metadata.
 
     Attributes:
         id (`str`):
@@ -84,6 +84,28 @@ class CausalNode(BaseModel):
     event: str = Field(..., description="The assumption or event in the chain")
     probability: Optional[float] = Field(None, ge=0, le=1)
     description: Optional[str] = None
+    node_id: str = Field(default_factory=lambda: "node_" + str(datetime.now().timestamp()), description="Unique ID for graph operations")
+
+
+class CausalEdge(BaseModel):
+    r"""
+    Represents a directed causal dependency between two reasoning nodes.
+
+    Attributes:
+        source (`str`):
+            The node_id of the cause.
+        target (`str`):
+            The node_id of the effect.
+        weight (`float`, *optional*):
+            The strength of the causal connection (0 to 1).
+        description (`str`, *optional*):
+            Narrative explanation of the causal link.
+    """
+
+    source: str
+    target: str
+    weight: float = Field(default=1.0, ge=0, le=1)
+    description: Optional[str] = None
 
 
 class ForecastOutput(BaseModel):
@@ -116,9 +138,33 @@ class ForecastOutput(BaseModel):
     logical_trace: List[CausalNode] = Field(
         default_factory=list, description="The Bayesian-style sequence of assumptions (Mental Model)"
     )
+    logical_edges: List[CausalEdge] = Field(
+        default_factory=list, description="Causal dependencies between nodes in the trace"
+    )
     structural_trace: List[str] = Field(default_factory=list, description="Order of graph nodes executed (Audit Trail)")
 
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Model info, latency, usage, cost")
+
+    def to_networkx(self) -> Any:
+        r"""
+        Exports the logical_trace as a NetworkX DiGraph.
+
+        Returns:
+            `networkx.DiGraph`: A directed graph representing the causal chain.
+        """
+        import networkx as nx
+
+        dg = nx.DiGraph()
+        for node in self.logical_trace:
+            dg.add_node(
+                node.node_id,
+                event=node.event,
+                probability=node.probability,
+                description=node.description,
+            )
+        for edge in self.logical_edges:
+            dg.add_edge(edge.source, edge.target, weight=edge.weight, description=edge.description)
+        return dg
 
 
 class ForecastResolution(BaseModel):
@@ -138,7 +184,7 @@ class ForecastResolution(BaseModel):
 
     question_id: str
     outcome: str = Field(..., description="The final winning outcome or value")
-    resolved_at: datetime = Field(default_factory=datetime.utcnow)
+    resolved_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Source info, verification method")
 
 
@@ -169,6 +215,7 @@ __all__ = [
     "MetadataBase",
     "ForecastQuestion",
     "CausalNode",
+    "CausalEdge",
     "ForecastOutput",
     "ForecastResolution",
     "TimeSeriesPoint",

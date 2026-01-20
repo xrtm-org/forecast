@@ -19,6 +19,7 @@ import time
 from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 from forecast.core.config.graph import GraphConfig
+from forecast.core.interfaces import HumanProvider
 from forecast.core.runtime import AsyncRuntime
 from forecast.core.schemas.graph import BaseGraphState
 
@@ -161,154 +162,174 @@ class Orchestrator(Generic[StateT]):
         self,
         state: BaseGraphState,
         entry_node: str = "ingestion",
-        on_progress: Optional[Callable] = None,
+        on_progress: Optional[Any] = None,
         stopwatch: Optional[Any] = None,
     ) -> BaseGraphState:
         r"""
         Orchestrates the execution of the graph stages starting from an entry point.
+        """
+        from forecast.core.runtime import temporal_context_var
 
-        This method manages the control flow of the graph, tracking the execution path,
-        cycle count, and total latency. It terminates when a stage returns `None`
-        or `max_cycles` is reached.
-
-        Args:
-            state (`BaseGraphState`):
-                The initial state object to be processed and evolved.
-            entry_node (`str`, *optional*, defaults to `"ingestion"`):
-                The name of the first stage to execute.
-            on_progress (`Optional[Callable]`, *optional*):
-                A callback function for reporting progress during execution.
-            stopwatch (`Optional[Any]`, *optional*):
-                An optional instrumentation utility for tracking timing across stages.
-
-        Returns:
-            `BaseGraphState`: The final evolved state after execution completes.
-
-        Example:
-            ```python
-            from forecast.core.orchestrator import Orchestrator
-            from forecast.core.schemas.graph import BaseGraphState
-
-            orch = Orchestrator()
-            orch.add_node("ingestion", lambda s: "next")
-            orch.add_node("next", lambda s: None)
-            orch.add_edge("ingestion", "next")
-
-            state = BaseGraphState(subject_id="test")
-            final_state = await orch.run(state)
-            print(final_state.execution_path)
-            # Output: ['ingestion', 'next']
-            ```
-        r"""
+        # Set the temporal context for this reasoning task
+        token = temporal_context_var.set(state.temporal_context)
         self.stopwatch = stopwatch
+        try:
 
-        async def report_progress(
-            phase_id: float, phase: str, status: str, details: str, active_specialists: Optional[list[str]] = None
-        ):
-            if on_progress:
-                await on_progress(phase_id, phase, status, details, active_specialists)
+            async def report_progress(
+                phase_id: float,
+                phase: str,
+                status: str,
+                details: str,
+                active_specialists: Optional[list[str]] = None,
+            ):
+                if on_progress:
+                    await on_progress(phase_id, phase, status, details, active_specialists)
 
-        start_total = time.time()
-        await report_progress(0, "Graph", "START", f"Reasoning cycle for {state.subject_id}")
+            start_total = time.time()
+            await report_progress(0, "Graph", "START", f"Reasoning cycle for {state.subject_id}")
 
-        if entry_node == "ingestion" and self.entry_point:
-            entry_node = self.entry_point
+            if entry_node == "ingestion" and self.entry_point:
+                entry_node = self.entry_point
 
-        active_node = entry_node
-        while active_node:
-            if state.cycle_count >= self.max_cycles:
-                logger.warning(f"[GRAPH] Max cycles ({self.max_cycles}) reached for {state.subject_id}. Terminating.")
-                break
-
-            # Check if active_node is a parallel group
-            if active_node in self.nodes:
-                # Standard single node
-                node_func = self.nodes.get(active_node)
-                if not node_func:
-                    logger.error(f"[GRAPH] Unknown node: {active_node}")
+            active_node: Optional[str] = entry_node
+            while active_node:
+                next_node = None
+                if state.cycle_count >= self.max_cycles:
+                    logger.warning(
+                        f"[GRAPH] Max cycles ({self.max_cycles}) reached for {state.subject_id}. Terminating."
+                    )
                     break
 
-                # Temporal Sandboxing: Mock System Clock
-                if state.temporal_context and state.temporal_context.is_backtest:
-                    from freezegun import freeze_time
+                state.cycle_count += 1
+                # Check if active_node is a standard node or a native primitive
+                if active_node in self.nodes:
+                    # Merkle Anchoring: Capture parent state before execution
+                    state.parent_hash = state.state_hash
 
-                    with freeze_time(state.temporal_context.reference_time):
-                        next_node = await node_func(state, report_progress)
-                else:
-                    next_node = await node_func(state, report_progress)
+                    # Standard single node
+                    node_func = self.nodes.get(active_node)
+                    if node_func:
+                        # Temporal Sandboxing: Mock System Clock
+                        if state.temporal_context and state.temporal_context.is_backtest:
+                            from freezegun import freeze_time
 
-                state.execution_path.append(active_node)
+                            with freeze_time(state.temporal_context.reference_time):
+                                res = await node_func(state, report_progress)
+                        else:
+                            res = await node_func(state, report_progress)
 
-            elif active_node in self.parallel_groups:
-                # Parallel Group Execution
-                group_nodes = self.parallel_groups[active_node]
-                logger.info(f"[GRAPH] Executing parallel group: {active_node} -> {group_nodes}")
+                        # Automatically capture node results
+                        state.node_reports[active_node] = res
 
-                tasks = []
-                for node_name in group_nodes:
-                    func = self.nodes.get(node_name)
-                    if func:
-                        tasks.append(func(state, report_progress))
-                    else:
-                        logger.error(f"[GRAPH] Unknown node in group: {node_name}")
+                        # If the node returned a string, check if it's a valid next node
+                        if isinstance(res, str) and (res in self.nodes or res in self.parallel_groups or res.startswith("human:")):
+                            next_node = res
+                        else:
+                            next_node = None
+                    elif not active_node.startswith("human:"):
+                        logger.error(f"[GRAPH] Unknown node (function is None): {active_node}")
+                        break
 
-                # Execute all workers in parallel
-                if tasks:
-                    # Spawn properly named tasks for telemetry
-                    wrapped_tasks = []
-                    for i, t_coro in enumerate(tasks):
-                        task_name = f"{active_node}:worker_{i}"
-                        wrapped_tasks.append(AsyncRuntime.spawn(t_coro, name=task_name))
+                    if active_node.startswith("human:"):
+                        pass # Fall through to common anchor logic if we move the human logic up
 
-                    # Temporal Sandboxing: Mock System Clock
-                    if state.temporal_context and state.temporal_context.is_backtest:
-                        from freezegun import freeze_time
+                # Native Primitive: Human Intervention
+                if active_node.startswith("human:"):
+                    prompt = active_node.split("human:", 1)[1]
+                    logger.info(f"[GRAPH] Waiting for human input: {prompt}")
 
-                        with freeze_time(state.temporal_context.reference_time):
+                    # We look for a HumanProvider in the context
+                    provider: Optional[HumanProvider] = state.context.get("human_provider")
+                    if not provider:
+                        logger.error("[GRAPH] Human intervention requested but no 'human_provider' found in state context.")
+                        break
+
+                    human_val = await provider.get_human_input(prompt)
+                    state.node_reports[active_node] = human_val
+                    next_node = None
+
+                    # Common Anchor Logic (Merkle)
+                    state.execution_path.append(active_node)
+                    state.state_hash = state.compute_hash()
+                    logger.debug(f"[GRAPH] Node '{active_node}' anchored. Hash: {state.state_hash[:8]}...")
+
+                elif active_node in self.nodes and self.nodes.get(active_node) is not None:
+                    # Case handled above, just anchor
+                    state.execution_path.append(active_node)
+                    state.state_hash = state.compute_hash()
+                    logger.debug(f"[GRAPH] Node '{active_node}' anchored. Hash: {state.state_hash[:8]}...")
+
+                elif active_node in self.parallel_groups:
+                    # Merkle Anchoring: Capture parent state before execution
+                    state.parent_hash = state.state_hash
+                    # Parallel Group Execution
+                    group_nodes = self.parallel_groups[active_node]
+                    logger.info(f"[GRAPH] Executing parallel group: {active_node} -> {group_nodes}")
+
+                    tasks = []
+                    for node_name in group_nodes:
+                        func = self.nodes.get(node_name)
+                        if func:
+                            tasks.append(func(state, report_progress))
+                        else:
+                            logger.error(f"[GRAPH] Unknown node in group: {node_name}")
+
+                    # Execute all workers in parallel
+                    if tasks:
+                        # Spawn properly named tasks for telemetry
+                        wrapped_tasks = []
+                        for i, t_coro in enumerate(tasks):
+                            task_name = f"{active_node}:worker_{i}"
+                            wrapped_tasks.append(AsyncRuntime.spawn(t_coro, name=task_name))
+
+                        # Temporal Sandboxing: Mock System Clock
+                        if state.temporal_context and state.temporal_context.is_backtest:
+                            from freezegun import freeze_time
+
+                            with freeze_time(state.temporal_context.reference_time):
+                                results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
+                        else:
                             results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
-                    else:
-                        results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
 
-                    for i, res in enumerate(results):
-                        if isinstance(res, Exception):
-                            node_name = group_nodes[i] if i < len(group_nodes) else "unknown"
-                            logger.error(f"[GRAPH] Error in parallel node {node_name}: {res}")
+                        for i, res in enumerate(results):
+                            if isinstance(res, Exception):
+                                node_name = group_nodes[i] if i < len(group_nodes) else "unknown"
+                                logger.error(f"[GRAPH] Error in parallel node {node_name}: {res}")
 
-                # Logic for parallel group next step:
-                # Parallel groups don't return a single "next_node".
-                # We rely on the declared edge coming OUT of the group name.
-                next_node = None
-                state.execution_path.append(f"parallel:{active_node}")
+                    # Merkle Update: Parallel groups update the state hash once after all workers
+                    state.execution_path.append(f"parallel:{active_node}")
+                    state.state_hash = state.compute_hash()
 
-            else:
-                logger.error(f"[GRAPH] Unknown flow control: {active_node}")
-                break
+                else:
+                    logger.error(f"[GRAPH] Unknown flow control: {active_node}")
+                    break
 
-            # If the node didn't explicitly return a next step (or returned None),
-            # check the declarative edge registry, prioritizing conditional edges.
-            if next_node is None:
-                # 1. Check valid conditional edges
-                if active_node in self.conditional_edges:
-                    condition_func, route_map = self.conditional_edges[active_node]
-                    try:
-                        route_key = condition_func(state)
-                        next_node = route_map.get(route_key)
-                        if not next_node:
-                            logger.warning(
-                                f"[GRAPH] Condition returned '{route_key}' but no mapping found for node '{active_node}'"
-                            )
-                    except Exception as e:
-                        logger.error(f"[GRAPH] Conditional edge logic failed for '{active_node}': {e}")
-
-                # 2. If no conditional match (or no condition), fall back to static edge
+                # If the node didn't explicitly return a next step (or returned None),
+                # check the declarative edge registry, prioritizing conditional edges.
                 if next_node is None:
-                    next_node = self.edges.get(active_node)
+                    # 1. Check valid conditional edges
+                    if active_node in self.conditional_edges:
+                        condition_func, route_map = self.conditional_edges[active_node]
+                        try:
+                            route_key = condition_func(state)
+                            next_node = route_map.get(route_key)
+                            if not next_node:
+                                logger.warning(
+                                    f"[GRAPH] Condition returned '{route_key}' but no mapping found for node '{active_node}'"
+                                )
+                        except Exception as e:
+                            logger.error(f"[GRAPH] Conditional edge logic failed for '{active_node}': {e}")
 
-            active_node = next_node
-            state.cycle_count += 1
+                    # 2. If no conditional match (or no condition), fall back to static edge
+                    if next_node is None:
+                        next_node = self.edges.get(active_node)
 
-        state.latencies["total_graph"] = time.time() - start_total
-        logger.info(f"[GRAPH] Total cycle took {state.latencies['total_graph']:.2f}s")
+                active_node = next_node
+
+            state.latencies["total_graph"] = time.time() - start_total
+            logger.info(f"[GRAPH] Total cycle took {state.latencies['total_graph']:.2f}s")
+        finally:
+            temporal_context_var.reset(token)
 
         return state
 

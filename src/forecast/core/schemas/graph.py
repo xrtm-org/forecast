@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
+import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -96,6 +98,24 @@ class BaseGraphState(BaseModel):
 
     # Temporal Sandboxing
     temporal_context: Optional[TemporalContext] = Field(default=None, description="Metadata for temporal sandboxing.")
+
+    # Merkle Integrity (Institutional Grade)
+    state_hash: Optional[str] = Field(default=None, description="SHA-256 hash of the current state.")
+    parent_hash: Optional[str] = Field(default=None, description="Hash of the preceding state in the reasoning chain.")
+
+    def compute_hash(self) -> str:
+        r"""
+        Computes a deterministic SHA-256 hash of the current state.
+        Excludes volatile fields like 'latencies' or 'usage' if desired,
+        but for sovereignty we include everything that impacts the reasoning.
+        """
+        # We exclude the hash fields themselves from the computation
+        # and volatile fields like latencies to ensure consistency across environments
+        state_dict = self.model_dump(exclude={"state_hash", "parent_hash", "latencies", "usage"})
+
+        # Use deterministic JSON serialization
+        encoded = json.dumps(state_dict, sort_keys=True, default=str).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
