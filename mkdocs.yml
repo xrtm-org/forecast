@@ -44,6 +44,9 @@ nav:
           - Tools: wiki/concepts/tools.md
           - Orchestration: wiki/concepts/orchestration.md
           - Calibration: wiki/concepts/calibration.md
+          - Temporal Integrity: wiki/concepts/temporal_integrity.md
+          - Merkle Sovereignty: wiki/concepts/merkle_sovereignty.md
+          - Human-in-the-Loop: wiki/concepts/human_loop.md
       - Patterns:
           - Topologies: wiki/patterns/topologies.md
       - Standards:
