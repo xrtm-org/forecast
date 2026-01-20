@@ -13,4 +13,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = []
+r"""
+The Researcher Kit: High-level components for forecasting pipelines.
+
+This module provides production-ready agents, topologies, and evaluators
+for building institutional-grade forecasting systems.
+"""
+
+# Topologies
+from forecast.kit.agents.fact_checker import FactCheckerAgent
+
+# Agents
+from forecast.kit.agents.red_team import RedTeamAgent
+from forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
+
+# Evaluation
+from forecast.kit.eval.resilience import AdversarialInjector, GullibilityReport
+
+# Sentinel
+from forecast.kit.sentinel import PollingDriver, SentinelDriver, TriggerRules
+from forecast.kit.topologies import (
+    RecursiveConsensus,
+    create_ivw_aggregator,
+    create_simple_aggregator,
+)
+
+__all__ = [
+    # Topologies
+    "RecursiveConsensus",
+    "create_ivw_aggregator",
+    "create_simple_aggregator",
+    # Agents
+    "RedTeamAgent",
+    "FactCheckerAgent",
+    # Evaluation
+    "AdversarialInjector",
+    "GullibilityReport",
+    "EpistemicEvaluator",
+    # Sentinel
+    "PollingDriver",
+    "SentinelDriver",
+    "TriggerRules",
+]
