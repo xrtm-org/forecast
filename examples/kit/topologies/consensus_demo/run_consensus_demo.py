@@ -38,51 +38,31 @@ async def main():
         cycle = state.cycle_count
 
         # Each analyst generates a slightly different forecast based on the cycle
-        # Cycle 0 (First Pass): Low confidence
-        # Cycle 1+ (Refinement): High confidence
         base_confidence = 0.6 if cycle < 3 else 0.95
         noise = random.uniform(-0.05, 0.05)
         confidence = max(0.0, min(1.0, base_confidence + noise))
 
-        # This is a hack for the demo because reporter isn't the agent
-        # Actually reporter is the report_progress function.
-        # We rely on the orchestrator's task naming if we want exact ID,
-        # but here we just push to a shared bucket.
+        # We also provide uncertainty for IVW
+        uncertainty = max(0.01, (1.0 - confidence) * random.uniform(0.5, 1.5))
 
-        forecast = {"confidence": confidence, "reasoning": f"Based on cycle {cycle}, I am {confidence:.2f} confident."}
+        forecast = {
+            "confidence": confidence,
+            "uncertainty": uncertainty,
+            "reasoning": f"Based on cycle {cycle}, I am {confidence:.2f} confident.",
+        }
 
-        # Thread-safe append? The Orchestrator runs parallel groups.
-        # Dicts are thread-safe for atomic ops in GIL, but let's be safe:
-        # We'll just assume atomic append to a list in context.
-        # In production, use state locking or merge steps.
-        results = state.context.get("results", [])
+        # Use the standard key expected by the default aggregator
+        results = state.context.get("analyst_outputs", [])
         results.append(forecast)
-        state.context["results"] = results
+        state.context["analyst_outputs"] = results
 
         return None
 
-    # --- 2. Define Aggregator ---
-    async def aggregator_behavior(state: BaseGraphState, reporter: Any) -> Any:
-        results = state.context.get("results", [])
-        if not results:
-            state.context["aggregate"] = 0.0
-            return None
-
-        # Average confidence
-        avg_conf = sum(r["confidence"] for r in results) / len(results)
-        state.context["aggregate"] = avg_conf
-
-        # Clear results for next pass so we don't double count
-        # In a real system, we might want to keep history.
-        state.context["history"] = state.context.get("history", []) + results
-        state.context["results"] = []
-
-        logger.info(f"cycle {state.cycle_count} | Aggregated Confidence: {avg_conf:.2f}")
-        return None
-
-    # --- 3. Define Supervisor ---
+    # --- 2. Define Supervisor ---
     async def supervisor_behavior(state: BaseGraphState, reporter: Any) -> Any:
-        score = state.context.get("aggregate", 0.0)
+        # Use the standard 'aggregate' structure produced by ivw_aggregator
+        agg = state.context.get("aggregate", {})
+        score = agg.get("confidence", 0.0)
         threshold = 0.9
 
         if score >= threshold:
@@ -93,6 +73,10 @@ async def main():
             logger.info(f"Supervisor: Confidence {score:.2f} < {threshold}. REVISING.")
 
         state.context["decision"] = decision
+
+        # Clear analyst outputs for the next possible revision cycle
+        state.context["analyst_outputs"] = []
+
         return None
 
     # --- 4. Assemble Topology ---
@@ -103,8 +87,8 @@ async def main():
     topology = RecursiveConsensus(
         analyst_wrappers=analysts,
         supervisor_wrapper=supervisor_behavior,
-        aggregator_wrapper=aggregator_behavior,
-        max_cycles=10,
+        use_ivw=True,  # No manual aggregator_wrapper needed!
+        max_cycles=5,
     )
 
     orch = topology.build_graph()

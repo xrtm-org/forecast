@@ -16,8 +16,8 @@ limitations under the License.
 
 <p align="center">
     <br>
-    <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square" alt="License">
     <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
+    <img src="https://img.shields.io/badge/version-0.4.2-blue.svg?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
     <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
 </p>
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 To understand our vision for "Institutional Grade" forecasting, including our focus on Time Travel (Chronos), Calibration, and Dynamic Trajectories (Sentinel), please read our **[Strategic Roadmap](ROADMAP.md)**.
 
-## Key Features (v0.4.0)
+## Key Features (v0.4.2)
 
 *   **Institutional Sovereignty**:
     *   **Merkle Reasoning**: Every state transition is anchored via SHA-256 Merkle proofs.
@@ -88,7 +88,8 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **Institutional Grade Physics**:
     *   **Chronos Protocol**: Time-travel safe backtesting with instant-sleep acceleration.
     *   **Sentinel Protocol**: Forecast trajectories to track probability evolution.
-    *   **Calibration**: Native `PlattScaler` and Brier Score decomposition.
+    *   **Calibration**: Native `PlattScaler`, `BetaScaler`, and Brier Score decomposition.
+    *   **Inverse Variance Weighting (IVW)**: Uncertainty-aware consensus for multi-agent aggregation.
 *   **Advanced Reasoning**:
     *   **Recursive Consensus**: Peer-review topology that loops until confidence threshold is met.
     *   **Fact-Checking**: Dedicated `FactCheckerAgent` to verify claims against external tools.

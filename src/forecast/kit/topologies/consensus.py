@@ -19,6 +19,8 @@ from typing import Callable, List, Optional
 from forecast.core.orchestrator import Orchestrator
 from forecast.core.schemas.graph import BaseGraphState
 
+from .aggregators import create_ivw_aggregator
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,31 +40,46 @@ class RecursiveConsensus:
             List of callables (agent wrappers) that take (state, reporter) and return result.
         supervisor_wrapper (`Callable`):
              A callable that inspects the state so far and returns 'APPROVE' or 'REVISE'.
-        aggregator_wrapper (`Callable`):
+        aggregator_wrapper (`Callable`, *optional*):
              A callable that combines analyst outputs into a single forecast.
+             If None and `use_ivw` is True, `create_ivw_aggregator()` is used.
         red_team_wrapper (`Callable`, *optional*):
              A callable that challenges the consensus (Devil's Advocate pattern).
         max_cycles (`int`):
              Maximum number of revision loops allowed.
+        use_ivw (`bool`, *optional*, defaults to `False`):
+             Whether to use Inverse Variance Weighting by default if no aggregator is provided.
     """
 
     def __init__(
         self,
         analyst_wrappers: List[Callable],
         supervisor_wrapper: Callable,
-        aggregator_wrapper: Callable,
+        aggregator_wrapper: Optional[Callable] = None,
         red_team_wrapper: Optional[Callable] = None,
         max_cycles: int = 3,
+        use_ivw: bool = False,
     ):
         self.analysts = analyst_wrappers
         self.supervisor = supervisor_wrapper
-        self.aggregator = aggregator_wrapper
         self.red_team = red_team_wrapper
         self.max_cycles = max_cycles
 
+        if aggregator_wrapper is None:
+            if use_ivw:
+                self.aggregator = create_ivw_aggregator()
+            else:
+                raise ValueError("aggregator_wrapper must be provided if use_ivw is False")
+        else:
+            self.aggregator = aggregator_wrapper
+
     def build_graph(self) -> Orchestrator:
         r"""Constructs the executable Orchestrator graph."""
-        orch = Orchestrator.create_standard(max_cycles=self.max_cycles)
+        # Orchestrator uses max_cycles for total node visits.
+        # We want max_cycles to be revision loops.
+        # We allow ~10 nodes per revision loop to be very safe.
+        orch_max_visits = (self.max_cycles + 1) * 10
+        orch = Orchestrator.create_standard(max_cycles=orch_max_visits)
 
         # 1. Register Analysts
         analyst_names = []
