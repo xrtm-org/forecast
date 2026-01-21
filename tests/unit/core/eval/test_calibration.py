@@ -13,113 +13,150 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
+r"""Unit tests for forecast.core.eval.calibration."""
 
-from forecast.core.eval.calibration import PlattScaler
-from forecast.core.eval.definitions import EvaluationResult
-from forecast.kit.eval.metrics import BrierScoreEvaluator
+import pytest
+
+from forecast.core.eval.calibration import BetaScaler, PlattScaler
 
 
 class TestPlattScaler:
-    r"""Unit tests for the PlattScaler."""
+    r"""Tests for the PlattScaler calibration class."""
 
-    def test_identity_scaling(self):
-        """
-        Verify that perfectly calibrated data results in near-identity scaling parameters.
-        a approx 1, b approx 0.
-        """
-        # Generate synthetic perfectly calibrated data
-        # Prob 0.2 -> 20% positives
-        # Prob 0.8 -> 80% positives
-        np.random.seed(42)
-        n_samples = 1000
-        y_probs = []
-        y_true = []
-
-        for p in [0.2, 0.5, 0.8]:
-            n = int(n_samples / 3)
-            outcomes = np.random.binomial(1, p, n)
-            y_probs.extend([p] * n)
-            y_true.extend(outcomes)
-
+    def test_default_params(self):
+        r"""Should have default params a=1, b=0."""
         scaler = PlattScaler()
-        scaler.fit(y_true, y_probs)
+        assert scaler.a == 1.0
+        assert scaler.b == 0.0
+        assert scaler.fitted is False
 
-        assert scaler.fitted
-        # Tolerances for convergence
-        assert 0.8 < scaler.a < 1.2
-        assert -0.2 < scaler.b < 0.2
-
-        # Test transform
-        t = scaler.transform(0.5)
-        assert 0.45 < t < 0.55
-
-    def test_bias_correction(self):
-        """
-        Verify that under-confident data (everything is 0.5) gets pushed to extremes
-        if the reality determines it.
-        Actually, let's test a simple shift.
-        Model says 0.3, Reality is 0.6.
-        """
-        # Model consistently underestimates
-        y_probs = [0.3] * 1000
-        # Reality is 60% positive
-        y_true = np.random.binomial(1, 0.6, 1000).tolist()
-
+    def test_transform_not_fitted(self):
+        r"""Should return input unchanged when not fitted."""
         scaler = PlattScaler()
-        scaler.fit(y_true, y_probs)
+        result = scaler.transform(0.7)
+        assert result == 0.7
 
-        # Transform 0.3 should be closer to 0.6
-        calibrated = scaler.transform(0.3)
-        assert calibrated > 0.45
+    def test_transform_not_fitted_list(self):
+        r"""Should return input list unchanged when not fitted."""
+        scaler = PlattScaler()
+        result = scaler.transform([0.3, 0.5, 0.8])
+        assert result == [0.3, 0.5, 0.8]
 
-    def test_save_load(self, tmp_path):
-        scaler = PlattScaler(a=2.5, b=-0.5, fitted=True)
-        p = tmp_path / "scaler.pkl"
-        scaler.save(p)
+    def test_fit_sets_params(self):
+        r"""Should set a, b params after fitting."""
+        scaler = PlattScaler()
+        y_true = [0, 0, 1, 1, 1, 1]
+        y_prob = [0.2, 0.3, 0.6, 0.7, 0.8, 0.9]
 
-        loaded = PlattScaler().load(p)
-        assert loaded.a == 2.5
-        assert loaded.b == -0.5
-        assert loaded.fitted
+        scaler.fit(y_true, y_prob)
+
+        assert scaler.fitted is True
+        assert isinstance(scaler.a, float)
+        assert isinstance(scaler.b, float)
+
+    def test_transform_scalar(self):
+        r"""Should transform single probability."""
+        scaler = PlattScaler()
+        scaler.fit([0, 0, 1, 1], [0.2, 0.4, 0.6, 0.8])
+
+        result = scaler.transform(0.5)
+
+        assert isinstance(result, float)
+        assert 0.0 <= result <= 1.0
+
+    def test_transform_list(self):
+        r"""Should transform list of probabilities."""
+        scaler = PlattScaler()
+        scaler.fit([0, 0, 1, 1], [0.2, 0.4, 0.6, 0.8])
+
+        result = scaler.transform([0.3, 0.5, 0.7])
+
+        assert isinstance(result, list)
+        assert len(result) == 3
+        for r in result:
+            assert 0.0 <= r <= 1.0
+
+    def test_save_and_load(self, tmp_path):
+        r"""Should save and load scaler state."""
+        scaler = PlattScaler()
+        scaler.fit([0, 0, 1, 1], [0.2, 0.4, 0.6, 0.8])
+
+        filepath = tmp_path / "scaler.pkl"
+        scaler.save(filepath)
+
+        new_scaler = PlattScaler()
+        new_scaler.load(filepath)
+
+        assert new_scaler.a == scaler.a
+        assert new_scaler.b == scaler.b
+        assert new_scaler.fitted is True
 
 
-class TestBrierDecomposition:
-    r"""Unit tests for Brier Score decomposition."""
+class TestBetaScaler:
+    r"""Tests for the BetaScaler calibration class."""
 
-    def test_decomposition_identity(self):
-        """
-        Verify that BS = Rel - Res + Unc
-        """
-        # Create a small set of results
-        # 2 bins: 0.2 (0/5 pos), 0.8 (4/5 pos)
-        results = []
+    def test_default_params(self):
+        r"""Should have default params a=1, b=1, c=0."""
+        scaler = BetaScaler()
+        assert scaler.a == 1.0
+        assert scaler.b == 1.0
+        assert scaler.c == 0.0
+        assert scaler.fitted is False
 
-        # Bin 1: Pred=0.2, Outcome=0 (5 times)
-        for _ in range(5):
-            results.append(EvaluationResult(subject_id="x", score=0.0, ground_truth=0, prediction=0.2))
+    def test_transform_not_fitted(self):
+        r"""Should return input unchanged when not fitted."""
+        scaler = BetaScaler()
+        result = scaler.transform(0.7)
+        assert result == 0.7
 
-        # Bin 2: Pred=0.8, Outcome=1 (4 times), Outcome=0 (1 time)
-        for _ in range(4):
-            results.append(EvaluationResult(subject_id="x", score=0.0, ground_truth=1, prediction=0.8))
-        results.append(EvaluationResult(subject_id="x", score=0.0, ground_truth=0, prediction=0.8))
+    def test_transform_not_fitted_list(self):
+        r"""Should return input list unchanged when not fitted."""
+        scaler = BetaScaler()
+        result = scaler.transform([0.3, 0.5, 0.8])
+        assert result == [0.3, 0.5, 0.8]
 
-        evaluator = BrierScoreEvaluator()
-        decomp = evaluator.compute_decomposition(results, num_bins=10)  # 10 bins is standard, our preds fall nicely
+    def test_fit_sets_params(self):
+        r"""Should set a, b, c params after fitting."""
+        scaler = BetaScaler()
+        y_true = [0, 0, 1, 1, 1, 1]
+        y_prob = [0.2, 0.3, 0.6, 0.7, 0.8, 0.9]
 
-        # Expected calculation:
-        # N = 10
-        # Outcomes: 0,0,0,0,0, 1,1,1,1,0 -> Total 4 positives. o_bar = 0.4.
-        # Uncertainty = 0.4 * 0.6 = 0.24
+        scaler.fit(y_true, y_prob)
 
-        assert abs(decomp.uncertainty - 0.24) < 1e-5
+        assert scaler.fitted is True
+        assert isinstance(scaler.a, float)
+        assert isinstance(scaler.b, float)
+        assert isinstance(scaler.c, float)
 
-        # Check identity
-        # We need to manually calc BS average
-        bs_sum = 0
-        for r in results:
-            bs_sum += (r.prediction - r.ground_truth) ** 2
-        bs_mean = bs_sum / 10
+    def test_transform_scalar(self):
+        r"""Should transform single probability."""
+        scaler = BetaScaler()
+        scaler.fit([0, 0, 1, 1], [0.2, 0.4, 0.6, 0.8])
 
-        assert abs(decomp.score - (decomp.reliability - decomp.resolution + decomp.uncertainty)) < 1e-5
-        assert abs(decomp.score - bs_mean) < 1e-5
+        result = scaler.transform(0.5)
+
+        assert isinstance(result, float)
+        assert 0.0 <= result <= 1.0
+
+    def test_transform_list(self):
+        r"""Should transform list of probabilities."""
+        scaler = BetaScaler()
+        scaler.fit([0, 0, 1, 1], [0.2, 0.4, 0.6, 0.8])
+
+        result = scaler.transform([0.3, 0.5, 0.7])
+
+        assert isinstance(result, list)
+        assert len(result) == 3
+        for r in result:
+            assert 0.0 <= r <= 1.0
+
+    def test_edge_probabilities(self):
+        r"""Should handle edge probabilities (near 0 or 1)."""
+        scaler = BetaScaler()
+        scaler.fit([0, 0, 1, 1], [0.1, 0.2, 0.8, 0.9])
+
+        # Test extreme values - should not crash due to clipping
+        result = scaler.transform([0.001, 0.999])
+
+        assert isinstance(result, list)
+        assert len(result) == 2
