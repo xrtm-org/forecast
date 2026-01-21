@@ -15,9 +15,6 @@
 
 r"""Unit tests for forecast.core.utils.json_util."""
 
-import math
-
-import pytest
 from pydantic import BaseModel
 
 from forecast.core.utils.json_util import robust_clean, safe_json_dumps

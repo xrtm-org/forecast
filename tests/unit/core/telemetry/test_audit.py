@@ -17,9 +17,7 @@ r"""Unit tests for forecast.core.telemetry.audit."""
 
 import os
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import MagicMock
 
 from forecast.core.telemetry.audit import Audit
 
@@ -30,9 +28,8 @@ class TestAudit:
     def test_init_creates_log_dir(self, tmp_path):
         r"""Should create log directory if it doesn't exist."""
         log_dir = tmp_path / "audit_logs"
-        assert not log_dir.exists()
-
-        audit = Audit(log_dir=str(log_dir))
+        # Initialize
+        Audit(log_dir=str(log_dir))
 
         assert log_dir.exists()
 
@@ -41,9 +38,7 @@ class TestAudit:
         log_dir = tmp_path / "audit_logs"
         audit = Audit(log_dir=str(log_dir))
 
-        filepath = audit.log_chain(
-            subject_id="TEST_SUBJECT", chain={"step1": "data1", "step2": "data2"}
-        )
+        filepath = audit.log_chain(subject_id="TEST_SUBJECT", chain={"step1": "data1", "step2": "data2"})
 
         assert filepath != ""
         assert os.path.exists(filepath)
@@ -86,16 +81,14 @@ class TestAudit:
         log_dir = tmp_path / "audit_logs"
         audit = Audit(log_dir=str(log_dir))
 
-        filepath = audit.log_chain(
-            subject_id="TEST", chain={}, extra_metadata={"custom": "data"}
-        )
+        filepath = audit.log_chain(subject_id="TEST", chain={}, extra_metadata={"custom": "data"})
 
         with open(filepath) as f:
             data = json.load(f)
 
         assert data["custom"] == "data"
 
-    # Note: test_log_chain_handles_write_error removed - the try/except 
+    # Note: test_log_chain_handles_write_error removed - the try/except
     # path is tested implicitly and mocking builtins.open is fragile
 
     def test_generate_execution_report(self, tmp_path):

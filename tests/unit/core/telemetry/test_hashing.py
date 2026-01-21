@@ -15,8 +15,6 @@
 
 r"""Unit tests for forecast.core.telemetry.hashing."""
 
-import pytest
-
 from forecast.core.telemetry.hashing import AuditHasher
 
 

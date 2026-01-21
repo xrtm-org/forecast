@@ -15,8 +15,6 @@
 
 r"""Unit tests for forecast.core.eval.calibration."""
 
-import pytest
-
 from forecast.core.eval.calibration import BetaScaler, PlattScaler
 
 

@@ -36,18 +36,14 @@ class TestTokenBucket:
     def test_init_with_redis_import_error(self):
         r"""Should fall back to in-memory when redis not installed."""
         with patch.dict("sys.modules", {"redis": None, "redis.asyncio": None}):
-            bucket = TokenBucket(
-                redis_url="redis://localhost:6379", key="test", rate=1.0, capacity=10.0
-            )
+            bucket = TokenBucket(redis_url="redis://localhost:6379", key="test", rate=1.0, capacity=10.0)
             # Should gracefully fall back
             assert bucket.key == "test"
 
     def test_init_with_redis_connection_error(self):
         r"""Should fall back to in-memory on Redis connection error."""
         with patch("redis.asyncio.from_url", side_effect=Exception("Connection refused")):
-            bucket = TokenBucket(
-                redis_url="redis://localhost:6379", key="test", rate=1.0, capacity=10.0
-            )
+            bucket = TokenBucket(redis_url="redis://localhost:6379", key="test", rate=1.0, capacity=10.0)
             assert bucket.use_redis is False
 
     @pytest.mark.asyncio

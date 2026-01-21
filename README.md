@@ -17,7 +17,7 @@ limitations under the License.
 <p align="center">
     <br>
     <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
-    <img src="https://img.shields.io/badge/version-0.4.2-blue.svg?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.4.3-blue.svg?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
     <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
 </p>
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 To understand our vision for "Institutional Grade" forecasting, including our focus on Time Travel (Chronos), Calibration, and Dynamic Trajectories (Sentinel), please read our **[Strategic Roadmap](ROADMAP.md)**.
 
-## Key Features (v0.4.2)
+## Key Features (v0.4.3)
 
 *   **Institutional Sovereignty**:
     *   **Merkle Reasoning**: Every state transition is anchored via SHA-256 Merkle proofs.
@@ -121,6 +121,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 6. **Institutional-Grade Compliance**:
     *   Built for environments where "Black Boxes" are forbidden.
     *   Every component is strictly typed, and our **Managed Async Runtime** ensures that background tasks are traceable, high-performance (uvloop), and time-travel safe (Chronos).
+    *   See our **[Architecture Overview](docs/architecture.md)** for a deep dive into Core ABCs and Agent topologies.
 
 ## Why shouldn't I use xrtm-forecast?
 

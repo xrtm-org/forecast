@@ -15,8 +15,6 @@
 
 r"""Unit tests for forecast.core.telemetry.manager."""
 
-import pytest
-
 from forecast.core.telemetry.manager import TelemetryManager, trace_context
 from forecast.core.telemetry.schemas import SpanKind
 
@@ -27,9 +25,8 @@ class TestTelemetryManager:
     def test_init_creates_log_dir(self, tmp_path):
         r"""Should create log directory on init."""
         log_dir = tmp_path / "telemetry_logs"
-        assert not log_dir.exists()
-
-        manager = TelemetryManager(log_dir=str(log_dir))
+        # Initialize
+        TelemetryManager(log_dir=str(log_dir))
 
         assert log_dir.exists()
 
@@ -161,6 +158,7 @@ class TestTelemetryManager:
         r"""Should handle export when no trace active."""
         # Clear any leftover context from previous tests
         from forecast.core.telemetry.manager import _current_trace_var, _span_stack_var
+
         _current_trace_var.set(None)
         _span_stack_var.set([])
 

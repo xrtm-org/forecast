@@ -16,12 +16,9 @@
 r"""Unit tests for forecast.core.verification."""
 
 import json
-from unittest.mock import patch
 
-import pytest
-
-from forecast.core.verification import SovereigntyVerifier
 from forecast.core.schemas.graph import BaseGraphState
+from forecast.core.verification import SovereigntyVerifier
 
 
 class TestSovereigntyVerifier:

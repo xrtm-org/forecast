@@ -20,8 +20,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from forecast.core.tools.base import FunctionTool, StrandToolWrapper, Tool
 from forecast.core.schemas.graph import TemporalContext
+from forecast.core.tools.base import FunctionTool, StrandToolWrapper, Tool
 
 
 class TestFunctionTool:
@@ -292,9 +292,7 @@ class TestToolBase:
                 return None
 
         tool = ConcreteTool()
-        ctx = TemporalContext(
-            reference_time=datetime(2025, 6, 15), is_backtest=True
-        )
+        ctx = TemporalContext(reference_time=datetime(2025, 6, 15), is_backtest=True)
         result = tool._apply_temporal_filters("my query", ctx)
         assert "before:2025-06-15" in result
 
@@ -318,8 +316,6 @@ class TestToolBase:
                 return None
 
         tool = ConcreteTool()
-        ctx = TemporalContext(
-            reference_time=datetime(2025, 6, 15), is_backtest=True
-        )
+        ctx = TemporalContext(reference_time=datetime(2025, 6, 15), is_backtest=True)
         result = tool._apply_temporal_filters("my query before:2025-06-15", ctx)
         assert result.count("before:2025-06-15") == 1

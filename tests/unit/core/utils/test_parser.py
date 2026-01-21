@@ -15,8 +15,6 @@
 
 r"""Unit tests for forecast.core.utils.parser."""
 
-import pytest
-
 from forecast.core.utils.parser import parse_json_markdown
 
 
@@ -25,22 +23,22 @@ class TestParseJsonMarkdown:
 
     def test_json_in_markdown_code_block(self):
         r"""Should extract JSON from markdown code blocks."""
-        text = '''Here is the result:
+        text = """Here is the result:
 ```json
 {"confidence": 0.8, "reasoning": "test"}
 ```
-'''
+"""
         result = parse_json_markdown(text)
         assert result["confidence"] == 0.8
         assert result["reasoning"] == "test"
 
     def test_json_in_plain_code_block(self):
         r"""Should extract JSON from plain code blocks (no json specifier)."""
-        text = '''
+        text = """
 ```
 {"value": 42}
 ```
-'''
+"""
         result = parse_json_markdown(text)
         assert result["value"] == 42
 
@@ -52,13 +50,13 @@ class TestParseJsonMarkdown:
 
     def test_raw_json_array(self):
         r"""Should parse raw JSON array without markdown."""
-        text = '[1, 2, 3]'
+        text = "[1, 2, 3]"
         result = parse_json_markdown(text)
         assert result == [1, 2, 3]
 
     def test_json_with_preamble(self):
         r"""Should handle JSON with conversational preamble."""
-        text = "Here is my analysis: {\"confidence\": 0.75}"
+        text = 'Here is my analysis: {"confidence": 0.75}'
         result = parse_json_markdown(text)
         assert result["confidence"] == 0.75
 
@@ -70,11 +68,11 @@ class TestParseJsonMarkdown:
 
     def test_json_array_in_markdown(self):
         r"""Should extract JSON array from markdown."""
-        text = '''Results:
+        text = """Results:
 ```json
 [{"id": 1}, {"id": 2}]
 ```
-'''
+"""
         result = parse_json_markdown(text)
         assert len(result) == 2
         assert result[0]["id"] == 1
@@ -87,12 +85,12 @@ class TestParseJsonMarkdown:
 
     def test_malformed_in_code_block_returns_default(self):
         r"""Should return default when code block contains invalid JSON and no valid JSON elsewhere."""
-        text = '''
+        text = """
 ```json
 {invalid json here}
 ```
 No actual JSON here either
-'''
+"""
         result = parse_json_markdown(text, default={"fallback": True})
         assert result == {"fallback": True}
 
@@ -104,12 +102,12 @@ No actual JSON here either
 
     def test_empty_object(self):
         r"""Should handle empty JSON objects."""
-        text = '{}'
+        text = "{}"
         result = parse_json_markdown(text)
         assert result == {}
 
     def test_empty_array(self):
         r"""Should handle empty JSON arrays."""
-        text = '[]'
+        text = "[]"
         result = parse_json_markdown(text)
         assert result == []
