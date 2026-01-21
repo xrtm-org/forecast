@@ -16,6 +16,8 @@ Welcome to the `xrtm-forecast` API reference. This section provides detailed inf
 
 ## Advanced Modules (v0.4.x+)
 
+- **[Sentinel Protocol](sentinel.md)**: Dynamic Forecasting and Polling drivers.
+- **[Epistemic Security](security.md)**: Adversarial resilience and source trust scoring.
 - **[Causal Interpretability](causal.md)**: DAG-based explanations and "What-If" analysis.
 - **[Optimization](optimization.md)**: Beta Calibration and DSPy-style prompt tuning.
 - **[Centaur Protocol](centaur.md)**: Human-in-the-Loop interventions.

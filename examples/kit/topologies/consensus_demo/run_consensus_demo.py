@@ -79,15 +79,23 @@ async def main():
 
         return None
 
+    # --- 3. Define Red Team Agent ---
+    # This simulates a 'Devil's Advocate' that challenges the consensus.
+    async def red_team_behavior(state: BaseGraphState, reporter: Any) -> Any:
+        logger.info("🚨 Red Team: Challenging the consensus with contrarian views.")
+        # In a real system, the Red Team adds critique to the context
+        state.context["past_critique"] = "Research indicates possible market saturation not accounted for."
+        return None
+
     # --- 4. Assemble Topology ---
     # We wrap the behavior function 3 times to simulate 3 different analysts
-    # Note: In a real system, these would be distinct Agent instances.
     analysts = [analyst_behavior, analyst_behavior, analyst_behavior]
 
     topology = RecursiveConsensus(
         analyst_wrappers=analysts,
         supervisor_wrapper=supervisor_behavior,
-        use_ivw=True,  # No manual aggregator_wrapper needed!
+        red_team_wrapper=red_team_behavior,  # Optional Devil's Advocate!
+        use_ivw=True,
         max_cycles=5,
     )
 
@@ -100,7 +108,7 @@ async def main():
     print("\n=== Final Trace ===")
     print("Execution Path:", " -> ".join(final_state.execution_path))
     print("Final Decision:", final_state.context.get("decision"))
-    print("Total Cycles:", final_state.cycle_count)
+    print("Total Nodes Visited:", final_state.cycle_count)
 
 
 if __name__ == "__main__":

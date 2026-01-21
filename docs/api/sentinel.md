@@ -1,51 +1,25 @@
-# Sentinel Protocol API
+# Sentinel Protocol: Dynamic Forecasting
 
-The Sentinel module provides infrastructure for **Dynamic Forecasting** — tracking
-how a forecast's confidence evolves as new information becomes available.
+The `sentinel` module provides the drivers and orchestration logic for **Dynamic Forecasting**—the ability for agents to continuously monitor news feeds and emit probability updates over time.
 
-## Core Classes
+## Polling Driver
 
-### `SentinelDriver` (Abstract Base)
-The interface that all Sentinel implementations must follow.
+The `PollingDriver` is the primary high-level interface for running background forecasting loops.
 
-```python
-from forecast.kit.sentinel import SentinelDriver
+### PollingDriver
+::: forecast.kit.sentinel.polling.PollingDriver
+    rendering:
+      show_root_heading: true
+      show_source: true
 
-class MySentinel(SentinelDriver):
-    async def register_watch(self, question, rules): ...
-    async def unregister_watch(self, question_id): ...
-    async def get_trajectory(self, question_id): ...
-```
+## Schemas
 
-### `PollingDriver`
-A zero-infrastructure implementation that periodically checks for updates.
+### ForecastTrajectory
+::: forecast.core.schemas.forecast.ForecastTrajectory
+    rendering:
+      show_root_heading: true
 
-```python
-from forecast.kit.sentinel import PollingDriver
-
-driver = PollingDriver(model=llm, poll_interval=3600)
-await driver.register_watch(question, rules)
-await driver.run(max_cycles=10)
-```
-
-### `TriggerRules`
-Configuration for when to update a forecast.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `interval_seconds` | `int` | Minimum time between updates |
-| `max_updates` | `int` | Maximum updates before stopping |
-
-## Schema: `ForecastTrajectory`
-Defined in `forecast.core.schemas.forecast`, this schema stores the time-series
-of probability updates for a single question.
-
-```python
-from forecast.core.schemas.forecast import ForecastTrajectory
-
-trajectory = ForecastTrajectory(
-    question_id="q123",
-    points=[TimeSeriesPoint(timestamp=now, value=0.75)],
-    final_confidence=0.75
-)
-```
+### TimeSeriesPoint
+::: forecast.core.schemas.forecast.TimeSeriesPoint
+    rendering:
+      show_root_heading: true
