@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+
+## [0.4.3] - 2026-01-21
+
+### Fixed
+- **Privacy Hardening**: Implemented regex-based PII redaction (Email, Phone, API Keys, Credit Cards, SSN) in `Core.Anonymizer`.
+- **Architecture Clarity**: Added a comprehensive Mermaid class dependency diagram to documentation.
+- **Redundancy Cleanup**: Deprecated `AdversaryAgent` (Redundant with `RedTeamAgent`) to prepare for v0.5.0 cleanup.
+- **Optimization Context**: Marked `BrierOptimizer` as experimental to align with its skeletal implementation.
+
+## [0.4.2] - 2026-01-21
+
+### Added
+- **Institutional Coverage**: Achieved 91% core test coverage, resolving critical "Institutional Grade" debt.
+- **Seamless Consensus**: `RecursiveConsensus` now natively supports Inverse Variance Weighting (IVW) and Red Team "Devil's Advocate" supervision.
+- **Resilience Demo**: New `run_resilience_demo` showcasing `AdversarialInjector` and `GullibilityReport` for epistemic security testing.
+- **Kit Exports**: Complete public API surface area for `forecast.kit`, exposing all agents and protocols.
+
+### Fixed
+- **Orchestration Cycles**: Resolved a logic mismatch where `Orchestrator` cycle limits could prematurely terminate revision loops.
+- **Stranded Assets**: Fully integrated previously isolated modules (IVW, Red Team, Security) into the main topology.
+
 ## [0.4.1] - 2026-01-20
 
 ### Added

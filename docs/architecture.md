@@ -87,3 +87,146 @@ graph TD
 - `src/forecast/core/`: The "Bus", Interfaces, and Physics (Orchestrator, Runtime, Guardian).
 - `src/forecast/kit/`: The Applied Layer (Agents, Skills, Topologies).
 - `src/forecast/providers/`: The Hardware Layer (Inference, Memory, Tools).
+
+---
+
+## Class Dependency Diagram
+
+The following diagram shows the relationship between Core ABCs and their implementations:
+
+```mermaid
+classDiagram
+    direction TB
+    
+    %% ═══════════════════════════════════════════
+    %% CORE LAYER (Abstract Base Classes)
+    %% ═══════════════════════════════════════════
+    
+    class InferenceProvider {
+        <<abstract>>
+        +generate_content_async()
+        +generate_content()
+        +stream()
+        +knowledge_cutoff
+    }
+    
+    class FactStore {
+        <<abstract>>
+        +remember(fact)
+        +query(subject)
+        +forget(subject)
+    }
+    
+    class Tool {
+        <<abstract>>
+        +name
+        +description
+        +run()
+        +pit_supported
+    }
+    
+    class Evaluator {
+        <<abstract>>
+        +score()
+        +evaluate()
+    }
+    
+    class Agent {
+        <<abstract>>
+        +run()
+        +add_skill()
+        +set_fact_store()
+    }
+    
+    %% ═══════════════════════════════════════════
+    %% PROVIDERS LAYER (Implementations)
+    %% ═══════════════════════════════════════════
+    
+    class GeminiProvider {
+        +model_id
+        +rate_limiter
+    }
+    class OpenAIProvider {
+        +model_id
+        +base_url
+    }
+    class HuggingFaceProvider {
+        +model_id
+    }
+    
+    GeminiProvider --|> InferenceProvider
+    OpenAIProvider --|> InferenceProvider
+    HuggingFaceProvider --|> InferenceProvider
+    
+    class SQLiteFactStore {
+        +db_path
+    }
+    class ChromaStore {
+        +collection
+    }
+    
+    SQLiteFactStore --|> FactStore
+    ChromaStore --|> FactStore
+    
+    class TavilySearchTool {
+        +api_key
+    }
+    
+    TavilySearchTool --|> Tool
+    
+    %% ═══════════════════════════════════════════
+    %% KIT LAYER (Agents & Evaluators)
+    %% ═══════════════════════════════════════════
+    
+    class LLMAgent {
+        +model
+        +parse_output()
+    }
+    class GraphAgent {
+        +orchestrator
+    }
+    
+    LLMAgent --|> Agent
+    GraphAgent --|> Agent
+    
+    class RedTeamAgent {
+        +intensity
+        +challenge()
+    }
+    class ForecastingAnalyst {
+        +skills
+    }
+    class RoutingAgent {
+        +fast_tier
+        +smart_tier
+    }
+    
+    RedTeamAgent --|> LLMAgent
+    ForecastingAnalyst --|> LLMAgent
+    RoutingAgent --|> Agent
+    
+    class BrierScoreEvaluator {
+        +compute_decomposition()
+    }
+    class ECEEvaluator {
+        +num_bins
+    }
+    
+    BrierScoreEvaluator --|> Evaluator
+    ECEEvaluator --|> Evaluator
+    
+    %% ═══════════════════════════════════════════
+    %% RELATIONSHIPS
+    %% ═══════════════════════════════════════════
+    
+    Agent --> FactStore : uses
+    LLMAgent --> InferenceProvider : uses
+    ForecastingAnalyst --> Tool : uses
+```
+
+### Key Architectural Rules
+
+1. **Core never imports Kit**: ABCs in `core/` cannot depend on implementations in `kit/`.
+2. **Providers are interchangeable**: Any `InferenceProvider` can be swapped without changing agent code.
+3. **FactStore enables institutional memory**: Agents can optionally connect to a `FactStore` via `set_fact_store()`.
+

@@ -19,7 +19,7 @@ Metadata for the xrtm-forecast package.
 
 __all__ = ["__version__", "__author__", "__contact__", "__license__", "__copyright__"]
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 __author__ = "XRTM Team"
 __contact__ = "moy@xrtm.org"
 __license__ = "Apache-2.0"

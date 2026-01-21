@@ -29,6 +29,18 @@ class BrierOptimizer:
     r"""
     A simple "Teleprompter" that optimizes an agent's prompt template
     to minimize Brier Score based on historical failures.
+
+    .. warning:: Experimental
+        This module is experimental and subject to change. It implements
+        a basic version of DSPy-style prompt optimization. For production
+        use, consider integrating with the full DSPy library.
+
+    Example:
+        ```python
+        >>> optimizer = BrierOptimizer(optimizer_model=my_llm)
+        >>> new_template = await optimizer.optimize(agent, dataset)
+        >>> agent.template = new_template
+        ```
     """
 
     def __init__(self, optimizer_model: Any):

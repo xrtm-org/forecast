@@ -19,6 +19,7 @@ Specialized for Red-Team consensus and finding holes in expert reasoning.
 r"""
 
 import logging
+import warnings
 from typing import Any, Dict, Optional
 
 from forecast.kit.agents.llm import LLMAgent
@@ -31,6 +32,11 @@ class AdversaryAgent(LLMAgent):
     r"""
     A specialized agent designed to find flaws, biases, and contradictions
     in a collective reasoning trace.
+
+    .. deprecated:: 0.5.0
+        This class is deprecated and will be removed in v0.6.0.
+        Use :class:`forecast.kit.agents.red_team.RedTeamAgent` instead,
+        which provides the same functionality with a more complete API.
 
     The AdversaryAgent is used as a 'Red Team' in consensus topologies to
     mitigate groupthink and surface institutional risks.
@@ -47,6 +53,12 @@ class AdversaryAgent(LLMAgent):
     )
 
     def __init__(self, model: InferenceProvider, name: Optional[str] = "TheRedTeamer", persona: Optional[str] = None):
+        warnings.warn(
+            "AdversaryAgent is deprecated since v0.5.0 and will be removed in v0.6.0. "
+            "Use forecast.kit.agents.red_team.RedTeamAgent instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super().__init__(model, name)
         self.persona = persona or self.DEFAULT_PERSONA
 
