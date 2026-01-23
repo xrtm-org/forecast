@@ -18,7 +18,7 @@ Core interfaces for Sovereign Knowledge Graphs (Institutional Memory).
 r"""
 
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
@@ -43,7 +43,7 @@ class Fact(BaseModel):
         r"""Checks if the fact has expired."""
         if self.expires_at is None:
             return False
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(timezone.utc) > self.expires_at
 
 
 class FactStore(ABC):

@@ -23,7 +23,7 @@ import json
 import logging
 import os
 import zipfile
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from forecast.core.schemas.graph import BaseGraphState
@@ -53,7 +53,11 @@ class ForecastBundle:
         if not output_path.endswith(".forecast"):
             output_path += ".forecast"
 
-        manifest: Dict[str, Any] = {"version": __version__, "created_at": datetime.utcnow().isoformat(), "files": {}}
+        manifest: Dict[str, Any] = {
+            "version": __version__,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "files": {},
+        }
 
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
             # 1. Store Trace

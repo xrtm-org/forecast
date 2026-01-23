@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.5.0] - 2026-01-22
+
+### Added
+- **Inference Cache**: SQLite-based LLM response caching with SHA256 hashing for 90% dev cost reduction (`core.cache.InferenceCache`).
+- **Resilience Protocol**: Production-grade retry middleware with jittered exponential backoff and telemetry integration (`core.resilience.ResilientProvider`).
+- **Wayback Integration**: Internet Archive tool for temporally-verified content retrieval with zero-leakage guarantee (`providers.tools.WaybackTool`).
+- **30 New Tests**: Comprehensive test coverage for all v0.5.0 features.
+
+### Changed
+- **Master Plan**: Consolidated strategic roadmap in `.plans/master_plan.md`.
+- **Idea Bank**: Expanded `.plans/ideas/` with 7 new strategic concepts (Cache, Resilience, Wayback, Decomposition, Tiered Intelligence, Benchmarks, Prompts).
 
 ## [0.4.3] - 2026-01-21
 

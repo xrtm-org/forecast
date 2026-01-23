@@ -15,7 +15,7 @@
 
 import asyncio
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -38,7 +38,9 @@ async def test_consensus_lab_integration():
         os.remove(db_path)
 
     fact_store = SQLiteFactStore(db_path)
-    test_fact = Fact(subject="ConsensusLab", predicate="status", object_value="Active", verified_at=datetime.utcnow())
+    test_fact = Fact(
+        subject="ConsensusLab", predicate="status", object_value="Active", verified_at=datetime.now(timezone.utc)
+    )
     await fact_store.remember(test_fact)
 
     # 2. Verify FactStore Query

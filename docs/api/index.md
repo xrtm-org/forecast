@@ -17,6 +17,9 @@ Welcome to the `xrtm-forecast` API reference. This section provides detailed inf
 ## Advanced Modules (v0.4.x+)
 
 - **[Sentinel Protocol](sentinel.md)**: Dynamic Forecasting and Polling drivers.
+- **[Inference Cache](cache.md)**: SQLite-based response caching.
+- **[Resilience Protocol](resilience.md)**: Production-grade retry middleware.
+- **[Tools](tools.md)**: External capability integrations (Wayback, etc.).
 - **[Epistemic Security](security.md)**: Adversarial resilience and source trust scoring.
 - **[Causal Interpretability](causal.md)**: DAG-based explanations and "What-If" analysis.
 - **[Optimization](optimization.md)**: Beta Calibration and DSPy-style prompt tuning.

@@ -63,6 +63,9 @@ nav:
       - Sentinel Protocol: api/sentinel.md
       - Epistemic Security: api/security.md
       - Inference: api/inference.md
+      - Inference Cache: api/cache.md
+      - Resilience Protocol: api/resilience.md
+      - Tools: api/tools.md
       - Evaluation: api/evaluation.md
       - Memory: api/memory.md
       - Telemetry: api/telemetry.md
