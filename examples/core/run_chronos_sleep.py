@@ -17,7 +17,7 @@ import asyncio
 import time
 from datetime import datetime
 
-from forecast import AsyncRuntime, BaseGraphState, Orchestrator, TemporalContext
+from xrtm.forecast import AsyncRuntime, BaseGraphState, Orchestrator, TemporalContext
 
 
 async def sleep_stage(state, on_progress=None):

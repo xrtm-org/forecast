@@ -15,8 +15,8 @@
 
 import pytest
 
-from forecast.core.eval.aggregation import inverse_variance_weighting, robustness_check_mad
-from forecast.core.schemas.forecast import ForecastOutput
+from xrtm.forecast.core.eval.aggregation import inverse_variance_weighting, robustness_check_mad
+from xrtm.forecast.core.schemas.forecast import ForecastOutput
 
 
 def test_ivw_basic():

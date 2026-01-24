@@ -15,8 +15,8 @@
 
 import pytest
 
-from forecast.core.eval.definitions import EvaluationResult
-from forecast.kit.eval.metrics import BrierScoreEvaluator
+from xrtm.forecast.core.eval.definitions import EvaluationResult
+from xrtm.forecast.kit.eval.metrics import BrierScoreEvaluator
 
 
 def test_brier_score_calc():

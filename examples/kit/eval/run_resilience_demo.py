@@ -22,8 +22,8 @@ agent's gullibility by injecting fake news into its reasoning context.
 
 import logging
 
-from forecast.core.runtime import AsyncRuntime
-from forecast.kit.eval.resilience import AdversarialInjector
+from xrtm.forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.kit.eval.resilience import AdversarialInjector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

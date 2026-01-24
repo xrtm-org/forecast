@@ -16,9 +16,9 @@
 import logging
 from typing import Any
 
-from forecast import AsyncRuntime
-from forecast.kit.agents.specialists.adversary import AdversaryAgent
-from forecast.providers.inference.base import InferenceProvider
+from xrtm.forecast import AsyncRuntime
+from xrtm.forecast.kit.agents.specialists.adversary import AdversaryAgent
+from xrtm.forecast.providers.inference.base import InferenceProvider
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

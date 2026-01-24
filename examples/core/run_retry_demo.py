@@ -29,8 +29,8 @@ import logging
 import random
 import time
 
-from forecast.core.resilience import ResilientProvider
-from forecast.core.resilience.wrapper import RetryConfig
+from xrtm.forecast.core.resilience import ResilientProvider
+from xrtm.forecast.core.resilience.wrapper import RetryConfig
 
 # Configure logging to show retry attempts
 logging.basicConfig(

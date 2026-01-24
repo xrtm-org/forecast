@@ -19,10 +19,10 @@ from typing import Any, Optional
 
 import pytest
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
 
 
 class MockOrchestrator(Orchestrator):
@@ -53,7 +53,7 @@ async def test_brier_and_ece_verification(tmp_path):
     dataset_items = []
 
     # Group A: High Confidence (0.9), Low Accuracy (0.0) -> High ECE
-    from forecast.core.schemas.forecast import MetadataBase
+    from xrtm.forecast.core.schemas.forecast import MetadataBase
 
     for i in range(5):
         q_id = f"q_overconf_{i}"

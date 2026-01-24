@@ -16,7 +16,7 @@
 
 import pytest
 
-from forecast.core.tools.base import StrandToolWrapper
+from xrtm.forecast.core.tools.base import StrandToolWrapper
 
 
 class MockStrandTool:

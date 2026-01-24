@@ -17,7 +17,7 @@ import asyncio
 import os
 import sqlite3
 
-from forecast.providers.tools import PandasSkill, SQLSkill
+from xrtm.forecast.providers.tools import PandasSkill, SQLSkill
 
 
 async def run_data_analysis():

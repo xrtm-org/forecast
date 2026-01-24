@@ -17,8 +17,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.kit.agents.prompting import CompiledAgent, PromptTemplate
-from forecast.kit.optimization.compiler import BrierOptimizer
+from xrtm.forecast.kit.agents.prompting import CompiledAgent, PromptTemplate
+from xrtm.forecast.kit.optimization.compiler import BrierOptimizer
 
 
 @pytest.mark.asyncio

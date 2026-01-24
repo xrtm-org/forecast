@@ -15,8 +15,8 @@
 
 r"""Unit tests for forecast.core.telemetry.manager."""
 
-from forecast.core.telemetry.manager import TelemetryManager, trace_context
-from forecast.core.telemetry.schemas import SpanKind
+from xrtm.forecast.core.telemetry.manager import TelemetryManager, trace_context
+from xrtm.forecast.core.telemetry.schemas import SpanKind
 
 
 class TestTelemetryManager:
@@ -157,7 +157,7 @@ class TestTelemetryManager:
     def test_export_trace_no_active(self, tmp_path):
         r"""Should handle export when no trace active."""
         # Clear any leftover context from previous tests
-        from forecast.core.telemetry.manager import _current_trace_var, _span_stack_var
+        from xrtm.forecast.core.telemetry.manager import _current_trace_var, _span_stack_var
 
         _current_trace_var.set(None)
         _span_stack_var.set([])

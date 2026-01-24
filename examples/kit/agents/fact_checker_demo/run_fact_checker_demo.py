@@ -15,9 +15,9 @@
 
 import logging
 
-from forecast import AsyncRuntime, BaseGraphState
-from forecast.core.tools.base import Tool
-from forecast.kit.agents.fact_checker import FactCheckerAgent
+from xrtm.forecast import AsyncRuntime, BaseGraphState
+from xrtm.forecast.core.tools.base import Tool
+from xrtm.forecast.kit.agents.fact_checker import FactCheckerAgent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

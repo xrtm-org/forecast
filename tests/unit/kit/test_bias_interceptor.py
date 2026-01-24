@@ -17,7 +17,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.kit.eval.bias import BiasInterceptor
+from xrtm.forecast.kit.eval.bias import BiasInterceptor
 
 
 @pytest.mark.asyncio

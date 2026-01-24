@@ -15,8 +15,8 @@
 
 import pytest
 
-from forecast.core.eval.definitions import EvaluationReport, EvaluationResult
-from forecast.kit.eval.analytics import SliceAnalytics
+from xrtm.forecast.core.eval.definitions import EvaluationReport, EvaluationResult
+from xrtm.forecast.kit.eval.analytics import SliceAnalytics
 
 
 def test_compute_slices():

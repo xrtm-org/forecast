@@ -15,9 +15,9 @@
 
 import asyncio
 
-from forecast.core.epistemics import IntegrityGuardian, SourceTrustRegistry
-from forecast.core.schemas.forecast import ForecastOutput
-from forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
+from xrtm.forecast.core.epistemics import IntegrityGuardian, SourceTrustRegistry
+from xrtm.forecast.core.schemas.forecast import ForecastOutput
+from xrtm.forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
 
 
 async def run_epistemic_demo():

@@ -23,8 +23,8 @@ Meanwhile, human experts have deep intuition but can't process 10,000 news artic
 A topology where the central node is a human analyst:
 
 ```python
-from forecast.kit.eval.workbench import AnalystWorkbench
-from forecast.kit.agents import LLMAgent
+from xrtm.forecast.kit.eval.workbench import AnalystWorkbench
+from xrtm.forecast.kit.agents import LLMAgent
 
 # Create research agents
 researchers = [
@@ -46,7 +46,7 @@ orchestrator = workbench.build_orchestrator(
 An AI auditor that checks human reasoning for cognitive biases:
 
 ```python
-from forecast.kit.eval.bias import BiasInterceptor
+from xrtm.forecast.kit.eval.bias import BiasInterceptor
 
 interceptor = BiasInterceptor(model=llm)
 audit_result = await interceptor.evaluate_reasoning(
@@ -64,8 +64,8 @@ audit_result = await interceptor.evaluate_reasoning(
 The Orchestrator natively supports `human:` prefixed nodes:
 
 ```python
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.interfaces import HumanProvider
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.interfaces import HumanProvider
 
 class CLIHumanProvider(HumanProvider):
     async def get_human_input(self, prompt: str) -> str:

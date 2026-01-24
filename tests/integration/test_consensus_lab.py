@@ -19,13 +19,13 @@ from datetime import datetime, timezone
 
 import pytest
 
-from forecast.core.memory.graph import Fact
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.core.utils.bundling import ForecastBundle
-from forecast.kit.agents.llm import LLMAgent
-from forecast.kit.agents.specialists.adversary import AdversaryAgent
-from forecast.kit.stages.bayesian import BayesianSieveStage
-from forecast.providers.memory.sqlite_kg import SQLiteFactStore
+from xrtm.forecast.core.memory.graph import Fact
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.utils.bundling import ForecastBundle
+from xrtm.forecast.kit.agents.llm import LLMAgent
+from xrtm.forecast.kit.agents.specialists.adversary import AdversaryAgent
+from xrtm.forecast.kit.stages.bayesian import BayesianSieveStage
+from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
 
 
 @pytest.mark.asyncio
@@ -53,7 +53,7 @@ async def test_consensus_lab_integration():
     # We'll use a mock-like agent setup for deterministic BF
     class MockAgent(LLMAgent):
         async def run(self, input_data, context=None, **kwargs):
-            from forecast.providers.inference.base import ModelResponse
+            from xrtm.forecast.providers.inference.base import ModelResponse
 
             # Simulate returning a Bayes Factor in metadata
             return ModelResponse(text="Evidence is supportive.", metadata={"bayes_factor": 1.5})

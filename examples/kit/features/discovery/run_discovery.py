@@ -20,8 +20,8 @@ Demonstrating how to define skills succinctly and discover them at runtime.
 
 import asyncio
 
-from forecast.core.tools.registry import tool_registry
-from forecast.kit.skills.definitions import skill
+from xrtm.forecast.core.tools.registry import tool_registry
+from xrtm.forecast.kit.skills.definitions import skill
 
 
 # 1. Define a custom skill with a single decorator

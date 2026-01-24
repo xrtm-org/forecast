@@ -18,8 +18,8 @@ import logging
 import sys
 from typing import Any
 
-from forecast.core.config.inference import HFConfig
-from forecast.providers.inference.hf_provider import HuggingFaceProvider
+from xrtm.forecast.core.config.inference import HFConfig
+from xrtm.forecast.providers.inference.hf_provider import HuggingFaceProvider
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

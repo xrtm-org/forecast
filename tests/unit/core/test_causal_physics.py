@@ -15,9 +15,9 @@
 
 import pytest
 
-from forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput
-from forecast.core.utils.causal import validate_causal_dag
-from forecast.kit.eval.intervention import InterventionEngine
+from xrtm.forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput
+from xrtm.forecast.core.utils.causal import validate_causal_dag
+from xrtm.forecast.kit.eval.intervention import InterventionEngine
 
 
 def test_causal_dag_validation():

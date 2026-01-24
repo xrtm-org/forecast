@@ -15,10 +15,10 @@
 
 import pytest
 
-from forecast.core.config.graph import GraphConfig
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.scenarios import ScenarioManager
+from xrtm.forecast.core.config.graph import GraphConfig
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.scenarios import ScenarioManager
 
 
 class SimpleState(BaseGraphState):

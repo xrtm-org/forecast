@@ -21,7 +21,7 @@ Run:
     python examples/core/run_cache_demo.py
 """
 
-from forecast.core.cache import InferenceCache
+from xrtm.forecast.core.cache import InferenceCache
 
 
 def main():

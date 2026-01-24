@@ -17,8 +17,8 @@ r"""Unit tests for forecast.core.verification."""
 
 import json
 
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.core.verification import SovereigntyVerifier
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.verification import SovereigntyVerifier
 
 
 class TestSovereigntyVerifier:

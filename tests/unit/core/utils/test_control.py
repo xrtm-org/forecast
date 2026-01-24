@@ -17,7 +17,7 @@ r"""Unit tests for forecast.core.utils.control."""
 
 from unittest.mock import MagicMock, patch
 
-from forecast.core.utils.control import ControlService
+from xrtm.forecast.core.utils.control import ControlService
 
 
 class TestControlService:

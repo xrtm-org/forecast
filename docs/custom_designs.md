@@ -7,7 +7,7 @@ The `xrtm-forecast` library is designed as a "Lego-piece" architecture. Here is 
 To build a custom agent, inherit from `forecast.Agent` and implement the `run` method.
 
 ```python
-from forecast import Agent
+from xrtm.forecast import Agent
 
 class SentimentAgent(Agent):
     def __init__(self, name="Sentiment"):
@@ -36,7 +36,7 @@ async def research_node(state, on_progress):
 ### Step 2: Assemble with the Orchestrator
 
 ```python
-from forecast import Orchestrator
+from xrtm.forecast import Orchestrator
 
 orchestrator = Orchestrator()
 orchestrator.register_node("research", research_node)

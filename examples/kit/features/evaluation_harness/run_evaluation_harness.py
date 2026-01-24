@@ -15,11 +15,11 @@
 
 import asyncio
 
-from forecast.core.config.inference import OpenAIConfig
-from forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
-from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
-from forecast.kit.eval import Backtester, BrierScoreEvaluator
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
+from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+from xrtm.forecast.kit.eval import Backtester, BrierScoreEvaluator
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 async def main():

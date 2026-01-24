@@ -18,11 +18,11 @@ import os
 import pytest
 from pydantic import SecretStr
 
-from forecast.core.config.inference import GeminiConfig
-from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
-from forecast.kit.pipelines.analyst import GenericAnalystPipeline
-from forecast.providers.data.local import LocalDataSource
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.core.config.inference import GeminiConfig
+from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+from xrtm.forecast.kit.pipelines.analyst import GenericAnalystPipeline
+from xrtm.forecast.providers.data.local import LocalDataSource
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 @pytest.mark.asyncio

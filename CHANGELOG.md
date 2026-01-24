@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Changed
+- **Namespace Refactor**: Migrated package structure from `forecast` to `xrtm.forecast` Native Namespace Package.
+- **Project Rename**: Renamed project to `xrtm-forecast` in `pyproject.toml`.
+
 ## [0.5.0] - 2026-01-22
 
 ### Added
@@ -174,7 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **"Pure Core, Practical Shell" Architecture**: Re-engineered the platform to separate strict abstract logic from ergonomic high-level APIs.
 - **Assistants Module**: Introduced `forecast.assistants` with high-level factories like `create_forecasting_analyst()` for one-line agent setup.
-- **Flattened Namespace**: Key classes and factories (e.g., `ModelFactory`, `Orchestrator`, `TelemetryManager`) are now accessible directly at the module level (e.g., `from forecast.inference import ModelFactory`).
+- **Flattened Namespace**: Key classes and factories (e.g., `ModelFactory`, `Orchestrator`, `TelemetryManager`) are now accessible directly at the module level (e.g., `from xrtm.forecast.inference import ModelFactory`).
 - **Smart Model Resolution**: `ModelFactory` and `Agent.from_config()` now support string shortcuts and model presets (e.g., `model="gemini"`).
 
 ### Changed

@@ -16,14 +16,14 @@
 import asyncio
 import os
 
-from forecast.kit.agents.llm import LLMAgent
-from forecast.kit.skills.web_search import WebSearchSkill
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.kit.agents.llm import LLMAgent
+from xrtm.forecast.kit.skills.web_search import WebSearchSkill
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 async def main():
     # 1. Setup - Using a real model if API key is present
-    from forecast.core.config.inference import OpenAIConfig
+    from xrtm.forecast.core.config.inference import OpenAIConfig
 
     config = OpenAIConfig(api_key=os.getenv("OPENAI_API_KEY", "mock-key"), model_id="gpt-4o")
     factory = ModelFactory()

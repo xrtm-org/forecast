@@ -17,11 +17,11 @@ from typing import Any, Callable, Dict, Optional
 
 import pytest
 
-from forecast.core.config.inference import GeminiConfig
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.agents.llm import LLMAgent
-from forecast.providers.inference.base import InferenceProvider, ModelResponse
+from xrtm.forecast.core.config.inference import GeminiConfig
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.agents.llm import LLMAgent
+from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 
 # 1. Mock Provider for tests
@@ -70,7 +70,7 @@ async def test_library_standalone_orchestration():
     mock_provider = MockProvider()
     _ = MockAgent(model=mock_provider)
 
-    from forecast.core.config.graph import GraphConfig
+    from xrtm.forecast.core.config.graph import GraphConfig
 
     orchestrator = Orchestrator(config=GraphConfig(max_cycles=2))
 

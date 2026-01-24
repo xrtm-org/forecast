@@ -17,9 +17,9 @@ from datetime import datetime
 
 import pytest
 
-from forecast.core.schemas.graph import TemporalContext
-from forecast.core.tools.base import Tool
-from forecast.kit.tools.guardian import GuardianTool
+from xrtm.forecast.core.schemas.graph import TemporalContext
+from xrtm.forecast.core.tools.base import Tool
+from xrtm.forecast.kit.tools.guardian import GuardianTool
 
 
 class UnsafeTool(Tool):

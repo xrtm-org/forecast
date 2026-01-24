@@ -16,7 +16,7 @@ r"""Unit tests for InferenceCache."""
 
 from __future__ import annotations
 
-from forecast.core.cache import InferenceCache
+from xrtm.forecast.core.cache import InferenceCache
 
 
 class TestInferenceCacheBasics:

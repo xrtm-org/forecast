@@ -15,7 +15,7 @@
 
 import logging
 
-from forecast import AsyncRuntime
+from xrtm.forecast import AsyncRuntime
 
 # Configure logging to see uvloop activation
 logging.basicConfig(level=logging.INFO)

@@ -25,7 +25,7 @@ graph LR
 
 **Usage:**
 ```python
-from forecast.kit.patterns import create_debate_graph
+from xrtm.forecast.kit.patterns import create_debate_graph
 
 graph = create_debate_graph(
     pro_agent=pro_agent,
@@ -55,7 +55,7 @@ graph LR
 
 **Usage:**
 ```python
-from forecast.kit.patterns import create_fanout_graph
+from xrtm.forecast.kit.patterns import create_fanout_graph
 
 workers = [analyst_1, analyst_2, analyst_3]
 graph = create_fanout_graph(

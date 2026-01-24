@@ -82,7 +82,7 @@ markers = [
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = {find = {where = ["src"]}}
+packages = {find = {where = ["src"], include = ["xrtm*"], namespaces = true}}
 
 
 [tool.ruff]

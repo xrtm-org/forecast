@@ -18,10 +18,10 @@ from typing import Callable, Optional
 
 import pytest
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.forecast import ForecastQuestion, ForecastResolution
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
 
 
 # 1. Simple mock node that returns a confidence score based on the input

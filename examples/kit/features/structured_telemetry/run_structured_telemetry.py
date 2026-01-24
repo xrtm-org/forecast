@@ -15,7 +15,7 @@
 
 import asyncio
 
-from forecast.core.telemetry import SpanKind, telemetry_manager
+from xrtm.forecast.core.telemetry import SpanKind, telemetry_manager
 
 
 async def simulate_work():

@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from forecast.core.utils.rate_limiter import TokenBucket
+from xrtm.forecast.core.utils.rate_limiter import TokenBucket
 
 
 class TestTokenBucket:

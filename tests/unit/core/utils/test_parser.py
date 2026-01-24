@@ -15,7 +15,7 @@
 
 r"""Unit tests for forecast.core.utils.parser."""
 
-from forecast.core.utils.parser import parse_json_markdown
+from xrtm.forecast.core.utils.parser import parse_json_markdown
 
 
 class TestParseJsonMarkdown:

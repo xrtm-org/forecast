@@ -20,8 +20,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from forecast.core.resilience import ResilientProvider
-from forecast.core.resilience.wrapper import RetryConfig
+from xrtm.forecast.core.resilience import ResilientProvider
+from xrtm.forecast.core.resilience.wrapper import RetryConfig
 
 
 class TestRetryConfig:

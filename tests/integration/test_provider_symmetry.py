@@ -18,9 +18,9 @@ from typing import Any
 import pytest
 from pydantic import SecretStr
 
-from forecast.core.config.inference import GeminiConfig, OpenAIConfig
-from forecast.providers.inference.gemini_provider import GeminiProvider
-from forecast.providers.inference.openai_provider import OpenAIProvider
+from xrtm.forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from xrtm.forecast.providers.inference.gemini_provider import GeminiProvider
+from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 
 class MockTool:
@@ -59,7 +59,7 @@ async def test_provider_symmetry_tool_calling():
 
 def test_config_singleton_integrity():
     r"""Verifies that the global settings singleton is correctly initialized."""
-    from forecast.core.config.main import settings
+    from xrtm.forecast.core.config.main import settings
 
     assert settings is not None
     # Verify defaults are minimal/gone

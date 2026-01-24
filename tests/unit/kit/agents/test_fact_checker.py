@@ -15,9 +15,9 @@
 
 import pytest
 
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.core.tools.base import Tool
-from forecast.kit.agents.fact_checker import FactCheckerAgent
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.tools.base import Tool
+from xrtm.forecast.kit.agents.fact_checker import FactCheckerAgent
 
 
 class MockSearchTool(Tool):

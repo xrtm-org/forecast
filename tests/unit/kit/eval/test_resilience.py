@@ -15,7 +15,7 @@
 
 import pytest
 
-from forecast.kit.eval.resilience import AdversarialInjector
+from xrtm.forecast.kit.eval.resilience import AdversarialInjector
 
 
 def test_generate_attack():

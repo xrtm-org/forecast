@@ -21,7 +21,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from forecast.providers.tools.wayback import WaybackResult, WaybackTool
+from xrtm.forecast.providers.tools.wayback import WaybackResult, WaybackTool
 
 
 class TestWaybackResult:

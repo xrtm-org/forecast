@@ -15,7 +15,7 @@
 
 r"""Unit tests for forecast.core.telemetry.hashing."""
 
-from forecast.core.telemetry.hashing import AuditHasher
+from xrtm.forecast.core.telemetry.hashing import AuditHasher
 
 
 class TestAuditHasher:

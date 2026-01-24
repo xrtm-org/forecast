@@ -17,8 +17,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forecast.kit.agents.routing import RoutingAgent
-from forecast.providers.inference.base import ModelResponse
+from xrtm.forecast.kit.agents.routing import RoutingAgent
+from xrtm.forecast.providers.inference.base import ModelResponse
 
 
 @pytest.mark.asyncio

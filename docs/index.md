@@ -27,7 +27,7 @@ pip install "xrtm-forecast[standard]"
 ### Basic Usage
 
 ```python
-from forecast import Orchestrator, ModelFactory
+from xrtm.forecast import Orchestrator, ModelFactory
 
 # Initialize the factory
 factory = ModelFactory()

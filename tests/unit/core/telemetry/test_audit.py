@@ -19,7 +19,7 @@ import os
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
-from forecast.core.telemetry.audit import Audit
+from xrtm.forecast.core.telemetry.audit import Audit
 
 
 class TestAudit:

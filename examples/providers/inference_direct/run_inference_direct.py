@@ -16,8 +16,8 @@
 import asyncio
 import os
 
-from forecast.core.config.inference import OpenAIConfig
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 async def main():

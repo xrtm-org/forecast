@@ -16,13 +16,13 @@
 import os
 from datetime import datetime
 
-from forecast.core.config.inference import OpenAIConfig
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.runtime import AsyncRuntime
-from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.core.stages.guardian import LeakageGuardian
-from forecast.providers.inference.openai_provider import OpenAIProvider
-from forecast.providers.tools.search import TavilySearchTool
+from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from xrtm.forecast.core.stages.guardian import LeakageGuardian
+from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
+from xrtm.forecast.providers.tools.search import TavilySearchTool
 
 
 async def forecasting_stage(state, report):
@@ -58,7 +58,7 @@ async def main():
         subject_id="demo_backtest", temporal_context=TemporalContext(reference_time=historical_time, is_backtest=True)
     )
 
-    from forecast import __version__
+    from xrtm.forecast import __version__
 
     print(f"--- Running v{__version__} Backtest Demo ---")
     print(f"Reference Time: {historical_time}")

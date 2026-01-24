@@ -17,8 +17,8 @@ from typing import Any
 
 import pytest
 
-from forecast.kit.agents.base import Agent
-from forecast.kit.skills.definitions import BaseSkill
+from xrtm.forecast.kit.agents.base import Agent
+from xrtm.forecast.kit.skills.definitions import BaseSkill
 
 
 class MockSkill(BaseSkill):

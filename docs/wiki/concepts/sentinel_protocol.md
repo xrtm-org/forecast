@@ -38,7 +38,7 @@ The Sentinel Protocol uses a **Driver** abstraction for flexibility:
 ## Example
 
 ```python
-from forecast.kit.sentinel import PollingDriver, TriggerRules
+from xrtm.forecast.kit.sentinel import PollingDriver, TriggerRules
 
 driver = PollingDriver(model=llm, poll_interval=3600)
 await driver.register_watch(

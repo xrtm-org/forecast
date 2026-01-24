@@ -19,8 +19,8 @@ from datetime import timedelta
 
 import pytest
 
-from forecast.core.schemas.forecast import ForecastQuestion
-from forecast.kit.sentinel import PollingDriver, TriggerRules
+from xrtm.forecast.core.schemas.forecast import ForecastQuestion
+from xrtm.forecast.kit.sentinel import PollingDriver, TriggerRules
 
 
 class MockInferenceProvider:

@@ -18,7 +18,7 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from forecast.core.schemas.forecast import ForecastTrajectory, TimeSeriesPoint
+from xrtm.forecast.core.schemas.forecast import ForecastTrajectory, TimeSeriesPoint
 
 
 def test_sentinel_trajectory_basics():

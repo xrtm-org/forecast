@@ -17,7 +17,7 @@ from datetime import datetime
 
 from freezegun import freeze_time
 
-from forecast.core.schemas.graph import TemporalContext
+from xrtm.forecast.core.schemas.graph import TemporalContext
 
 
 def test_temporal_context_real_time():

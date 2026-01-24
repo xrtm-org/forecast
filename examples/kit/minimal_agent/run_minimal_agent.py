@@ -20,9 +20,9 @@ Showcasing explicit configuration and user-defined model defaults.
 
 import asyncio
 
-from forecast.core.config.inference import GeminiConfig
-from forecast.kit.agents.specialists.analyst import ForecastingAnalyst
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.core.config.inference import GeminiConfig
+from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 # In actual user applications, you define your preferred models and tiers here.
 # The core platform remains abstract and model-agnostic.

@@ -18,12 +18,12 @@ from datetime import datetime
 
 import pytest
 
-from forecast import AsyncRuntime
-from forecast.core.epistemics import IntegrityGuardian, SourceTrustRegistry
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.forecast import ForecastOutput
-from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
+from xrtm.forecast import AsyncRuntime
+from xrtm.forecast.core.epistemics import IntegrityGuardian, SourceTrustRegistry
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.forecast import ForecastOutput
+from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from xrtm.forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
 
 
 @pytest.mark.asyncio

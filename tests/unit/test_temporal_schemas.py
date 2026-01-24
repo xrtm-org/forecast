@@ -15,9 +15,9 @@
 
 from datetime import datetime
 
-from forecast.core.config.inference import OpenAIConfig
-from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.providers.inference.openai_provider import OpenAIProvider
+from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 
 def test_temporal_context_validation():

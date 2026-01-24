@@ -31,8 +31,8 @@ If anyone modifies Step 1 after the fact, the entire hash chain breaks.
 ### Usage
 
 ```python
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.bundling import ManifestBundler
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.bundling import ManifestBundler
 
 # Run your reasoning graph
 orchestrator = Orchestrator()
@@ -47,7 +47,7 @@ ManifestBundler.write_to_file(manifest, "research_proof.xrtm")
 ### Verification
 
 ```python
-from forecast.core.verification import SovereigntyVerifier
+from xrtm.forecast.core.verification import SovereigntyVerifier
 
 # Anyone can verify the proof independently
 is_valid = SovereigntyVerifier.verify_file("research_proof.xrtm")

@@ -17,8 +17,8 @@ import asyncio
 import logging
 from typing import Optional
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
 
 # Configure logging to see the state transitions
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

@@ -6,7 +6,7 @@ In `xrtm-forecast`, we distinguish between Tools (low-level actions) and Skills 
 A Tool is a single, deterministic Python function. It is intended for granular tasks.
 
 ```python
-from forecast.providers.tools import FunctionTool
+from xrtm.forecast.providers.tools import FunctionTool
 
 def get_atmospheric_pressure(station_id: str):
     """Fetches the latest EOD pressure reading."""
@@ -26,7 +26,7 @@ A Skill is a high-level bundle. It represents an agent's "professional training"
 Use the `FunctionTool` wrapper or `tool_registry` to turn any Python function into a skill.
 
 ```python
-from forecast.providers.tools import FunctionTool
+from xrtm.forecast.providers.tools import FunctionTool
 
 def calculate_variance(data_points: list[float]) -> float:
     """Calculates the statistical variance of a dataset."""

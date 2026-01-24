@@ -18,8 +18,8 @@ from typing import List
 
 from pydantic import Field
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
 
 
 # 1. Define a Custom State

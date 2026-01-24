@@ -17,7 +17,7 @@ r"""Unit tests for forecast.core.utils.json_util."""
 
 from pydantic import BaseModel
 
-from forecast.core.utils.json_util import robust_clean, safe_json_dumps
+from xrtm.forecast.core.utils.json_util import robust_clean, safe_json_dumps
 
 
 class TestRobustClean:

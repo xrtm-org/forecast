@@ -19,8 +19,8 @@ from typing import Any
 
 import pytest
 
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.topologies.consensus import RecursiveConsensus
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.topologies.consensus import RecursiveConsensus
 
 
 @pytest.mark.asyncio

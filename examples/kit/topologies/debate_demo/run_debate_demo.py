@@ -18,9 +18,9 @@ import logging
 import sys
 import time
 
-from forecast.kit.agents import LLMAgent
-from forecast.kit.patterns import create_debate_graph, create_fanout_graph
-from forecast.providers.inference.base import InferenceProvider, ModelResponse
+from xrtm.forecast.kit.agents import LLMAgent
+from xrtm.forecast.kit.patterns import create_debate_graph, create_fanout_graph
+from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

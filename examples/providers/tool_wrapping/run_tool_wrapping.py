@@ -15,8 +15,8 @@
 
 import asyncio
 
-from forecast.core.tools.base import FunctionTool
-from forecast.core.tools.registry import tool_registry
+from xrtm.forecast.core.tools.base import FunctionTool
+from xrtm.forecast.core.tools.registry import tool_registry
 
 
 # 1. Define a standard Python function

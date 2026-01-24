@@ -17,10 +17,10 @@ from datetime import datetime
 
 import pytest
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.forecast import ForecastOutput, ForecastQuestion, ForecastResolution
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.forecast import ForecastOutput, ForecastQuestion, ForecastResolution
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.eval.runner import BacktestDataset, BacktestInstance, BacktestRunner
 
 
 async def report_node(state: BaseGraphState, on_progress=None):

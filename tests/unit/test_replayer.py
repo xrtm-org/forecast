@@ -17,8 +17,8 @@ from datetime import datetime
 
 import pytest
 
-from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.kit.eval.replayer import TraceReplayer
+from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from xrtm.forecast.kit.eval.replayer import TraceReplayer
 
 
 class MockState(BaseGraphState):

@@ -20,10 +20,10 @@ from typing import Any, cast
 import pytest
 from pydantic import SecretStr
 
-from forecast.core.config.inference import GeminiConfig, OpenAIConfig
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 def mock_tool(a: int, b: int) -> int:
@@ -100,12 +100,12 @@ async def test_orchestrator_live():
         return
 
     print("\n🧠 Testing Orchestrator Live with OpenAI...")
-    from forecast.core.config.inference import OpenAIConfig
+    from xrtm.forecast.core.config.inference import OpenAIConfig
 
     config = OpenAIConfig(model_id="gpt-4o-mini", api_key=SecretStr(openai_key))
     provider = ModelFactory.get_provider(config)
 
-    from forecast.core.config.graph import GraphConfig
+    from xrtm.forecast.core.config.graph import GraphConfig
 
     graph_config = GraphConfig(max_cycles=3)
     orchestrator = Orchestrator(config=graph_config)

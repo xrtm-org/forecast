@@ -16,10 +16,10 @@
 import asyncio
 import logging
 
-from forecast.core.config.graph import GraphConfig
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.scenarios import ScenarioManager
+from xrtm.forecast.core.config.graph import GraphConfig
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.scenarios import ScenarioManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

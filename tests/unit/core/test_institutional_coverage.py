@@ -18,10 +18,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.runtime import AsyncRuntime
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.core.utils.parser import parse_json_markdown
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.utils.parser import parse_json_markdown
 
 
 @pytest.mark.asyncio

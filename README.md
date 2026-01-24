@@ -54,7 +54,7 @@ pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
 Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
-from forecast import AsyncRuntime, create_forecasting_analyst
+from xrtm.forecast import AsyncRuntime, create_forecasting_analyst
 
 async def main():
     # 1. Instantiate the analyst (API keys injected from env)

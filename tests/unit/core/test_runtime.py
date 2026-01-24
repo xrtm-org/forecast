@@ -15,7 +15,7 @@
 
 import pytest
 
-from forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.runtime import AsyncRuntime
 
 
 class TestAsyncRuntime:

@@ -51,7 +51,7 @@ orch.add_edge("run_all", "aggregator")
 For "Institutional Grade" performance and safety, never run the Orchestrator with raw `asyncio.run()`. Always use the `AsyncRuntime`.
 
 ```python
-from forecast import AsyncRuntime, Orchestrator
+from xrtm.forecast import AsyncRuntime, Orchestrator
 
 async def main():
     orch = Orchestrator(...)

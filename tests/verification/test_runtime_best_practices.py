@@ -17,7 +17,7 @@ import asyncio
 
 import pytest
 
-from forecast import AsyncRuntime
+from xrtm.forecast import AsyncRuntime
 
 
 @pytest.mark.asyncio

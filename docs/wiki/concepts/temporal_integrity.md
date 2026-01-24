@@ -25,7 +25,7 @@ Standard backtesting frameworks prevent *data* leakage (looking at tomorrow's pr
 Every reasoning session operates within a frozen time context:
 
 ```python
-from forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.schemas.graph import BaseGraphState
 
 # Create a state anchored to a specific point in time
 state = BaseGraphState(
@@ -39,7 +39,7 @@ state = BaseGraphState(
 The `Guardian` wraps all external I/O (search, news, data feeds) and validates timestamps:
 
 ```python
-from forecast.core.stages.guardian import Guardian
+from xrtm.forecast.core.stages.guardian import Guardian
 
 # Guardian intercepts search results
 # If any result has timestamp > sim_time, it raises TemporalViolation
@@ -52,7 +52,7 @@ validated_results = guardian.filter_results(raw_search_results)
 The `AsyncRuntime.sleep()` function is linked to `TemporalContext`:
 
 ```python
-from forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.runtime import AsyncRuntime
 
 # In backtest mode, this doesn't actually wait—it fast-forwards
 # the simulated clock, enabling 1000x speedup

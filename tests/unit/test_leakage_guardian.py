@@ -18,9 +18,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from forecast.core.stages.guardian import LeakageGuardian
-from forecast.providers.inference.base import ModelResponse
+from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
+from xrtm.forecast.core.stages.guardian import LeakageGuardian
+from xrtm.forecast.providers.inference.base import ModelResponse
 
 
 class MockProvider:

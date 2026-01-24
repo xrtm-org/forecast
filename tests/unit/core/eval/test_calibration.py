@@ -15,7 +15,7 @@
 
 r"""Unit tests for forecast.core.eval.calibration."""
 
-from forecast.core.eval.calibration import BetaScaler, PlattScaler
+from xrtm.forecast.core.eval.calibration import BetaScaler, PlattScaler
 
 
 class TestPlattScaler:

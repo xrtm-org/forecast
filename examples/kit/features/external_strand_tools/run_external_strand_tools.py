@@ -19,8 +19,8 @@ import os
 from pydantic import SecretStr
 
 # Import core library components
-from forecast import LLMAgent, ModelFactory, tool_registry
-from forecast.core.config.inference import GeminiConfig
+from xrtm.forecast import LLMAgent, ModelFactory, tool_registry
+from xrtm.forecast.core.config.inference import GeminiConfig
 
 
 # --- SIMULATION OF EXTERNAL SDK ---

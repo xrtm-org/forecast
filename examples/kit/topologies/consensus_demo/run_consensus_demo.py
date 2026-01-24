@@ -18,9 +18,9 @@ import logging
 import random
 from typing import Any
 
-from forecast.core.runtime import AsyncRuntime
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.topologies.consensus import RecursiveConsensus
+from xrtm.forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.topologies.consensus import RecursiveConsensus
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -20,14 +20,14 @@ from typing import Callable
 
 from pydantic import BaseModel, Field, SecretStr
 
-from forecast import (
+from xrtm.forecast import (
     BaseGraphState,
     LLMAgent,
     ModelFactory,
     Orchestrator,
     ToolAgent,
 )
-from forecast.core.config.inference import GeminiConfig
+from xrtm.forecast.core.config.inference import GeminiConfig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -134,7 +134,7 @@ async def run_custom_pipeline():
     trend_tool = ToolAgent(fn=get_trend_multiplier, name="TrendMultiplier")
 
     # Orchestrator
-    from forecast.core.config.graph import GraphConfig
+    from xrtm.forecast.core.config.graph import GraphConfig
 
     orchestrator = Orchestrator(config=GraphConfig(max_cycles=10))
     orchestrator.register_node("fetch_news", fetch_news_node)

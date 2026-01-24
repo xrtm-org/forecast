@@ -17,11 +17,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from forecast.core.eval.definitions import EvaluationReport, EvaluationResult
-from forecast.core.schemas.graph import BaseGraphState
-from forecast.kit.eval.analytics import SliceAnalytics
-from forecast.kit.eval.backtester import Backtester
-from forecast.kit.eval.replayer import TraceReplayer
+from xrtm.forecast.core.eval.definitions import EvaluationReport, EvaluationResult
+from xrtm.forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.kit.eval.analytics import SliceAnalytics
+from xrtm.forecast.kit.eval.backtester import Backtester
+from xrtm.forecast.kit.eval.replayer import TraceReplayer
 
 
 def test_definitions_to_json(tmp_path):
@@ -69,7 +69,9 @@ def test_analytics_ece_failure_handling():
             metadata={"tags": ["fail"]},
         )
     ]
-    with patch("forecast.kit.eval.analytics.ExpectedCalibrationErrorEvaluator.compute_calibration_data") as mock_ece:
+    with patch(
+        "xrtm.forecast.kit.eval.analytics.ExpectedCalibrationErrorEvaluator.compute_calibration_data"
+    ) as mock_ece:
         mock_ece.side_effect = Exception("Mock ECE Failure")
         reports = SliceAnalytics.compute_slices(results)
         assert "tag:fail" in reports
@@ -95,7 +97,7 @@ def test_replayer_full_cycle(tmp_path):
 
     # 4. Replay
     # We need to mock BacktestRunner to avoid integration overhead, but the logic should run.
-    with patch("forecast.kit.eval.replayer.BacktestRunner") as mock_runner_cls:
+    with patch("xrtm.forecast.kit.eval.replayer.BacktestRunner") as mock_runner_cls:
         mock_runner = mock_runner_cls.return_value
         mock_result = EvaluationResult(subject_id="q1", score=0.1, ground_truth=1, prediction=0.8)
         mock_runner.evaluate_state.return_value = mock_result
@@ -106,7 +108,7 @@ def test_replayer_full_cycle(tmp_path):
         assert res.metadata["is_replay"] is True
 
         # Test with resolution object
-        from forecast.core.schemas.forecast import ForecastResolution
+        from xrtm.forecast.core.schemas.forecast import ForecastResolution
 
         res_obj = ForecastResolution(question_id="q1", outcome="1.0")
         res2 = replayer.replay_evaluation(str(path), resolution=res_obj)

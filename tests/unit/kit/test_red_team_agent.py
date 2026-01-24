@@ -17,7 +17,7 @@ r"""Unit tests for the Red Team Agent."""
 
 import pytest
 
-from forecast.kit.agents.red_team import CounterArgument, RedTeamAgent
+from xrtm.forecast.kit.agents.red_team import CounterArgument, RedTeamAgent
 
 
 class MockInferenceProvider:
@@ -110,7 +110,7 @@ class TestRedTeamAgent:
     @pytest.mark.asyncio
     async def test_run_method_integration(self, mock_model: MockInferenceProvider) -> None:
         r"""Test that run() integrates with BaseGraphState."""
-        from forecast.core.schemas.graph import BaseGraphState
+        from xrtm.forecast.core.schemas.graph import BaseGraphState
 
         agent = RedTeamAgent(model=mock_model)  # type: ignore
 

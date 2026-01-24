@@ -28,7 +28,7 @@ The `AdversarialInjector` stress-tests agents by deliberately feeding them
 fake news in a sandbox environment.
 
 ```python
-from forecast.kit.eval.resilience import AdversarialInjector
+from xrtm.forecast.kit.eval.resilience import AdversarialInjector
 
 injector = AdversarialInjector()
 fake = injector.generate_attack("ACME Corp", "bearish")

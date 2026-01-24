@@ -16,7 +16,7 @@
 import asyncio
 import logging
 
-from forecast import create_local_analyst
+from xrtm.forecast import create_local_analyst
 
 # Setup logging to see the "Pure Core" initialization
 logging.basicConfig(level=logging.INFO)

@@ -20,8 +20,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from forecast.core.schemas.graph import TemporalContext
-from forecast.core.tools.base import FunctionTool, StrandToolWrapper, Tool
+from xrtm.forecast.core.schemas.graph import TemporalContext
+from xrtm.forecast.core.tools.base import FunctionTool, StrandToolWrapper, Tool
 
 
 class TestFunctionTool:

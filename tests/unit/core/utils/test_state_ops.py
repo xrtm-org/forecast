@@ -20,7 +20,7 @@ from typing import Any, Dict, List
 import pytest
 from pydantic import BaseModel
 
-from forecast.core.utils.state_ops import clone_state
+from xrtm.forecast.core.utils.state_ops import clone_state
 
 
 class SimpleState(BaseModel):

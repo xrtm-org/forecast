@@ -16,7 +16,7 @@
 import json
 import os
 
-from forecast.core.telemetry.manager import TelemetryManager
+from xrtm.forecast.core.telemetry.manager import TelemetryManager
 
 
 def test_telemetry_trace_lifecycle():

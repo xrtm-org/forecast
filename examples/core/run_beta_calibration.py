@@ -20,8 +20,8 @@ Shows how BetaScaler corrects asymmetric biases better than Platt scaling.
 
 import numpy as np
 
-from forecast.core.eval.calibration import BetaScaler, PlattScaler
-from forecast.kit.eval.metrics import EvaluationResult, ExpectedCalibrationErrorEvaluator
+from xrtm.forecast.core.eval.calibration import BetaScaler, PlattScaler
+from xrtm.forecast.kit.eval.metrics import EvaluationResult, ExpectedCalibrationErrorEvaluator
 
 
 def run_beta_demo() -> None:

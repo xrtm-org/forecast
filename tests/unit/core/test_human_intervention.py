@@ -17,9 +17,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forecast.core.interfaces import HumanProvider
-from forecast.core.orchestrator import Orchestrator
-from forecast.core.schemas.graph import BaseGraphState
+from xrtm.forecast.core.interfaces import HumanProvider
+from xrtm.forecast.core.orchestrator import Orchestrator
+from xrtm.forecast.core.schemas.graph import BaseGraphState
 
 
 @pytest.mark.asyncio

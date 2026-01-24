@@ -15,7 +15,7 @@
 
 import pytest
 
-from forecast.kit.cognition.confidence import ConfidenceEstimator, StandardHybridStrategy
+from xrtm.forecast.kit.cognition.confidence import ConfidenceEstimator, StandardHybridStrategy
 
 
 def test_confidence_hybrid_strategy():
