@@ -164,3 +164,29 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 </details>
 
+
+## Development Environment
+
+This project is configured with a production-grade **Dev Container** to ensure a consistent, reproducible environment across all machines (Mac, Linux, Windows/WSL).
+
+### Prerequisites
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running)
+*   [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+### Getting Started
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/xrtm-org/forecast.git
+    ```
+2.  **Open in VS Code**:
+    ```bash
+    code forecast
+    ```
+3.  **Reopen in Container**:
+    *   Click the "Reopen in Container" button in the notification popup.
+    *   Or press `Cmd+Shift+P` (or `Ctrl+Shift+P`) and type **"Dev Containers: Reopen in Container"**.
+
+### Features
+*   **Zero Config**: Python 3.12, `uv` dependency manager, and all project tools are pre-installed.
+*   **Zsh Terminal**: Enhanced shell with autosuggestions and syntax highlighting.
+*   **Tooling**: `gh` CLI, `ruff` (linting), `pytest` (testing), and `mypy` (typing) are ready to use.
