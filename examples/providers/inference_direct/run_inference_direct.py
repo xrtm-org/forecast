@@ -30,7 +30,7 @@ async def main():
     # 2. Configure a Provider (Directly)
     # Note: This requires an OPENAI_API_KEY environment variable if run live.
     # For this demo, we show the configuration pattern.
-    config = OpenAIConfig(api_key=os.getenv("OPENAI_API_KEY", "mock-key"), model_name="gpt-4o")
+    config = OpenAIConfig(api_key=os.getenv("OPENAI_API_KEY", "mock-key"), model_id="gpt-4o")
 
     # 3. Get the Provider
     # In Pure Core, you can interact with providers without creating an Agent.

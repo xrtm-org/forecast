@@ -34,7 +34,9 @@ class Fact(BaseModel):
     object_value: Any = Field(description="The value of the fact.")
     source_url: Optional[str] = Field(default=None, description="Where the fact came from.")
     source_hash: Optional[str] = Field(default=None, description="SHA-256 hash of the evidence.")
-    verified_at: datetime = Field(default_factory=datetime.utcnow, description="When the fact was confirmed.")
+    verified_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), description="When the fact was confirmed."
+    )
     expires_at: Optional[datetime] = Field(default=None, description="When the fact should be considered stale.")
     confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Confidence in the fact truthfulness.")
 

@@ -184,7 +184,7 @@ Remember: You are the Devil's Advocate. Your job is to CHALLENGE, not to agree.
         prompt = self._build_challenge_prompt(thesis, reasoning, context)
 
         try:
-            response = await self.model.generate(prompt)
+            response = await self.model.run(prompt)
             text = response.text
 
             # Parse the response

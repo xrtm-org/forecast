@@ -38,6 +38,9 @@ ALTERNATIVE_PROBABILITY: 0.45
 CHALLENGE_CONFIDENCE: 0.75"""
         )
 
+    async def run(self, prompt: str) -> "MockResponse":
+        return await self.generate(prompt)
+
 
 class MockResponse:
     def __init__(self, text: str) -> None:

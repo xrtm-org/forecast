@@ -23,7 +23,7 @@ from xrtm.forecast.core.memory.graph import Fact
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.core.utils.bundling import ForecastBundle
 from xrtm.forecast.kit.agents.llm import LLMAgent
-from xrtm.forecast.kit.agents.specialists.adversary import AdversaryAgent
+from xrtm.forecast.kit.agents.red_team import RedTeamAgent
 from xrtm.forecast.kit.stages.bayesian import BayesianSieveStage
 from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
 
@@ -68,11 +68,13 @@ async def test_consensus_lab_integration():
     assert 0.27 < state.context["final_forecast"] < 0.28
     print(f"[PASS] BayesianSieve: 0.2 prior -> {state.context['final_forecast']:.4f} posterior.")
 
-    # 4. Verify AdversaryAgent (Red-Team)
-    # We'll just verify it can be instantiated and has the right persona
-    adversary = AdversaryAgent(model=None)
-    assert "Red Team" in adversary.persona
-    print("[PASS] AdversaryAgent: Persona verified.")
+    # 4. Verify RedTeamAgent
+    # We'll just verify it can be instantiated and has the right configuration
+    red_team = RedTeamAgent(model=None)
+    # Check if the prompt builder includes the mission role
+    prompt = red_team._build_challenge_prompt("thesis", "reasoning")
+    assert "RED TEAM ANALYST" in prompt
+    print("[PASS] RedTeamAgent: Instantiation and Prompt verified.")
 
     # 5. Test .forecast Bundling
     bundle_path = "test_run.forecast"

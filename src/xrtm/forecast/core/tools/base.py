@@ -177,8 +177,19 @@ class FunctionTool(Tool):
         sig = inspect.signature(fn)
         properties = {}
         required = []
+
+        type_map = {
+            int: "integer",
+            str: "string",
+            bool: "boolean",
+            float: "number",
+        }
+
         for name, param in sig.parameters.items():
-            properties[name] = {"type": "string"}  # Default to string for simplicity
+            # Default to string if no annotation or complex type
+            json_type = type_map.get(param.annotation, "string")
+            properties[name] = {"type": json_type}
+
             if param.default == inspect.Parameter.empty:
                 required.append(name)
         return {"type": "object", "properties": properties, "required": required}
