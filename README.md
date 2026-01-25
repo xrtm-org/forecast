@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 To understand our vision for "Institutional Grade" forecasting, including our focus on Time Travel (Chronos), Calibration, and Dynamic Trajectories (Sentinel), please read our **[Strategic Roadmap](ROADMAP.md)**.
 
-## Key Features (v0.4.3)
+## Key Features
 
 *   **Institutional Sovereignty**:
     *   **Merkle Reasoning**: Every state transition is anchored via SHA-256 Merkle proofs.

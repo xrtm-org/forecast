@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+
+## [0.5.3] - 2026-01-25
+
+### Fixed
+- **Version Mismatch**: Synchronized project version to `0.5.3` across all metadata files to resolve PyPI upload conflicts.
+- **Legacy Cleanup**: Removed stale build artifacts from `dist/` directory.
+
+### Changed
+- **Code Refinement**: Removed deprecated `AdversaryAgent` (redundant with `RedTeamAgent`).
+- **Documentation**: Simplified "Key Features" heading in README.
+
 ## [0.5.2] - 2026-01-25
 
 ### Changed

@@ -38,7 +38,7 @@ We organize our roadmap into three distinct layers of maturity.
 | **Epistemic Security** | **Anti-Manipulation.** source verification and cross-referencing to block "News Injection" attacks. | In Progress |
 | **Dossier Generator** | **Institutional Reporting.** Auto-generating audit-ready research proofs via `.xrtm`. | **DONE** |
 
-### v0.5.0: The "Intelligence" Layer (Frontier)
+### v0.5.3: The "Intelligence" Layer (Frontier)
 *Focus: Causal inference and automated optimization.*
 
 | Feature | Description | Status |
