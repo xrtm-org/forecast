@@ -17,7 +17,7 @@ limitations under the License.
 <p align="center">
     <br>
     <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
-    <img src="https://img.shields.io/badge/version-0.5.0-blue.svg?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.5.2-blue.svg?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
     <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
 </p>
