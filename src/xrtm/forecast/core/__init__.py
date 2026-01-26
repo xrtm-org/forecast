@@ -18,7 +18,6 @@ from xrtm.forecast.core.epistemics import IntegrityGuardian, SourceTrustRegistry
 from xrtm.forecast.core.orchestrator import Orchestrator
 from xrtm.forecast.core.runtime import AsyncRuntime
 from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from xrtm.forecast.core.verification import SovereigntyVerifier
 
 __all__ = [
     "Orchestrator",
@@ -26,7 +25,6 @@ __all__ = [
     "AsyncRuntime",
     "ManifestBundler",
     "TemporalContext",
-    "SovereigntyVerifier",
     "SourceTrustRegistry",
     "IntegrityGuardian",
 ]

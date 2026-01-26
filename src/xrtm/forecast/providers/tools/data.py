@@ -66,6 +66,10 @@ class SQLSkill(Tool):
 
         Returns:
             `Any`: A list of dictionaries representing the rows, or an error message.
+
+        Example:
+            >>> skill = SQLSkill(db_url="data.db")
+            >>> results = await skill.run(query="SELECT * FROM users")
         r"""
         query = kwargs.get("query")
         if not query or not isinstance(query, str):
@@ -166,6 +170,12 @@ class PandasSkill(Tool):
 
         Returns:
             `Any`: The result of the pandas analysis or an error message.
+
+        Example:
+            >>> skill = PandasSkill()
+            >>> data = [{"val": 10}, {"val": 20}]
+            >>> await skill.run(data=data, operation="mean", column="val")
+            15.0
         r"""
         data = kwargs.get("data")
         operation = kwargs.get("operation")
@@ -190,12 +200,18 @@ class PandasSkill(Tool):
             if column not in df.columns:
                 return f"Error: Column '{column}' not found in dataset. Available columns: {list(df.columns)}"
 
-            if operation == "mean":
-                return float(df[column].mean())
-            if operation == "sum":
-                return float(df[column].sum())
+            # Institutional Robustness: Ensure we return standard Python types
+            # to prevent serialization issues or numpy-specific errors like _NoValueType.
+            op_name = str(operation)
+            result = getattr(df[column], op_name)()
+            if hasattr(result, "item"):
+                return result.item()
+
+            # Fallback for non-numpy scalars
+            if operation in ["mean", "sum"]:
+                return float(result)
             if operation == "count":
-                return int(df[column].count())
+                return int(result)
 
             return f"Error: Unsupported operation '{operation}'"
         except Exception as e:

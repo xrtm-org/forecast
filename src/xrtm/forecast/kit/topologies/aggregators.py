@@ -23,7 +23,10 @@ This module provides production-ready aggregator wrappers that implement
 import logging
 from typing import Any, List
 
-from xrtm.forecast.core.eval.aggregation import inverse_variance_weighting
+from xrtm.eval.core.eval.aggregation import (
+    inverse_variance_weighting,
+)
+
 from xrtm.forecast.core.schemas.forecast import ForecastOutput
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 

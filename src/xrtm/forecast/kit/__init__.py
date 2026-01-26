@@ -21,14 +21,14 @@ for building institutional-grade forecasting systems.
 """
 
 # Topologies
+# Evaluation (Migrated to xrtm-eval)
+from xrtm.eval.kit.eval.epistemic_evaluator import EpistemicEvaluator
+from xrtm.eval.kit.eval.resilience import AdversarialInjector, GullibilityReport
+
 from xrtm.forecast.kit.agents.fact_checker import FactCheckerAgent
 
 # Agents
 from xrtm.forecast.kit.agents.red_team import RedTeamAgent
-from xrtm.forecast.kit.eval.epistemic_evaluator import EpistemicEvaluator
-
-# Evaluation
-from xrtm.forecast.kit.eval.resilience import AdversarialInjector, GullibilityReport
 
 # Sentinel
 from xrtm.forecast.kit.sentinel import PollingDriver, SentinelDriver, TriggerRules

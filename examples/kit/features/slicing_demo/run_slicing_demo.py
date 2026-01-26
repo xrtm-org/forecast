@@ -16,7 +16,7 @@
 import logging
 from typing import List
 
-from xrtm.forecast.core.eval.definitions import EvaluationReport, EvaluationResult
+from xrtm.eval.core.eval.definitions import EvaluationReport, EvaluationResult
 from xrtm.forecast.kit.eval.analytics import SliceAnalytics
 
 # Setup Logging

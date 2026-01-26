@@ -18,11 +18,11 @@ import logging
 import os
 
 from pydantic import SecretStr
+from xrtm.data.providers.data.local import LocalDataSource
 
 from xrtm.forecast.core.config.inference import GeminiConfig
 from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
 from xrtm.forecast.kit.pipelines.analyst import GenericAnalystPipeline
-from xrtm.forecast.providers.data.local import LocalDataSource
 from xrtm.forecast.providers.inference.factory import ModelFactory
 
 # Configure logging

@@ -3,6 +3,7 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "forecast",
     "workspaceFolder": "/workspace/forecast",
+    "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspace,type=bind",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -25,6 +26,6 @@
             }
         }
     },
-    "postCreateCommand": "uv sync",
+    "postCreateCommand": "uv sync && pip install -e ../data ../eval ../train",
     "remoteUser": "root"
 }

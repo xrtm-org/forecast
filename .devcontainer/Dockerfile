@@ -45,10 +45,18 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_PROJECT_ENVIRONMENT=/venv
 
 # Copy dependency definition
-COPY pyproject.toml .
+COPY forecast/pyproject.toml .
+# Also need to copy siblings' pyproject.toml for uv resolution if it's going to check them
+# But we'll try just the main one first. uv might need the paths to exist.
+RUN mkdir -p ../data ../eval ../train
+COPY data/pyproject.toml ../data/
+COPY eval/pyproject.toml ../eval/
+COPY train/pyproject.toml ../train/
 
 # Install dependencies including dev (skipping heavy extras like vllm/llama-cpp)
-RUN uv sync --no-install-project --extra dev
+# We skip this during image build because local path dependencies (../data, etc) 
+# are only available at runtime via mounts.
+# RUN uv sync --no-install-project --extra dev
 
 # Ensure the virtual environment is used by default
 ENV PATH="/venv/bin:$PATH"

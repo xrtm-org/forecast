@@ -15,8 +15,9 @@
 
 import asyncio
 
-from xrtm.forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput
 from xrtm.forecast.kit.eval.intervention import InterventionEngine
+
+from xrtm.forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput
 
 
 async def run_causal_demo():

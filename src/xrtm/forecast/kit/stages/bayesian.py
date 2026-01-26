@@ -22,7 +22,8 @@ r"""
 import logging
 from typing import Optional
 
-from xrtm.forecast.core.eval.bayesian import bayesian_update
+from xrtm.eval.core.eval.bayesian import bayesian_update
+
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.kit.agents.base import Agent
 

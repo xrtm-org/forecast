@@ -14,11 +14,11 @@
 # limitations under the License.
 
 import logging
-from typing import Any, List, Optional
+from typing import Any, List
 
-from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.core.tools.base import Tool
-from xrtm.forecast.kit.agents.base import Agent
+
+from .base import Agent
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class FactCheckerAgent(Agent):
         self.tools = tools
         self.model_id = model_id
 
-    async def run(self, state: BaseGraphState, reporter: Optional[Any] = None) -> BaseGraphState:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         Executes the fact-checking loop.
 
@@ -52,6 +52,8 @@ class FactCheckerAgent(Agent):
         In a full SOTA implementation, this would involve complex NLI (Natural Language Inference).
         Here, we demonstrate the architectural pattern: State -> Tool -> Update.
         """
+        state = input_data
+        reporter = kwargs.get("reporter")
         logger.info(f"[{self.name}] Scanning state for claims to verify...")
 
         # 1. Identify Claims (Mock logic for strictly typed simulation)

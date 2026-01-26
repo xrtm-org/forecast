@@ -14,11 +14,11 @@
 # limitations under the License.
 
 import logging
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel, Field
 
-from xrtm.forecast.core.schemas.forecast import CausalNode, ForecastOutput, ForecastQuestion
+from xrtm.forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput, ForecastQuestion, MetadataBase
 from xrtm.forecast.kit.agents.llm import LLMAgent
 
 logger = logging.getLogger(__name__)
@@ -27,11 +27,19 @@ logger = logging.getLogger(__name__)
 class AnalystOutput(BaseModel):
     r"""
     Internal schema for structured output from the Forecasting Analyst.
-    r"""
+    """
 
-    confidence: float = Field(..., ge=0, le=1)
+    probability: float = Field(..., ge=0, le=1)
+    confidence_interval: Dict[str, float] = Field(
+        ..., description="Map containing 'low', 'high', and 'level' (e.g., 0.9)"
+    )
     reasoning: str
-    causal_chain: List[CausalNode] = Field(default_factory=list)
+    causal_nodes: List[Dict[str, Any]] = Field(
+        default_factory=list, description="List of reasoning steps with 'node_id' and 'event'"
+    )
+    causal_edges: List[Dict[str, Any]] = Field(
+        default_factory=list, description="List of directed dependencies with 'source' and 'target'"
+    )
 
 
 class ForecastingAnalyst(LLMAgent):
@@ -47,7 +55,7 @@ class ForecastingAnalyst(LLMAgent):
     for specific forecasting niches.
     r"""
 
-    async def run(self, input_data: Union[str, ForecastQuestion], **kwargs) -> ForecastOutput:
+    async def run(self, input_data: Union[str, ForecastQuestion], **kwargs: Any) -> ForecastOutput:
         r"""
         Processes a ForecastQuestion (or a raw string) and returns a ForecastOutput.
         Demonstrates how to use skills if they are present.
@@ -56,10 +64,10 @@ class ForecastingAnalyst(LLMAgent):
             input_data = ForecastQuestion(
                 id="quick-query",
                 title=input_data,
-                content="Auto-generated from string input.",
+                description="Auto-generated from string input.",
             )
 
-        context = input_data.content or "No additional context provided."
+        context = input_data.description or "No additional context provided."
 
         # Dynamic Skill Usage: If the agent has a 'web_search' skill, use it to gather more info.
         search_skill = self.get_skill("web_search")
@@ -69,43 +77,55 @@ class ForecastingAnalyst(LLMAgent):
             context = f"{context}\n\nSearch Findings:\n{skill_result}"
 
         prompt = f"""
-        Analyze the following event and provide a probabilistic forecast:
+        Analyze the following event and provide a probabilistic forecast according to xrtm Governance v1:
         Title: {input_data.title}
         Context: {context}
 
         Provide your response in JSON format matching this schema:
-        - confidence: (float 0-1)
+        - probability: (float 0-1)
+        - confidence_interval: {{'low': float, 'high': float, 'level': 0.9}}
         - reasoning: (narrative text)
-        - causal_chain: (list of {{'event': string, 'probability': float, 'description': string}})
-        r"""
+        - causal_nodes: (list of {{'node_id': string, 'event': string, 'probability': float, 'description': string}})
+        - causal_edges: (list of {{'source': string, 'target': string, 'weight': float}})
+
+        Ensure the causal_nodes and causal_edges form a valid Directed Acyclic Graph (DAG) representing your reasoning.
+        """
 
         response = await self.model.generate_content_async(prompt)
         parsed = self.parse_output(response.text, schema=AnalystOutput)
 
-        # Type guard for Mypy
-        confidence = 0.5
+        # Defaults for safe fallback
+        probability = 0.5
+        confidence_interval = {"low": 0.4, "high": 0.6, "level": 0.9}
         reasoning = "Parsing failed."
-        logical_trace = []
+        nodes = []
+        edges = []
 
         if isinstance(parsed, AnalystOutput):
-            confidence = parsed.confidence
+            probability = parsed.probability
+            confidence_interval = parsed.confidence_interval
             reasoning = parsed.reasoning
-            logical_trace = parsed.causal_chain
+            nodes = [CausalNode(**n) for n in parsed.causal_nodes]
+            edges = [CausalEdge(**e) for e in parsed.causal_edges]
         elif isinstance(parsed, dict):
-            confidence = parsed.get("confidence", 0.5)
+            probability = parsed.get("probability", 0.5)
+            confidence_interval = parsed.get("confidence_interval", confidence_interval)
             reasoning = parsed.get("reasoning", "Parsing failed fallback.")
-            logical_trace = parsed.get("causal_chain", [])
+            nodes = [CausalNode(**n) for n in parsed.get("causal_nodes", [])]
+            edges = [CausalEdge(**e) for e in parsed.get("causal_edges", [])]
 
         # Wrap the parsed output into the standardized ForecastOutput
         return ForecastOutput(
             question_id=input_data.id,
-            confidence=confidence,
+            probability=probability,
+            confidence_interval=confidence_interval,  # type: ignore
             reasoning=reasoning,
-            logical_trace=logical_trace,
-            metadata={
-                "model_id": getattr(self.model, "model_id", "unknown"),
-                "token_usage": getattr(response, "usage", {}),
-            },
+            logical_trace=nodes,
+            logical_edges=edges,
+            metadata=MetadataBase(
+                source_version=getattr(self.model, "model_id", "unknown"),
+                raw_data={"token_usage": getattr(response, "usage", {})},
+            ),
         )
 
 

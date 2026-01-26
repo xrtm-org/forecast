@@ -20,8 +20,9 @@ from pydantic import BaseModel
 
 from xrtm.forecast.core.tools.registry import tool_registry
 from xrtm.forecast.core.utils.parser import parse_json_markdown
-from xrtm.forecast.kit.agents.base import Agent
 from xrtm.forecast.providers.inference.base import InferenceProvider
+
+from .base import Agent
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=BaseModel)

@@ -16,12 +16,13 @@
 import logging
 from typing import Callable, Optional
 
+from xrtm.data.providers.data.base import DataSource
+
 from xrtm.forecast.core.config.graph import GraphConfig
 from xrtm.forecast.core.orchestrator import Orchestrator
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.core.telemetry.audit import auditor
 from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
-from xrtm.forecast.providers.data.base import DataSource
 
 __all__ = ["GenericAnalystPipeline"]
 

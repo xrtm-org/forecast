@@ -16,9 +16,10 @@
 import logging
 from typing import Any, Dict, Optional, Union
 
-from xrtm.forecast.kit.agents.base import Agent
 from xrtm.forecast.providers.inference.base import InferenceProvider
 from xrtm.forecast.providers.inference.factory import ModelFactory
+
+from .base import Agent
 
 logger = logging.getLogger(__name__)
 

@@ -18,7 +18,6 @@ from typing import Any, Dict, List, Optional
 
 from xrtm.forecast.core.schemas.base import EpisodicExperience
 from xrtm.forecast.kit.memory.base import BaseVectorStore, MemoryRegistry
-from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
 
 logger = logging.getLogger(__name__)
 
@@ -40,12 +39,16 @@ class Memory:
         # Use registry only for default production paths to avoid test contamination,
         # but ensure at least one registration for agnosticism tests.
         if persist_directory:
+            from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
+
             self.provider = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
             if not MemoryRegistry.get_provider("CHROMA"):
                 MemoryRegistry.register_provider("CHROMA", self.provider)
         else:
             p = MemoryRegistry.get_provider("CHROMA")
             if p is None:
+                from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
+
                 p = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
                 MemoryRegistry.register_provider("CHROMA", p)
             self.provider = p

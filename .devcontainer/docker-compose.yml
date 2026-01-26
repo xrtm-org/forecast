@@ -3,10 +3,10 @@ name: forecast
 services:
   forecast:
     build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
+      context: ../..
+      dockerfile: forecast/.devcontainer/Dockerfile
     volumes:
-      - ..:/workspace/forecast:cached
+      - ../..:/workspace:cached
       - audit-logs:/workspace/forecast/logs/audit
       - chroma-db:/workspace/forecast/.chroma_db
     environment:

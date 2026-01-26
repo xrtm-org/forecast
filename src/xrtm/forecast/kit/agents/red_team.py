@@ -34,13 +34,13 @@ Example:
 """
 
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
 from xrtm.forecast.core.interfaces import InferenceProvider
-from xrtm.forecast.core.schemas.graph import BaseGraphState
-from xrtm.forecast.kit.agents.base import Agent
+
+from .base import Agent
 
 logger = logging.getLogger(__name__)
 
@@ -238,7 +238,7 @@ Remember: You are the Devil's Advocate. Your job is to CHALLENGE, not to agree.
                 confidence_in_challenge=0.0,
             )
 
-    async def run(self, state: BaseGraphState) -> BaseGraphState:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         Runs the Red Team agent within an orchestrator graph.
 
@@ -250,12 +250,13 @@ Remember: You are the Devil's Advocate. Your job is to CHALLENGE, not to agree.
         - `red_team_counter`: The CounterArgument result
 
         Args:
-            state (`BaseGraphState`):
+            input_data (`Any`):
                 The current graph state.
 
         Returns:
-            `BaseGraphState`: Updated state with counter-argument.
+            `Any`: Updated state with counter-argument.
         """
+        state = input_data
         thesis = state.context.get("current_thesis", "")
         reasoning = state.context.get("current_reasoning", "")
         question_context = state.context.get("question_title", "")

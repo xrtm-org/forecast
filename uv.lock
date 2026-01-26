@@ -6030,6 +6030,40 @@ wheels = [
 ]
 
 [[package]]
+name = "xrtm-data"
+version = "0.1.0"
+source = { directory = "../data" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiohttp", specifier = ">=3.9.0" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+]
+
+[[package]]
+name = "xrtm-eval"
+version = "0.1.0"
+source = { directory = "../eval" }
+dependencies = [
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "pydantic" },
+    { name = "xrtm-data" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "networkx", specifier = ">=3.0" },
+    { name = "numpy", specifier = ">=1.24.0" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "xrtm-data" },
+]
+
+[[package]]
 name = "xrtm-forecast"
 version = "0.5.3"
 source = { editable = "." }
@@ -6052,6 +6086,8 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "sqlalchemy" },
+    { name = "xrtm-data" },
+    { name = "xrtm-eval" },
 ]
 
 [package.optional-dependencies]
@@ -6120,6 +6156,8 @@ requires-dist = [
     { name = "transformers", marker = "extra == 'transformers'", specifier = ">=4.40.0" },
     { name = "transformers", marker = "extra == 'xlm'", specifier = ">=4.40.0" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.3.0" },
+    { name = "xrtm-data", directory = "../data" },
+    { name = "xrtm-eval", directory = "../eval" },
 ]
 provides-extras = ["transformers", "vllm", "llama-cpp", "xlm", "dev"]
 

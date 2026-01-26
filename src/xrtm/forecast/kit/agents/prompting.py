@@ -22,8 +22,9 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from xrtm.forecast.kit.agents.llm import LLMAgent
 from xrtm.forecast.providers.inference.base import InferenceProvider
+
+from .llm import LLMAgent
 
 logger = logging.getLogger(__name__)
 
