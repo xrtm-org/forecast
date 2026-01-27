@@ -6032,34 +6032,20 @@ wheels = [
 [[package]]
 name = "xrtm-data"
 version = "0.1.0"
-source = { directory = "../data" }
+source = { git = "https://github.com/xrtm-org/data.git?branch=main#0dfcd6828e4f3e7f3d2d61eff4b88b02ce61e424" }
 dependencies = [
     { name = "aiohttp" },
     { name = "pydantic" },
 ]
 
-[package.metadata]
-requires-dist = [
-    { name = "aiohttp", specifier = ">=3.9.0" },
-    { name = "pydantic", specifier = ">=2.0.0" },
-]
-
 [[package]]
 name = "xrtm-eval"
 version = "0.1.0"
-source = { directory = "../eval" }
+source = { git = "https://github.com/xrtm-org/eval.git?branch=main#f9b118686dc15a0fb224d9dd39c1b3433a7b28dd" }
 dependencies = [
     { name = "networkx" },
     { name = "numpy" },
     { name = "pydantic" },
-    { name = "xrtm-data" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "networkx", specifier = ">=3.0" },
-    { name = "numpy", specifier = ">=1.24.0" },
-    { name = "pydantic", specifier = ">=2.0.0" },
     { name = "xrtm-data" },
 ]
 
@@ -6156,8 +6142,8 @@ requires-dist = [
     { name = "transformers", marker = "extra == 'transformers'", specifier = ">=4.40.0" },
     { name = "transformers", marker = "extra == 'xlm'", specifier = ">=4.40.0" },
     { name = "vllm", marker = "extra == 'vllm'", specifier = ">=0.3.0" },
-    { name = "xrtm-data", directory = "../data" },
-    { name = "xrtm-eval", directory = "../eval" },
+    { name = "xrtm-data", git = "https://github.com/xrtm-org/data.git?branch=main" },
+    { name = "xrtm-eval", git = "https://github.com/xrtm-org/eval.git?branch=main" },
 ]
 provides-extras = ["transformers", "vllm", "llama-cpp", "xlm", "dev"]
 
