@@ -20,23 +20,15 @@ This module provides production-ready agents, topologies, and evaluators
 for building institutional-grade forecasting systems.
 """
 
-# Topologies
-# Evaluation (Migrated to xrtm-eval)
-from xrtm.eval.kit.eval.epistemic_evaluator import EpistemicEvaluator
-from xrtm.eval.kit.eval.resilience import AdversarialInjector, GullibilityReport
-
 from xrtm.forecast.kit.agents.fact_checker import FactCheckerAgent
-
-# Agents
 from xrtm.forecast.kit.agents.red_team import RedTeamAgent
-
-# Sentinel
 from xrtm.forecast.kit.sentinel import PollingDriver, SentinelDriver, TriggerRules
 from xrtm.forecast.kit.topologies import (
     RecursiveConsensus,
     create_ivw_aggregator,
     create_simple_aggregator,
 )
+from xrtm.forecast.kit.workbench import AnalystWorkbench
 
 __all__ = [
     # Topologies
@@ -46,10 +38,8 @@ __all__ = [
     # Agents
     "RedTeamAgent",
     "FactCheckerAgent",
-    # Evaluation
-    "AdversarialInjector",
-    "GullibilityReport",
-    "EpistemicEvaluator",
+    # Workbench
+    "AnalystWorkbench",
     # Sentinel
     "PollingDriver",
     "SentinelDriver",
