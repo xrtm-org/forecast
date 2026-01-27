@@ -17,7 +17,7 @@ limitations under the License.
 <p align="center">
     <br>
     <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
-    <img src="https://img.shields.io/badge/version-0.5.2-blue.svg?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.6.0-blue.svg?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
     <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
 </p>
@@ -33,6 +33,42 @@ limitations under the License.
 It centralizes the "Reasoning Graph" definition so that agent behaviors are deterministic and auditable. `forecast` is the pivot across the ecosystem: if a provider is supported, it can be plugged into any agent topology (Orchestrator, Debate, Consensus) without changing business logic.
 
 We pledge to uphold research-grade transparency: strict typing, zero-tolerance verification, and rigorous double-trace auditability for every decision made by an AI.
+
+## The XRTM Ecosystem
+
+`xrtm-forecast` is one of four packages in the XRTM ecosystem, each with a specific role:
+
+```mermaid
+graph LR
+    subgraph "Layer 4: Optimization"
+        Train["xrtm-train<br/><i>Backtesting & Calibration</i>"]
+    end
+    subgraph "Layer 3: Reasoning"
+        Forecast["xrtm-forecast<br/><i>Graph Engine & Agents</i>"]
+    end
+    subgraph "Layer 2: Scoring"
+        Eval["xrtm-eval<br/><i>Metrics & Evaluation</i>"]
+    end
+    subgraph "Layer 1: Foundation"
+        Data["xrtm-data<br/><i>Schemas & Snapshots</i>"]
+    end
+    
+    Train --> Forecast
+    Train --> Eval
+    Forecast --> Eval
+    Forecast --> Data
+    Eval --> Data
+```
+
+| Package | Role | PyPI |
+|---------|------|------|
+| **xrtm-data** | Ground-truth schemas, temporal snapshots | `pip install xrtm-data` |
+| **xrtm-eval** | Brier scores, ECE, trust primitives | `pip install xrtm-eval` |
+| **xrtm-forecast** | Orchestrator, agents, inference providers | `pip install xrtm-forecast` |
+| **xrtm-train** | Backtesting, trace replay, calibration | `pip install xrtm-train` |
+
+> **For most users**: `pip install xrtm-forecast` is sufficient—it automatically installs `xrtm-data` and `xrtm-eval`.
+> **For researchers**: `pip install xrtm-train` installs the full stack including backtesting tools.
 
 ## Installation
 
@@ -84,7 +120,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **Institutional Sovereignty**:
     *   **Merkle Reasoning**: Every state transition is anchored via SHA-256 Merkle proofs.
     *   **.xrtm Manifests**: Portable bundles containing full reasoning traces, telemetry, and hashes.
-    *   **Source Epistemics**: Automated `IntegrityGuardian` for domain-level trust evaluation.
+    *   **Source Epistemics**: Trust scoring via `IntegrityGuardian` (in `xrtm-eval`).
 *   **Institutional Grade Physics**:
     *   **Chronos Protocol**: Time-travel safe backtesting with instant-sleep acceleration.
     *   **Sentinel Protocol**: Forecast trajectories to track probability evolution.
@@ -159,8 +195,8 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 *   **[Discovery (Search)](examples/kit/features/discovery/run_discovery.py)**: Automated information retrieval.
 *   **[Streaming](examples/kit/features/streaming_demo/run_streaming_demo.py)**: Real-time token streaming for UIs.
-*   **[Calibration](examples/kit/features/calibration_demo/run_calibration_demo.py)**: Adjusting confidence intervals to match reality.
-*   **[Trace Replay](examples/kit/features/trace_replay/run_trace_replay.py)**: Re-running a saved execution for debugging.
+*   **[Calibration](https://github.com/xrtm-org/train/blob/main/examples/kit/run_calibration_demo.py)**: Adjusting confidence intervals (in `xrtm-train`).
+*   **[Trace Replay](https://github.com/xrtm-org/train/blob/main/examples/kit/run_trace_replay.py)**: Re-running a saved execution (in `xrtm-train`).
 
 </details>
 

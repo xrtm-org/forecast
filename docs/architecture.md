@@ -2,6 +2,21 @@
 
 `xrtm-forecast` is built on a "Platform vs. Application" architecture. We distinguish clearly between the **Engine** (the structural bricks) and the **Experts** (the pre-assembled kits).
 
+## Ecosystem Overview
+
+`xrtm-forecast` is part of a four-package ecosystem with strict layer dependencies:
+
+| Layer | Package | Role | Can Import From |
+|-------|---------|------|-----------------|
+| 4 | `xrtm-train` | Backtesting, calibration | forecast, eval, data |
+| 3 | `xrtm-forecast` | Graph engine, agents | eval, data |
+| 2 | `xrtm-eval` | Metrics, trust primitives | data |
+| 1 | `xrtm-data` | Schemas, snapshots | *(none)* |
+
+> See [.agent/rules/governance.md](../.agent/rules/governance.md) for detailed import rules.
+
+---
+
 ## Core Philosophy: The Lego Analogy
 
 To understand how to build with this library, imagine a Lego set:
