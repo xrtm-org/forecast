@@ -21,11 +21,10 @@ Demonstrates human-AI collaborative forecasting with the Analyst Workbench.
 import asyncio
 import logging
 
-from xrtm.forecast.kit.eval.workbench import AnalystWorkbench
-
 from xrtm.forecast.core.interfaces import HumanProvider
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.kit.agents.llm import LLMAgent
+from xrtm.forecast.kit.workbench import AnalystWorkbench
 
 logging.basicConfig(level=logging.INFO)
 

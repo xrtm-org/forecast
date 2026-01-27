@@ -23,7 +23,7 @@ Meanwhile, human experts have deep intuition but can't process 10,000 news artic
 A topology where the central node is a human analyst:
 
 ```python
-from xrtm.forecast.kit.eval.workbench import AnalystWorkbench
+from xrtm.forecast.kit.workbench import AnalystWorkbench
 from xrtm.forecast.kit.agents import LLMAgent
 
 # Create research agents
@@ -46,7 +46,7 @@ orchestrator = workbench.build_orchestrator(
 An AI auditor that checks human reasoning for cognitive biases:
 
 ```python
-from xrtm.forecast.kit.eval.bias import BiasInterceptor
+from xrtm.eval.kit.eval.bias import BiasInterceptor
 
 interceptor = BiasInterceptor(model=llm)
 audit_result = await interceptor.evaluate_reasoning(
