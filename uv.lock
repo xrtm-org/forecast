@@ -6040,8 +6040,8 @@ dependencies = [
 
 [[package]]
 name = "xrtm-eval"
-version = "0.1.1"
-source = { git = "https://github.com/xrtm-org/eval.git?branch=main#5dfc1e0c94189a340df3e9fcbae78e8587de4630" }
+version = "0.1.2"
+source = { git = "https://github.com/xrtm-org/eval.git?branch=main#6fea55a2ff912cd2b9374f5db785329b38695079" }
 dependencies = [
     { name = "networkx" },
     { name = "numpy" },
@@ -6051,7 +6051,7 @@ dependencies = [
 
 [[package]]
 name = "xrtm-forecast"
-version = "0.5.3"
+version = "0.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
