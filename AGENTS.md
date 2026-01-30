@@ -1,6 +1,7 @@
 ---
-# AGENT CONFIGURATION: xrtm-forecast NODE
-# IDENTITY: THE ENGINE
+agent_node: xrtm-forecast
+identity: THE ENGINE
+---
 
 ### 1. [PRIME DIRECTIVES] (Shared Core)
 - **Tech Stack**: Python 3.11+, Pydantic v2, Polars (where applicable for data frames), `uv` package manager.
