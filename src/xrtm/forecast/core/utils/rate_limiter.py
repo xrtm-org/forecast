@@ -79,10 +79,15 @@ class TokenBucket:
 
         if redis_url:
             try:
+                import redis as redis_sync
                 import redis.asyncio as redis
 
                 self.redis = redis.from_url(redis_url, encoding="utf-8", decode_responses=True)
                 self.script = self.redis.register_script(LUA_RATE_LIMIT_SCRIPT)
+
+                self.redis_sync = redis_sync.from_url(redis_url, encoding="utf-8", decode_responses=True)
+                self.script_sync = self.redis_sync.register_script(LUA_RATE_LIMIT_SCRIPT)
+
                 self.use_redis = True
                 logger.info(f"[RATE-LIMITER] Using Redis at {redis_url}")
             except ImportError:
@@ -122,14 +127,10 @@ class TokenBucket:
     def acquire_sync(self, tokens: int = 1):
         r"""Blocks until enough tokens are available (Sync)."""
         if self.use_redis:
-            import redis as redis_sync
-
             try:
-                r = redis_sync.from_url(self.redis_url, encoding="utf-8", decode_responses=True)
-                script = r.register_script(LUA_RATE_LIMIT_SCRIPT)
                 while True:
                     now = time.time()
-                    if script(
+                    if self.script_sync(
                         keys=[f"{self.key}:tokens", f"{self.key}:ts"], args=[self.rate, self.capacity, now, tokens]
                     ):
                         return
