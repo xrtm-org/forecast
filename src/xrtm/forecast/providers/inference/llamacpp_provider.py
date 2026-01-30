@@ -90,6 +90,25 @@ class LlamaCppProvider(InferenceProvider):
             },
         )
 
+    async def _async_iter(self, sync_iterable: Any) -> AsyncIterable[Any]:
+        """
+        Helper to iterate over a synchronous generator in a thread
+        to avoid blocking the main event loop.
+        """
+        iterator = iter(sync_iterable)
+
+        def safe_next(it):
+            try:
+                return next(it), False
+            except StopIteration:
+                return None, True
+
+        while True:
+            chunk, is_done = await asyncio.to_thread(safe_next, iterator)
+            if is_done:
+                break
+            yield chunk
+
     async def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
         self._ensure_initialized()
         if self._llm is None:
@@ -105,10 +124,9 @@ class LlamaCppProvider(InferenceProvider):
             stream=True,
         )
 
-        for chunk in stream:
+        async for chunk in self._async_iter(stream):
             text = chunk["choices"][0]["text"]
             yield {"contentBlockDelta": {"delta": {"text": text}}}
-            await asyncio.sleep(0)
 
         yield {"messageStop": {"stopReason": "end_turn"}}
 
