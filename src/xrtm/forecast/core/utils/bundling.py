@@ -37,6 +37,15 @@ def calculate_sha256(data: str) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
+def calculate_sha256_stream(file_obj) -> str:
+    r"""Calculates the SHA-256 hash of a file-like object using streaming."""
+    sha256_hash = hashlib.sha256()
+    # Read in 64kb chunks
+    for byte_block in iter(lambda: file_obj.read(65536), b""):
+        sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+
+
 class ForecastBundle:
     r"""
     A portable, auditable archive of a forecast run.
@@ -113,8 +122,8 @@ class ForecastBundle:
                         results["errors"].append(f"Missing file referenced in manifest: {filename}")
                         continue
 
-                    actual_data = zf.read(filename).decode("utf-8")
-                    actual_hash = calculate_sha256(actual_data)
+                    with zf.open(filename) as f:
+                        actual_hash = calculate_sha256_stream(f)
 
                     if actual_hash != expected_hash:
                         results["is_valid"] = False
