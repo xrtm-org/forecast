@@ -79,8 +79,8 @@ class TokenBucket:
 
         if redis_url:
             try:
-                import redis.asyncio as redis
                 import redis as redis_sync
+                import redis.asyncio as redis
 
                 self.redis = redis.from_url(redis_url, encoding="utf-8", decode_responses=True)
                 self.script = self.redis.register_script(LUA_RATE_LIMIT_SCRIPT)
