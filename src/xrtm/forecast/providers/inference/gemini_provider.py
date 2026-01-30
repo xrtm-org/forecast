@@ -545,19 +545,23 @@ class GeminiProvider(InferenceProvider):
         gemini_tools = [types.Tool(function_declarations=processed_tools)] if processed_tools else None
         config = types.GenerateContentConfig(system_instruction=final_system, tools=cast(Any, gemini_tools))
 
-        def get_stream():
-            return self.client.models.generate_content_stream(model=self.model_id, contents=contents, config=config)
-
         yield {"messageStart": {"role": "assistant"}}
         yield {"contentBlockStart": {"start": {"type": "text"}, "contentBlockIndex": 0}}
-        for chunk in await asyncio.to_thread(get_stream):
+        async for chunk in await self.client.aio.models.generate_content_stream(
+            model=self.model_id, contents=cast(Any, contents), config=config
+        ):
             try:
                 chunk_text = chunk.text
                 if chunk_text:
                     yield {"contentBlockDelta": {"contentBlockIndex": 0, "delta": {"text": chunk_text}}}
             except Exception:
                 pass
-            if hasattr(chunk, "candidates") and chunk.candidates:
+            if (
+                hasattr(chunk, "candidates")
+                and chunk.candidates
+                and chunk.candidates[0].content
+                and chunk.candidates[0].content.parts
+            ):
                 parts = chunk.candidates[0].content.parts
                 for part in parts:
                     if hasattr(part, "function_call") and part.function_call:
