@@ -548,7 +548,7 @@ class GeminiProvider(InferenceProvider):
         yield {"messageStart": {"role": "assistant"}}
         yield {"contentBlockStart": {"start": {"type": "text"}, "contentBlockIndex": 0}}
         async for chunk in await self.client.aio.models.generate_content_stream(
-            model=self.model_id, contents=contents, config=config
+            model=self.model_id, contents=cast(Any, contents), config=config
         ):
             try:
                 chunk_text = chunk.text
@@ -556,7 +556,12 @@ class GeminiProvider(InferenceProvider):
                     yield {"contentBlockDelta": {"contentBlockIndex": 0, "delta": {"text": chunk_text}}}
             except Exception:
                 pass
-            if hasattr(chunk, "candidates") and chunk.candidates:
+            if (
+                hasattr(chunk, "candidates")
+                and chunk.candidates
+                and chunk.candidates[0].content
+                and chunk.candidates[0].content.parts
+            ):
                 parts = chunk.candidates[0].content.parts
                 for part in parts:
                     if hasattr(part, "function_call") and part.function_call:
