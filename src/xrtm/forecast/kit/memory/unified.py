@@ -39,11 +39,19 @@ class Memory:
         # Use registry only for default production paths to avoid test contamination,
         # but ensure at least one registration for agnosticism tests.
         if persist_directory:
-            from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
+            p = MemoryRegistry.get_provider("CHROMA")
+            if (
+                p
+                and getattr(p, "persist_directory", None) == persist_directory
+                and getattr(p, "collection_name", None) == collection_name
+            ):
+                self.provider = p
+            else:
+                from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
 
-            self.provider = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
-            if not MemoryRegistry.get_provider("CHROMA"):
-                MemoryRegistry.register_provider("CHROMA", self.provider)
+                self.provider = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
+                if not MemoryRegistry.get_provider("CHROMA"):
+                    MemoryRegistry.register_provider("CHROMA", self.provider)
         else:
             p = MemoryRegistry.get_provider("CHROMA")
             if p is None:
