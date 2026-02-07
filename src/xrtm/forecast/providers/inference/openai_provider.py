@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 from typing import Any, AsyncIterable, Dict, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
+from openai.types.chat import ChatCompletion
 
+from xrtm.forecast.core.cache.inference_cache import InferenceCache
 from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
@@ -52,11 +55,65 @@ class OpenAIProvider(InferenceProvider):
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
         self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+        self.cache = InferenceCache()
 
     def _normalize_messages(self, messages: Any) -> List[Dict[str, str]]:
         if isinstance(messages, str):
             return [{"role": "user", "content": messages}]
         return messages
+
+    async def _generate_with_cache(
+        self,
+        messages: List[Any],
+        tools: Optional[List[Dict[str, Any]]],
+        output_logprobs: bool,
+        **kwargs: Any,
+    ) -> ChatCompletion:
+        r"""Internal method to handle API calls with caching."""
+        # Ensure messages are serializable for cache key
+        serializable_messages = []
+        for m in messages:
+            if hasattr(m, "model_dump"):
+                serializable_messages.append(m.model_dump())
+            elif hasattr(m, "dict"):  # Fallback for older pydantic
+                serializable_messages.append(m.dict())
+            else:
+                serializable_messages.append(m)
+
+        prompt_str = json.dumps(serializable_messages, sort_keys=True, default=str)
+        cache_params = kwargs.copy()
+        if tools:
+            cache_params["tools"] = tools
+        if output_logprobs:
+            cache_params["output_logprobs"] = output_logprobs
+
+        cache_key = self.cache.compute_key(self.model_id, prompt_str, **cache_params)
+
+        # Check cache
+        cached_val = self.cache.get(cache_key)
+        if cached_val:
+            try:
+                return ChatCompletion.model_validate_json(cached_val)
+            except Exception as e:
+                logger.warning(f"Failed to deserialize cached response: {e}")
+
+        # Call API
+        response = await self.client.chat.completions.create(
+            model=self.model_id,
+            messages=messages,
+            tools=cast(Any, tools),
+            logprobs=output_logprobs,
+            top_logprobs=5 if output_logprobs else None,
+            **kwargs,
+        )
+
+        # Store in cache
+        try:
+            self.cache.set(cache_key, response.model_dump_json())
+        except Exception as e:
+            logger.warning(f"Failed to cache response: {e}")
+
+        return response
 
     async def generate_content_async(
         self,
@@ -107,12 +164,10 @@ class OpenAIProvider(InferenceProvider):
         current_turn = 0
         while current_turn < max_tool_turns:
             current_turn += 1
-            response = await self.client.chat.completions.create(
-                model=self.model_id,
+            response = await self._generate_with_cache(
                 messages=messages,
-                tools=cast(Any, openai_tools),
-                logprobs=output_logprobs,
-                top_logprobs=5 if output_logprobs else None,
+                tools=openai_tools,
+                output_logprobs=output_logprobs,
                 **kwargs,
             )
 
@@ -153,7 +208,6 @@ class OpenAIProvider(InferenceProvider):
     async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[Dict[str, Any]]:
         r"""Executes tool calls and returns OpenAI-formatted tool results."""
         results = []
-        import json
 
         for call in tool_calls:
             tool_name = call.function.name
