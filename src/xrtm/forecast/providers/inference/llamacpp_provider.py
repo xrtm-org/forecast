@@ -15,6 +15,7 @@
 
 import asyncio
 import logging
+import threading
 from typing import Any, AsyncIterable, Dict, List
 
 from xrtm.forecast.core.config.inference import LlamaCppConfig
@@ -34,38 +35,42 @@ class LlamaCppProvider(InferenceProvider):
         self.model_path = config.model_id  # Often a path to .gguf
         self._llm = None
         self._is_initialized = False
+        self._init_lock = threading.Lock()
 
     def _ensure_initialized(self):
         if self._is_initialized:
             return
 
-        try:
-            from llama_cpp import Llama
-        except ImportError:
-            raise ImportError(
-                "The 'llama-cpp-python' library is required for LlamaCppProvider. "
-                "Install it with `pip install xrtm-forecast[llama-cpp]`."
-            )
+        with self._init_lock:
+            if self._is_initialized:
+                return
 
-        logger.info(f"Initializing Llama-CPP model: {self.model_path}")
-        self._llm = Llama(
-            model_path=self.model_path,
-            n_ctx=self.config.n_ctx,
-            n_threads=self.config.n_threads,
-            n_gpu_layers=self.config.n_gpu_layers,
-            **self.config.extra,
-        )
-        self._is_initialized = True
+            try:
+                from llama_cpp import Llama
+            except ImportError:
+                raise ImportError(
+                    "The 'llama-cpp-python' library is required for LlamaCppProvider. "
+                    "Install it with `pip install xrtm-forecast[llama-cpp]`."
+                )
+
+            logger.info(f"Initializing Llama-CPP model: {self.model_path}")
+            self._llm = Llama(
+                model_path=self.model_path,
+                n_ctx=self.config.n_ctx,
+                n_threads=self.config.n_threads,
+                n_gpu_layers=self.config.n_gpu_layers,
+                **self.config.extra,
+            )
+            self._is_initialized = True
 
     async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> ModelResponse:
-        self._ensure_initialized()
         return await asyncio.to_thread(self._generate_sync, prompt, **kwargs)
 
     def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> ModelResponse:
-        self._ensure_initialized()
         return self._generate_sync(prompt, **kwargs)
 
     def _generate_sync(self, prompt: str, **kwargs: Any) -> ModelResponse:
+        self._ensure_initialized()
         if self._llm is None:
             raise RuntimeError("Llama-CPP model failed to initialize.")
 
@@ -110,7 +115,7 @@ class LlamaCppProvider(InferenceProvider):
             yield chunk
 
     async def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
-        self._ensure_initialized()
+        await asyncio.to_thread(self._ensure_initialized)
         if self._llm is None:
             raise RuntimeError("Llama-CPP model failed to initialize.")
 
