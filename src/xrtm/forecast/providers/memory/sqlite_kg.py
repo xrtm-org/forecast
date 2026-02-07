@@ -17,6 +17,7 @@ r"""
 Reference implementation of FactStore using a local SQLite database.
 r"""
 
+import asyncio
 import json
 import sqlite3
 from datetime import datetime
@@ -62,8 +63,7 @@ class SQLiteFactStore(FactStore):
             )
             conn.commit()
 
-    async def remember(self, fact: Fact) -> None:
-        r"""Stores a fact in the database."""
+    def _remember_sync(self, fact: Fact) -> None:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
@@ -84,8 +84,11 @@ class SQLiteFactStore(FactStore):
             )
             conn.commit()
 
-    async def query(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
-        r"""Queries facts from the database."""
+    async def remember(self, fact: Fact) -> None:
+        r"""Stores a fact in the database."""
+        await asyncio.to_thread(self._remember_sync, fact)
+
+    def _query_sync(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
         query = "SELECT * FROM facts WHERE subject = ?"
         params = [subject]
 
@@ -113,8 +116,11 @@ class SQLiteFactStore(FactStore):
                 )
             return facts
 
-    async def forget(self, subject: str, predicate: Optional[str] = None) -> None:
-        r"""Removes facts from the database."""
+    async def query(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
+        r"""Queries facts from the database."""
+        return await asyncio.to_thread(self._query_sync, subject, predicate)
+
+    def _forget_sync(self, subject: str, predicate: Optional[str] = None) -> None:
         query = "DELETE FROM facts WHERE subject = ?"
         params = [subject]
 
@@ -125,6 +131,10 @@ class SQLiteFactStore(FactStore):
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(query, params)
             conn.commit()
+
+    async def forget(self, subject: str, predicate: Optional[str] = None) -> None:
+        r"""Removes facts from the database."""
+        await asyncio.to_thread(self._forget_sync, subject, predicate)
 
 
 __all__ = ["SQLiteFactStore"]
