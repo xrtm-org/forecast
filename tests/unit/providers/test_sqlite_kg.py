@@ -1,12 +1,13 @@
 
-import pytest
-import sqlite3
 import os
 import tempfile
 from datetime import datetime, timezone
-from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
+
+import pytest
+
 from xrtm.forecast.core.memory.graph import Fact
-from xrtm.forecast.core.memory.graph import FactStore
+from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
+
 
 @pytest.fixture
 def db_path():
