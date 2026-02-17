@@ -42,6 +42,7 @@ class TestTokenBucket:
 
     def test_init_with_redis_connection_error(self):
         r"""Should fall back to in-memory on Redis connection error."""
+        pytest.importorskip("redis")
         with patch("redis.asyncio.from_url", side_effect=Exception("Connection refused")):
             bucket = TokenBucket(redis_url="redis://localhost:6379", key="test", rate=1.0, capacity=10.0)
             assert bucket.use_redis is False

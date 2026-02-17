@@ -99,6 +99,18 @@ class BaseGraphState(BaseModel):
     # Temporal Sandboxing
     temporal_context: Optional[TemporalContext] = Field(default=None, description="Metadata for temporal sandboxing.")
 
+    # Prior State Injection (Decision 1)
+    prior_state: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Beta-parameterized prior state for training injection. Structure: {alpha, beta, silence_delta, deadline_delta}",
+    )
+
+    # Rolling News Context (Decision 5)
+    news_history: List[str] = Field(
+        default_factory=list,
+        description="Recent headlines for context/deduplication. Max ~20 items for token budget.",
+    )
+
     # Merkle Integrity (Institutional Grade)
     state_hash: Optional[str] = Field(default=None, description="SHA-256 hash of the current state.")
     parent_hash: Optional[str] = Field(default=None, description="Hash of the preceding state in the reasoning chain.")
