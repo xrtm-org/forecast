@@ -17,6 +17,8 @@ r"""Unit tests for forecast.core.utils.control."""
 
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from xrtm.forecast.core.utils.control import ControlService
 
 
@@ -32,12 +34,14 @@ class TestControlService:
 
     def test_init_with_redis_connection_error(self):
         r"""Should handle Redis connection errors gracefully."""
+        pytest.importorskip("redis")
         with patch("redis.from_url", side_effect=Exception("Connection refused")):
             service = ControlService("redis://localhost:6379")
             assert service.redis is None
 
     def test_init_with_custom_prefix(self):
         r"""Should use custom key prefix."""
+        pytest.importorskip("redis")
         mock_redis = MagicMock()
         with patch("redis.from_url", return_value=mock_redis):
             service = ControlService("redis://localhost:6379", key_prefix="CUSTOM")

@@ -75,8 +75,8 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
-testpaths = ["tests"]
+pythonpath = ["src", "../data/src", "../eval/src"]
+testpaths = ["tests/unit"]
 asyncio_mode = "strict"
 markers = [
     "live: marks tests as live (require API keys)",
@@ -87,8 +87,8 @@ package-dir = {"" = "src"}
 packages = {find = {where = ["src"], include = ["xrtm*"], namespaces = true}}
 
 [tool.uv.sources]
-xrtm-data = { git = "https://github.com/xrtm-org/data.git", branch = "main" }
-xrtm-eval = { git = "https://github.com/xrtm-org/eval.git", branch = "main" }
+xrtm-data = { path = "../data", editable = true }
+xrtm-eval = { path = "../eval", editable = true }
 
 [tool.ruff]
 line-length = 120
