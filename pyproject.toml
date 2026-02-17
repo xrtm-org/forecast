@@ -87,8 +87,8 @@ package-dir = {"" = "src"}
 packages = {find = {where = ["src"], include = ["xrtm*"], namespaces = true}}
 
 [tool.uv.sources]
-xrtm-data = { path = "../data", editable = true }
-xrtm-eval = { path = "../eval", editable = true }
+xrtm-data = { git = "https://github.com/xrtm-org/data.git", branch = "main" }
+xrtm-eval = { git = "https://github.com/xrtm-org/eval.git", tag = "v0.2.1" }
 
 [tool.ruff]
 line-length = 120
