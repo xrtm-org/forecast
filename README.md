@@ -201,28 +201,31 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 </details>
 
 
-## Development Environment
+## Local Development
 
-This project is configured with a production-grade **Dev Container** to ensure a consistent, reproducible environment across all machines (Mac, Linux, Windows/WSL).
+We use `uv` for dependency management and Python environment handling.
 
 ### Prerequisites
-*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running)
-*   [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+*   [uv](https://github.com/astral-sh/uv) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+*   Python 3.11 or higher
 
-### Getting Started
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/xrtm-org/forecast.git
-    ```
-2.  **Open in VS Code**:
-    ```bash
-    code forecast
-    ```
-3.  **Reopen in Container**:
-    *   Click the "Reopen in Container" button in the notification popup.
-    *   Or press `Cmd+Shift+P` (or `Ctrl+Shift+P`) and type **"Dev Containers: Reopen in Container"**.
+### Setup
+We provide a setup script to bootstrap your environment and install sibling projects in editable mode:
 
-### Features
-*   **Zero Config**: Python 3.12, `uv` dependency manager, and all project tools are pre-installed.
-*   **Zsh Terminal**: Enhanced shell with autosuggestions and syntax highlighting.
-*   **Tooling**: `gh` CLI, `ruff` (linting), `pytest` (testing), and `mypy` (typing) are ready to use.
+```bash
+./scripts/setup_dev.sh
+```
+
+### Common Commands
+
+*   **Run Check (Lint/Type)**: `uv run scripts/audit/check_docs.py` (and usage of standard tools `ruff check .`, `mypy .`)
+*   **Run Tests**: `uv run pytest tests/`
+*   **Run Live Tests**: `uv run pytest tests/live --run-live`
+
+### Containerized Development (Optional)
+If you prefer a pre-configured environment or are waiting for local setup approval, you can still use the **Dev Container**.
+
+1.  Open in VS Code.
+2.  Run **"Dev Containers: Reopen in Container"**.
+3.  The environment will auto-configure (though `setup_dev.sh` logic is mirrored in `postCreateCommand`).
+
