@@ -1,5 +1,3 @@
-from typing import Any, Dict, List
-
 # coding=utf-8
 # Copyright 2026 XRTM Team. All rights reserved.
 #
@@ -14,6 +12,9 @@ from typing import Any, Dict, List
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from typing import Any, Dict, List
+
 import pytest
 from pydantic import BaseModel
 
