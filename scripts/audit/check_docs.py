@@ -81,7 +81,7 @@ def main():
     )
     args = parser.parse_args()
 
-    base_dir = "." if args.global_audit else "src/forecast"
+    base_dir = "." if args.global_audit else "src/xrtm/forecast"
     total_errors = 0
     total_files = 0
 

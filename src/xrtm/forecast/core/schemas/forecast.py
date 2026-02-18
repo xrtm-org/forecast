@@ -19,7 +19,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 # Migrated to xrtm-data
-from xrtm.data.schemas.forecast import (
+from xrtm.data.core.schemas.forecast import (
     CausalEdge,
     CausalNode,
     ForecastOutput,
@@ -28,7 +28,7 @@ from xrtm.data.schemas.forecast import (
 )
 
 # Migrated to xrtm-eval
-from xrtm.eval.schemas.forecast import ForecastResolution
+from xrtm.eval.core.schemas import ForecastResolution
 
 
 class TimeSeriesPoint(BaseModel):
