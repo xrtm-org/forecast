@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
 
 # Install uv binary from official image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -14,7 +14,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zsh \
     zsh-autosuggestions \
     zsh-syntax-highlighting \
-    && rm -rf /var/lib/apt/lists/*
+    socat \
+    openssh-client \
+    libatomic1 \
+    nodejs \
+    npm \
+    xz-utils \
+    netcat-openbsd \
+    iproute2 \
+    net-tools \
+    lsof \
+    psmisc \
+    coreutils \
+    zip \
+    unzip \
+    bsdutils \
+    gawk \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/local/bin/python3 /usr/bin/python
 
 # Install GitHub CLI
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
