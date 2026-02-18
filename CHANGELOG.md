@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.6.1] - 2026-02-17
+
+### Fixed
+- **CI/CD**: Fixed dependency resolution in CI by switching `xrtm-data` and `xrtm-eval` to git dependencies.
+- **Audit Remediation**: Applied strict linter fixes and license header enforcement.
+
+## [0.6.0] - 2026-02-17
+
+### Added
+- **Ecosystem Split**: Formal separation of `xrtm-forecast` from the monorepo structure.
+- **Verification Scripts**: Added `scripts/verify/verify_eval.py` and `scripts/verify/verify_lora.py` for integrity checking.
+
+### Changed
+- **Architecture**: Major refactor to support independent lifecycle management of the forecast engine.
+- **Documentation**: Updated README and architecture docs to reflect the new ecosystem structure.
+
 ## [0.5.3] - 2026-01-25
 
 ### Fixed
