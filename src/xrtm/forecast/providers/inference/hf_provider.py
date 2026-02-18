@@ -198,29 +198,18 @@ class HuggingFaceProvider(InferenceProvider):
         thread.start()
 
         # 4. Yield Chunks Asynchronously
-        # The streamer is an iterator, but iterating it blocks.
-        # We need to iterate it in a non-blocking way relative to the event loop.
-        # Since 'for text in streamer' blocks, we can't easily `await` each chunk
-        # unless we wrap the iterator or use run_in_executor for the *entire* loop?
-        # Actually, `TextIteratorStreamer` uses a Queue internally.
-        # We can poll it or iterate it. Iterating blocks until next token.
-        # Best practice for AsyncIO integration:
+        # The streamer is an iterator, but iterating it blocks the event loop.
+        # We run the blocking next() call in a separate thread to keep the loop responsive.
+        # This prevents the loop from freezing during token generation.
+        iterator = iter(streamer)
+        sentinel = object()
 
-        # 4. Yield Chunks Asynchronously
-        # The streamer is an iterator, but iterating it blocks.
-        # We need to iterate it in a non-blocking way relative to the event loop.
+        while True:
+            # Run the blocking next() call in a separate thread
+            text = await asyncio.to_thread(next, iterator, sentinel)
 
-        # Best practice for AsyncIO integration with blocking iterators:
-        # We yield control explicitly with await asyncio.sleep(0)
-
-        # To strictly await, we iterate the sync generator in a thread?
-        # A simpler pattern:
-        for text in streamer:
-            # This blocks the loop briefly per token, but usually acceptable for local inference.
-            # Ideally we'd use `await loop.run_in_executor(None, next, streamer)` but streamer isn't a simple iterator.
-            # Given Python GIL, simple iteration is often the pragmatic choice for HF streamers.
-            # To be "Institutional Grade", we should yield control.
-            await asyncio.sleep(0)  # Yield control
+            if text is sentinel:
+                break
 
             chunk = {"contentBlockDelta": {"delta": {"text": text}}}
             yield chunk
