@@ -168,3 +168,4 @@ logs/
 src/logs/
 tests/logs/
 *.log
+output/
