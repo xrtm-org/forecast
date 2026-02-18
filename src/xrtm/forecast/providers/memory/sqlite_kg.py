@@ -41,11 +41,13 @@ class SQLiteFactStore(FactStore):
             db_path (`str`): Path to the SQLite database file.
         r"""
         self.db_path = db_path
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
         self._init_db()
 
     def _init_db(self):
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
+        with self.conn:
+            self.conn.execute(
                 r"""
                 CREATE TABLE IF NOT EXISTS facts (
                     subject TEXT,
@@ -60,12 +62,11 @@ class SQLiteFactStore(FactStore):
                 )
                 """
             )
-            conn.commit()
 
     async def remember(self, fact: Fact) -> None:
         r"""Stores a fact in the database."""
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
+        with self.conn:
+            self.conn.execute(
                 """
                 INSERT OR REPLACE INTO facts
                 (subject, predicate, object_value, source_url, source_hash, verified_at, expires_at, confidence)
@@ -82,7 +83,6 @@ class SQLiteFactStore(FactStore):
                     fact.confidence,
                 ),
             )
-            conn.commit()
 
     async def query(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
         r"""Queries facts from the database."""
@@ -93,25 +93,25 @@ class SQLiteFactStore(FactStore):
             query += " AND predicate = ?"
             params.append(predicate)
 
-        with sqlite3.connect(self.db_path) as conn:
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute(query, params).fetchall()
+        # Reads don't necessarily need explicit transaction management for rollback,
+        # but using the connection directly is fine.
+        rows = self.conn.execute(query, params).fetchall()
 
-            facts = []
-            for row in rows:
-                facts.append(
-                    Fact(
-                        subject=row["subject"],
-                        predicate=row["predicate"],
-                        object_value=json.loads(row["object_value"]),
-                        source_url=row["source_url"],
-                        source_hash=row["source_hash"],
-                        verified_at=datetime.fromisoformat(row["verified_at"]),
-                        expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
-                        confidence=row["confidence"],
-                    )
+        facts = []
+        for row in rows:
+            facts.append(
+                Fact(
+                    subject=row["subject"],
+                    predicate=row["predicate"],
+                    object_value=json.loads(row["object_value"]),
+                    source_url=row["source_url"],
+                    source_hash=row["source_hash"],
+                    verified_at=datetime.fromisoformat(row["verified_at"]),
+                    expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
+                    confidence=row["confidence"],
                 )
-            return facts
+            )
+        return facts
 
     async def forget(self, subject: str, predicate: Optional[str] = None) -> None:
         r"""Removes facts from the database."""
@@ -122,9 +122,19 @@ class SQLiteFactStore(FactStore):
             query += " AND predicate = ?"
             params.append(predicate)
 
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(query, params)
-            conn.commit()
+        with self.conn:
+            self.conn.execute(query, params)
+
+    def close(self):
+        r"""Closes the database connection."""
+        conn = getattr(self, 'conn', None)
+        if conn:
+            conn.close()
+            self.conn = None
+
+    def __del__(self):
+        r"""Closes the database connection when the object is destroyed."""
+        self.close()
 
 
 __all__ = ["SQLiteFactStore"]
