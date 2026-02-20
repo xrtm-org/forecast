@@ -246,13 +246,23 @@ REASONING: <brief explanation of any change>
         updated_count = 0
         now = datetime.now(timezone.utc)
 
+        update_tasks = []
+        pending_watches = []
+
         for watch_id, watched in list(self._watches.items()):
             if not await self._should_update(watched):
                 continue
 
             logger.debug(f"[SENTINEL] Checking {watch_id} for updates...")
+            update_tasks.append(self._perform_delta_update(watched))
+            pending_watches.append((watch_id, watched))
 
-            result = await self._perform_delta_update(watched)
+        if not update_tasks:
+            results = []
+        else:
+            results = await asyncio.gather(*update_tasks)
+
+        for (watch_id, watched), result in zip(pending_watches, results):
             if result is not None:
                 new_prob, reasoning = result
 
