@@ -1,11 +1,11 @@
 import asyncio
-import time
 import os
-from datetime import datetime, timezone
 import statistics
-import json
-from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
+import time
+from datetime import datetime, timezone
+
 from xrtm.forecast.core.memory.graph import Fact
+from xrtm.forecast.providers.memory.sqlite_kg import SQLiteFactStore
 
 DB_PATH = "perf_test.db"
 
