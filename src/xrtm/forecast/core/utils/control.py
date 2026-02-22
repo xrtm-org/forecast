@@ -13,7 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from redis import Redis
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +39,7 @@ class ControlService:
 
     def __init__(self, redis_url: str, key_prefix: str = "FORECAST"):
         self.key = f"{key_prefix}_CONTROL_STATUS"
+        self.redis: Redis | None = None
         try:
             import redis
 
@@ -80,4 +87,5 @@ class ControlService:
     def get_status(self) -> str:
         if not self.redis:
             return "UNKNOWN"
-        return self.redis.get(self.key) or self.STATUS_RUNNING
+        status = str(self.redis.get(self.key) or self.STATUS_RUNNING)
+        return status

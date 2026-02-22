@@ -169,3 +169,6 @@ src/logs/
 tests/logs/
 *.log
 output/
+
+# macOS
+.DS_Store
