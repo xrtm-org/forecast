@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Telemetry data schemas.
+
+Pydantic models for telemetry primitives: ``TelemetrySpan``,
+``TelemetryEvent``, ``Trace``, and the ``SpanKind`` enumeration
+following OpenTelemetry conventions.
+"""
+
 import uuid
 from datetime import datetime, timezone
 from enum import Enum

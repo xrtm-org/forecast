@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Hugging Face inference provider.
+
+Concrete implementation of ``InferenceProvider`` for Hugging Face
+models via the Inference API, supporting text generation and
+streaming responses.
+"""
+
 import asyncio
 import logging
 from typing import Any, AsyncIterable

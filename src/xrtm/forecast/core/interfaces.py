@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Abstract interfaces for inference and interaction providers.
+
+Defines the ``InferenceProvider`` protocol for LLM backends and the
+``HumanProvider`` protocol for human-in-the-loop interactions.
+All concrete providers must implement these interfaces.
+"""
+
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, AsyncIterable, Dict, List, Optional

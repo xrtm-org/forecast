@@ -13,6 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""JSON serialization utilities.
+
+Provides ``robust_clean`` for recursively sanitizing objects
+(Pydantic models, NaN/Inf values, non-serializable types) into
+JSON-safe structures, and ``safe_json_dumps`` for fault-tolerant
+serialization.
+"""
+
 import json
 import math
 from typing import Any

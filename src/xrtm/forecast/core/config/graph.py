@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Graph execution configuration.
+
+Defines ``GraphConfig`` with settings for the orchestrator state machine,
+including cycle limits, entry node selection, and global timeouts.
+"""
+
 from typing import Optional
 
 from pydantic import BaseModel, Field

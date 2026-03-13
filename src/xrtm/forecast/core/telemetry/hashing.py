@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Cryptographic hashing for reasoning chain integrity.
+
+Provides ``AuditHasher`` with SHA-256 signing and verification to
+ensure logic traces cannot be tampered with after generation.
+"""
+
 import hashlib
 import json
 import logging

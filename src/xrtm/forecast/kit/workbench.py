@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Interactive workbench for forecast development.
+
+Provides a high-level API for interactively constructing, running,
+and debugging forecast pipelines, with built-in visualization
+and state inspection utilities.
+"""
+
 import logging
 from typing import List
 

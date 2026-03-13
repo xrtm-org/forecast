@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Data retrieval tool provider.
+
+Implements tools for querying ``xrtm-data`` sources, enabling
+agents to retrieve forecast questions, historical data, and
+prior distributions during reasoning.
+"""
+
 import logging
 from typing import Any, Dict, Optional
 

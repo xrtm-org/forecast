@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Institutional-grade research proof bundling.
+
+Generates cryptographically signed ``.xrtm`` manifest files that capture
+the complete reasoning chain, state hashes, and provenance metadata for
+each forecast, enabling independent verification of the decision process.
+"""
+
 import json
 import logging
 from datetime import datetime

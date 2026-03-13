@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Research proof verification.
+
+Provides ``SovereigntyVerifier`` for validating the cryptographic
+integrity of ``.xrtm`` manifest files, checking structural completeness,
+hash consistency, and reasoning chain coherence.
+"""
+
 import json
 import logging
 from typing import Any, Dict, List, Tuple

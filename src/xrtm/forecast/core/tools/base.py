@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Abstract tool interface and wrappers.
+
+Defines the ``Tool`` ABC for atomic actions available to agents,
+along with ``FunctionTool`` for wrapping plain Python callables
+and ``StrandToolWrapper`` for protocol-compatible adapters.
+"""
+
 import abc
 import inspect
 import logging

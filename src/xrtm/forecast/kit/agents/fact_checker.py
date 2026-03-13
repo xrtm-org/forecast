@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Fact-checking agent for evidence verification.
+
+Implements a specialized agent that validates claims against external
+data sources and assigns veracity scores to supporting evidence.
+"""
+
 import logging
 from typing import Any, List
 

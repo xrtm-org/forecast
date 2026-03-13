@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""LLM interaction circular buffer.
+
+Singleton ``TokenStreamContext`` that stores the last N LLM
+interactions in a circular buffer for live debugging, compliance
+verification, and dashboard visualization.
+"""
+
 import logging
 import time
 from collections import deque

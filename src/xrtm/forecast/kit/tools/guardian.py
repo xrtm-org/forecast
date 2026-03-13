@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Tool execution guardian and safety layer.
+
+Wraps tool invocations with validation, rate limiting, and
+sandboxing to prevent runaway execution or unauthorized access
+to external resources.
+"""
+
 from typing import Any, Dict, Optional
 
 from xrtm.forecast.core.schemas.graph import TemporalContext

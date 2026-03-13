@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Unified platform configuration.
+
+Central ``Settings`` class that aggregates all sub-configurations
+(inference, graph, telemetry, tools) and loads values from environment
+variables with the ``FORECAST_`` prefix.
+"""
+
 import logging
 from typing import Optional
 

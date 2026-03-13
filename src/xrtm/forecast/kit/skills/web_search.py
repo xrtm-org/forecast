@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Web search skill for information retrieval.
+
+Implements a search skill that queries external APIs (e.g., Tavily)
+and returns structured results for agent consumption, respecting
+temporal constraints during backtests.
+"""
+
 from typing import Any, Optional
 
 from xrtm.forecast.core.tools.base import Tool

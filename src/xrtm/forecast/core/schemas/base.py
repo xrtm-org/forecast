@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Base reasoning and evidence schemas.
+
+Foundational Pydantic models for structured reasoning outputs,
+including ``ReasoningSchema``, ``Attribution``, ``ConfidenceMetrics``,
+and causal graph primitives used across the forecast pipeline.
+"""
+
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field

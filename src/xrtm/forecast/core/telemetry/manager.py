@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Structured telemetry and trace management.
+
+Implements ``TelemetryManager`` that creates, tracks, and exports
+OpenTelemetry-compatible traces and spans using context variables
+for async-safe state management.
+"""
+
 import contextvars
 import logging
 import os

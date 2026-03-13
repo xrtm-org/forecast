@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Confidence calibration and estimation.
+
+Utilities for extracting, normalizing, and calibrating probability
+estimates from LLM outputs, ensuring forecasts are well-calibrated
+against empirical frequencies.
+"""
+
 import logging
 import math
 from abc import ABC, abstractmethod

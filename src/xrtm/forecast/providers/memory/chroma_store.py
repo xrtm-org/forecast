@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""ChromaDB vector memory store.
+
+Concrete implementation of the memory store interface using
+ChromaDB for persistent vector similarity search, supporting
+episodic memory retrieval for agent reasoning.
+"""
+
 import logging
 import os
 from typing import Any, Dict, List, Optional

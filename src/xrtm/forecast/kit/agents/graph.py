@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Graph-aware agent for causal reasoning.
+
+Agent that operates on the causal graph structure, building and
+traversing logical dependency chains between forecast variables.
+"""
+
 from typing import Any, Optional
 
 from xrtm.forecast.core.orchestrator import Orchestrator

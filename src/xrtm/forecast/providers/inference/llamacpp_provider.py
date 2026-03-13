@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""LlamaCpp inference provider.
+
+Concrete implementation of ``InferenceProvider`` for locally-hosted
+GGUF models via llama-cpp-python, with thread-offloaded streaming
+to prevent event loop blocking.
+"""
+
 import asyncio
 import logging
 from typing import Any, AsyncIterable, Dict, List

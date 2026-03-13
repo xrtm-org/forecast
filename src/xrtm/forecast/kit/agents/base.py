@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Base agent class and shared agent infrastructure.
+
+Defines the ``BaseAgent`` that all specialized agents inherit from,
+providing common state management, tool access, and lifecycle hooks.
+"""
+
 import abc
 import logging
 import threading

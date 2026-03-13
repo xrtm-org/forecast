@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Consensus topology for multi-agent agreement.
+
+Implements a topology where multiple agents independently analyze
+a question and their outputs are aggregated using configurable
+consensus mechanisms (e.g., median, trimmed mean).
+"""
+
 import logging
 from typing import Callable, List, Optional
 
