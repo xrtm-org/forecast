@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Conditional routing agent for graph branching.
+
+Implements routing logic that selects the next node in the forecast
+graph based on state conditions, confidence thresholds, or
+LLM-driven decisions.
+"""
+
 import logging
 from typing import Any, Dict, Optional, Union
 

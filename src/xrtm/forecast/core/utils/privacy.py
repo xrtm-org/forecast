@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""PII redaction and data anonymization.
+
+Provides the ``Anonymizer`` class for scrubbing sensitive information
+(emails, phone numbers, API keys, credit cards, SSNs) from datasets
+and traces before logging or auditing.
+"""
+
 import re
 from typing import Any, Dict, List, Pattern, Tuple
 

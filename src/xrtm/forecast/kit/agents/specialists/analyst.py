@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Domain analyst specialist agent.
+
+A pre-configured agent specialized in deep-dive analysis of a
+specific subject, combining web research, data retrieval, and
+structured reasoning into a coherent analytical output.
+"""
+
 import logging
 from typing import Any, Dict, List, Union
 

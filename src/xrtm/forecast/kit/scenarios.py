@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Scenario generation and evaluation.
+
+Utilities for generating alternative future scenarios, assigning
+probabilities to each, and evaluating their impact on the final
+forecast confidence.
+"""
+
 import asyncio
 import logging
 from typing import Any, Dict, Generic, TypeVar

@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""State-machine orchestrator for multi-agent reasoning.
+
+Implements the ``Orchestrator`` that drives the forecast graph by
+executing registered node functions in sequence, managing cycle
+budgets, timeouts, and human review gates.
+"""
+
 import asyncio
 import logging
 import time

@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""LLM response parsing utilities.
+
+Extracts structured JSON from LLM responses that may be wrapped
+in markdown code blocks or surrounded by conversational text.
+Handles both dictionary and array outputs.
+"""
+
 import json
 import logging
 import re

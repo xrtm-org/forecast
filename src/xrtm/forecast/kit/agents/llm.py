@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""LLM-backed reasoning agent.
+
+Core agent that delegates reasoning to a configured inference
+provider, managing prompt construction, response parsing, and
+structured output extraction.
+"""
+
 import logging
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 

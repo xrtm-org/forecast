@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Abstract memory store interface.
+
+Defines the base protocol for episodic and semantic memory backends,
+supporting storage, retrieval, and similarity search operations.
+"""
+
 import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional

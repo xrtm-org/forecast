@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Forecast-specific schema re-exports and extensions.
+
+Re-exports core schemas from ``xrtm-data`` and ``xrtm-eval`` for
+convenience, and defines forecast-layer extensions such as
+``TimeSeriesPoint`` and ``ScenarioForecast``.
+"""
+
 from datetime import datetime
 from typing import List, Optional
 

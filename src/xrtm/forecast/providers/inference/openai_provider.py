@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""OpenAI inference provider.
+
+Concrete implementation of ``InferenceProvider`` for the OpenAI
+API, supporting chat completions, streaming, function calling,
+and structured output with JSON mode.
+"""
+
 import logging
 from typing import Any, AsyncIterable, Dict, List, Optional, cast
 

@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Inference provider factory.
+
+Creates and configures inference provider instances from
+``Settings``, supporting automatic backend selection based on
+available API keys and model identifiers.
+"""
+
 import logging
 from typing import Any, Optional
 

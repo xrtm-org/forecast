@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Base inference provider implementation.
+
+Shared infrastructure for all inference providers, including
+retry logic, rate limiting, token counting, and response
+normalization into ``ModelResponse`` objects.
+"""
+
 from xrtm.forecast.core.interfaces import InferenceProvider, ModelResponse
 
 __all__ = ["InferenceProvider", "ModelResponse"]

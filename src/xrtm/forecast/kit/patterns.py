@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Reusable reasoning patterns for agent pipelines.
+
+Pre-built composition patterns (e.g., chain-of-thought, debate,
+ensemble) that can be applied to agent topologies for structured
+multi-step reasoning.
+"""
+
 import logging
 from typing import Optional
 

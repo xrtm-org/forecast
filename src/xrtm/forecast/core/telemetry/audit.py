@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Immutable audit trail for agentic decisions.
+
+Captures full reasoning chains, metadata, and cryptographic hashes
+for every agentic action, providing a tamper-evident record of
+why each decision was made.
+"""
+
 import json
 import logging
 import os

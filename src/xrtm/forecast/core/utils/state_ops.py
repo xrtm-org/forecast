@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""State cloning and manipulation utilities.
+
+Provides ``clone_state`` for creating deep copies of Pydantic state
+models with optional field overrides, ensuring branch isolation in
+parallel execution topologies.
+"""
+
 from typing import Any, Dict, TypeVar
 
 from pydantic import BaseModel

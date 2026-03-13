@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Skill definitions and capability declarations.
+
+Defines the ``Skill`` abstraction that encapsulates reusable
+capabilities (e.g., web search, data analysis) that agents can
+be equipped with via composition.
+"""
+
 import abc
 from typing import Any, Callable, Optional, Protocol, runtime_checkable
 

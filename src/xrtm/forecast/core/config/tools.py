@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Tool execution configuration.
+
+Defines ``ToolConfig`` with settings for external tool timeouts,
+API keys, and HTTP client parameters.
+"""
+
 from typing import Optional
 
 from pydantic import BaseModel, Field, SecretStr

@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Inference provider configuration schemas.
+
+Pydantic settings for each supported LLM backend (Gemini, OpenAI,
+HuggingFace, vLLM, LlamaCpp), including API keys, model identifiers,
+generation parameters, and rate limiting.
+"""
+
 from datetime import datetime
 from typing import Any, Dict, Optional
 

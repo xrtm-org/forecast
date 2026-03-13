@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Tool-calling agent for structured function execution.
+
+Agent that translates reasoning into concrete tool invocations,
+managing parameter extraction, execution, and result integration
+back into the graph state.
+"""
+
 import inspect
 from typing import Any, Callable, Optional
 

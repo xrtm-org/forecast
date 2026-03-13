@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Tool discovery and invocation registry.
+
+Central ``ToolRegistry`` for managing, discovering, and invoking
+atomic tools, providing standardized JSON schema access for
+LLM function calling.
+"""
+
 import logging
 from typing import Any, Callable, Dict, List, Optional
 

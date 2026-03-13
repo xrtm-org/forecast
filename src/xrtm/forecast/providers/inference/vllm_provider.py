@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""vLLM inference provider.
+
+Concrete implementation of ``InferenceProvider`` for self-hosted
+models served via vLLM's OpenAI-compatible API endpoint.
+"""
+
 import asyncio
 import logging
 from typing import Any, AsyncIterable, Dict, List

@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Global execution state management.
+
+Provides ``ControlService`` for managing PAUSE/RESUME/HALT states
+of an agent swarm via Redis, enabling external control from CLI
+or dashboard interfaces.
+"""
+
 from __future__ import annotations
 
 import logging

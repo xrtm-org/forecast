@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""End-to-end analyst pipeline.
+
+A high-level pipeline that chains research, analysis, and synthesis
+agents into a complete forecast workflow with configurable skill
+composition.
+"""
+
 import logging
 from typing import Callable, Optional
 

@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Agent type registry and factory.
+
+Central registry for discovering and instantiating agent types
+by name, supporting dynamic agent composition in graph topologies.
+"""
+
 import logging
 from typing import Dict, List, Optional, Union
 

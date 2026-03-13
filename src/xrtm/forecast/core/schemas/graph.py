@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Graph state and temporal context schemas.
+
+Defines ``BaseGraphState`` — the mutable state object that flows
+through the orchestrator — and ``TemporalContext`` for temporal
+sandboxing during backtests.
+"""
+
 import hashlib
 import json
 from datetime import datetime

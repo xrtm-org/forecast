@@ -13,6 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Google Gemini inference provider.
+
+Concrete implementation of ``InferenceProvider`` for Google's
+Gemini API, supporting streaming, function calling, and
+structured output generation.
+"""
+
 import asyncio
 import inspect
 import logging

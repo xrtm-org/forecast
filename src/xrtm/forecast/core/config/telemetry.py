@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+r"""Telemetry and observability configuration.
+
+Defines ``TelemetryConfig`` with settings for PII masking, logging
+verbosity, and optional OpenTelemetry OTLP export.
+"""
+
 from typing import List
 
 from pydantic import BaseModel, Field
