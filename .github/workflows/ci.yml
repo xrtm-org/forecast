@@ -74,3 +74,58 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./forecast/coverage.xml
           fail_ci_if_error: false
+
+  integration:
+    name: Integration ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout forecast
+        uses: actions/checkout@v4
+        with:
+          path: forecast
+
+      - name: Checkout workspace siblings
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          for repo in data eval; do
+            git clone --depth 1 -b "$BRANCH" "https://github.com/xrtm-org/${repo}.git" "$repo" 2>/dev/null \
+              || git clone --depth 1 -b main "https://github.com/xrtm-org/${repo}.git" "$repo"
+          done
+
+      - name: Create workspace root
+        run: |
+          cat > pyproject.toml << 'EOF'
+          [project]
+          name = "xrtm-workspace"
+          version = "0.0.0"
+          requires-python = ">=3.11,<3.13"
+
+          [tool.uv.workspace]
+          members = ["data", "eval", "forecast"]
+
+          [tool.uv.sources]
+          xrtm-data = { workspace = true }
+          xrtm-eval = { workspace = true }
+          EOF
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: forecast
+        run: uv sync --all-extras
+
+      - name: Run deterministic integration tests
+        working-directory: forecast
+        run: uv run pytest tests/integration tests/verification
