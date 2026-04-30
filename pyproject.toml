@@ -37,6 +37,7 @@ dependencies = [
 
 [project.scripts]
 forecast = "xrtm.forecast.cli.main:cli"
+xrtm-forecast = "xrtm.forecast.cli.main:cli"
 
 [project.urls]
 Repository = "https://github.com/xrtm-org/forecast"
