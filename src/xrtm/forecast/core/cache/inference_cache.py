@@ -35,8 +35,9 @@ import logging
 import os
 import sqlite3
 import time
+from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 __all__ = ["InferenceCache"]
 
@@ -137,6 +138,48 @@ class InferenceCache:
         }
         hash_str = json.dumps(hash_input, sort_keys=True, ensure_ascii=True)
         return hashlib.sha256(hash_str.encode("utf-8")).hexdigest()
+
+    def compute_chat_key(
+        self,
+        model_id: str,
+        messages: Iterable[Any],
+        tools: Optional[Iterable[Any]] = None,
+        **params: Any,
+    ) -> str:
+        r"""Compute a cache key for chat-completion style requests.
+
+        The key includes ordered messages, tool schemas, and all JSON-serializable
+        non-None generation parameters. Streaming requests are intentionally
+        rejected because partial-token caching is nondeterministic.
+        """
+        if params.get("stream"):
+            raise ValueError("Streaming chat requests are not cacheable")
+
+        hash_input = {
+            "model_id": model_id,
+            "messages": self._make_jsonable(list(messages)),
+            "tools": self._make_jsonable(list(tools)) if tools is not None else None,
+            "params": self._make_jsonable({k: v for k, v in sorted(params.items()) if v is not None}),
+        }
+        hash_str = json.dumps(hash_input, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+        return hashlib.sha256(hash_str.encode("utf-8")).hexdigest()
+
+    def _make_jsonable(self, value: Any) -> Any:
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        if isinstance(value, dict):
+            return {str(k): self._make_jsonable(v) for k, v in sorted(value.items(), key=lambda item: str(item[0]))}
+        if isinstance(value, (list, tuple)):
+            return [self._make_jsonable(v) for v in value]
+        if is_dataclass(value) and not isinstance(value, type):
+            return self._make_jsonable(asdict(value))
+        if hasattr(value, "model_dump"):
+            return self._make_jsonable(value.model_dump())
+        if hasattr(value, "to_dict"):
+            return self._make_jsonable(value.to_dict())
+        if hasattr(value, "tool_spec"):
+            return self._make_jsonable(value.tool_spec)
+        raise TypeError(f"Value of type {type(value).__name__} is not JSON serializable for cache keys")
 
     def get(self, key: str) -> Optional[str]:
         r"""Retrieve cached response by key.

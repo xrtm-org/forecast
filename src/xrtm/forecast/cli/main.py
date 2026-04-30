@@ -18,6 +18,7 @@ Main CLI entry point for xrtm-forecast.
 r"""
 
 import sys
+from pathlib import Path
 
 import click
 from rich.console import Console
@@ -84,6 +85,54 @@ def verify(bundle_path: str, verbose: bool):
             )
         )
         sys.exit(1)
+
+
+@cli.command(name="real-e2e-local-llm")
+@click.option("--limit", type=int, default=2, show_default=True, help="Number of real corpus questions to run.")
+@click.option("--base-url", default=None, help="OpenAI-compatible local endpoint, e.g. http://localhost:8080/v1.")
+@click.option("--model", default=None, help="Local model id served by the endpoint.")
+@click.option("--api-key", default=None, help="API key for the local endpoint; defaults to test/env.")
+@click.option("--max-tokens", type=int, default=768, show_default=True, help="Maximum completion tokens per question.")
+@click.option("--artifact-dir", type=click.Path(file_okay=False, path_type=Path), default=None, help="Ignored runtime artifact directory.")
+@click.option("--no-artifacts", is_flag=True, help="Validate without writing JSONL runtime artifacts.")
+def real_e2e_local_llm(
+    limit: int,
+    base_url: str | None,
+    model: str | None,
+    api_key: str | None,
+    max_tokens: int,
+    artifact_dir: Path | None,
+    no_artifacts: bool,
+):
+    r"""Run deterministic real-question E2E validation against a local LLM."""
+    from xrtm.forecast.e2e import run_real_question_e2e
+
+    try:
+        records = run_real_question_e2e(
+            limit=limit,
+            base_url=base_url,
+            model=model,
+            api_key=api_key,
+            max_tokens=max_tokens,
+            artifact_dir=artifact_dir,
+            write_artifacts=not no_artifacts,
+        )
+    except Exception as exc:
+        console.print(Panel(f"[bold red]Real-question E2E failed[/bold red]\n{exc}", title="Local LLM E2E"))
+        sys.exit(1)
+
+    table = Table(title="Real-question local LLM E2E")
+    table.add_column("Question ID", style="cyan")
+    table.add_column("Probability", justify="right")
+    table.add_column("Trace Nodes", justify="right")
+    for record in records:
+        table.add_row(
+            record.question_id,
+            f"{record.output.probability:.3f}",
+            str(len(record.output.logical_trace)),
+        )
+    console.print(table)
+    console.print(f"[bold green]Validated {len(records)} ForecastOutput record(s).[/bold green]")
 
 
 if __name__ == "__main__":

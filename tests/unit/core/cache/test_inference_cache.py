@@ -16,6 +16,8 @@ r"""Unit tests for InferenceCache."""
 
 from __future__ import annotations
 
+import pytest
+
 from xrtm.forecast.core.cache import InferenceCache
 
 
@@ -47,6 +49,32 @@ class TestInferenceCacheBasics:
         key3 = cache.compute_key("gpt-4", "Hello", temperature=0.5)
         assert key1 != key2
         assert key1 != key3
+        cache.close()
+
+    def test_compute_chat_key_covers_messages_tools_and_kwargs(self, tmp_path):
+        r"""Chat keys include message bodies, tool schemas, and generation kwargs."""
+        cache = InferenceCache(db_path=str(tmp_path / "test.db"))
+        messages = [{"role": "user", "content": "Hello world"}]
+        tool = {"type": "function", "function": {"name": "lookup", "parameters": {"type": "object"}}}
+
+        base = cache.compute_chat_key("gpt", messages, tools=[tool], temperature=0)
+        assert base == cache.compute_chat_key("gpt", messages, tools=[tool], temperature=0)
+        assert base != cache.compute_chat_key("gpt", [{"role": "user", "content": "Hello  world"}], tools=[tool])
+        assert base != cache.compute_chat_key("gpt", messages, tools=[{**tool, "function": {"name": "other"}}])
+        assert base != cache.compute_chat_key("gpt", messages, tools=[tool], temperature=0.7)
+        cache.close()
+
+    def test_compute_chat_key_rejects_streaming_and_unserializable_values(self, tmp_path):
+        r"""Unsafe chat-cache inputs fail closed."""
+        cache = InferenceCache(db_path=str(tmp_path / "test.db"))
+        messages = [{"role": "user", "content": "Hello"}]
+
+        with pytest.raises(ValueError, match="Streaming"):
+            cache.compute_chat_key("gpt", messages, stream=True)
+        with pytest.raises(TypeError, match="not JSON serializable"):
+            cache.compute_chat_key("gpt", messages, response_format=object())
+        with pytest.raises(ValueError):
+            cache.compute_chat_key("gpt", messages, temperature=float("nan"))
         cache.close()
 
     def test_set_and_get(self, tmp_path):

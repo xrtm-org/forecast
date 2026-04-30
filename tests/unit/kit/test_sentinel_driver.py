@@ -15,6 +15,7 @@
 
 r"""Unit tests for the Sentinel PollingDriver."""
 
+import asyncio
 from datetime import timedelta
 
 import pytest
@@ -32,6 +33,12 @@ class MockInferenceProvider:
     async def generate(self, prompt: str) -> "MockResponse":
         self.call_count += 1
         return MockResponse(f"NEW_PROBABILITY: 0.65\nREASONING: Test update #{self.call_count}")
+
+
+class SlowMockInferenceProvider(MockInferenceProvider):
+    async def generate(self, prompt: str) -> "MockResponse":
+        await asyncio.sleep(0.05)
+        return await super().generate(prompt)
 
 
 class MockResponse:
@@ -161,3 +168,27 @@ class TestPollingDriver:
         # Initial point + 3 updates = 4 points
         assert len(trajectory.points) == 4
         assert mock_model.call_count == 3
+
+    @pytest.mark.asyncio
+    async def test_concurrent_run_once_serializes_shared_state(
+        self,
+        sample_question: ForecastQuestion,
+    ) -> None:
+        r"""Concurrent update cycles must not double-apply max_updates-limited watches."""
+        model = SlowMockInferenceProvider()
+        driver = PollingDriver(model=model)  # type: ignore
+        rules = TriggerRules(interval=timedelta(seconds=0), max_updates=1)
+
+        watch_id = await driver.register_watch(
+            question=sample_question,
+            rules=rules,
+            initial_confidence=0.5,
+        )
+
+        results = await asyncio.gather(driver.run_once(), driver.run_once())
+        trajectory = await driver.get_trajectory(watch_id)
+
+        assert sum(results) == 1
+        assert model.call_count == 1
+        assert trajectory is not None
+        assert len(trajectory.points) == 2

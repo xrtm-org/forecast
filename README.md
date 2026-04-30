@@ -85,6 +85,26 @@ pip install "xrtm-forecast[llama-cpp]"     # CPU-optimized GGUF
 pip install "xrtm-forecast[xlm]"           # Local Encoder specialists
 ```
 
+### Local OpenAI-Compatible Server
+
+For llama.cpp server, Ollama, LocalAI, or another OpenAI-compatible endpoint, use the existing OpenAI provider with a custom base URL:
+
+```python
+from pydantic import SecretStr
+from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.providers.inference.factory import ModelFactory
+
+config = OpenAIConfig(
+    model_id="Qwen3.5-27B-Q4_K_M.gguf",
+    api_key=SecretStr("test"),
+    base_url="http://localhost:8080/v1",
+)
+provider = ModelFactory.get_provider(config)
+response = provider.generate_content("Reply with exactly XRTM_LOCAL_OK", max_tokens=512, temperature=0)
+```
+
+The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-python`. Prefer the OpenAI-compatible path when a llama.cpp server is already running.
+
 ## Quickstart
 
 Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
@@ -228,4 +248,3 @@ If you prefer a pre-configured environment or are waiting for local setup approv
 1.  Open in VS Code.
 2.  Run **"Dev Containers: Reopen in Container"**.
 3.  The environment will auto-configure (though `setup_dev.sh` logic is mirrored in `postCreateCommand`).
-

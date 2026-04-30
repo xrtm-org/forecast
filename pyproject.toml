@@ -8,7 +8,7 @@ version = "0.6.1"
 description = "Institutional-grade modular engine for generative forecasting and agentic reasoning."
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 authors = [
     {name = "XRTM Team", email = "moy@xrtm.org"}
 ]
@@ -79,6 +79,7 @@ testpaths = ["tests/unit"]
 asyncio_mode = "strict"
 markers = [
     "live: marks tests as live (require API keys)",
+    "local_llm: marks tests as requiring a local OpenAI-compatible LLM endpoint",
 ]
 
 [tool.setuptools]

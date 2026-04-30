@@ -84,6 +84,7 @@ class PollingDriver(SentinelDriver):
         self._watches: Dict[str, WatchedQuestion] = {}
         self._running = False
         self._stop_event: Optional[asyncio.Event] = None
+        self._lock = asyncio.Lock()
 
     async def register_watch(
         self,
@@ -128,7 +129,8 @@ class PollingDriver(SentinelDriver):
             update_count=0,
         )
 
-        self._watches[watch_id] = watched
+        async with self._lock:
+            self._watches[watch_id] = watched
         logger.info(f"[SENTINEL] Registered watch {watch_id} for question '{question.id}'")
         return watch_id
 
@@ -143,10 +145,11 @@ class PollingDriver(SentinelDriver):
         Returns:
             `bool`: True if successfully removed.
         """
-        if watch_id in self._watches:
-            del self._watches[watch_id]
-            logger.info(f"[SENTINEL] Unregistered watch {watch_id}")
-            return True
+        async with self._lock:
+            if watch_id in self._watches:
+                del self._watches[watch_id]
+                logger.info(f"[SENTINEL] Unregistered watch {watch_id}")
+                return True
         return False
 
     async def get_trajectory(self, watch_id: str) -> Optional[ForecastTrajectory]:
@@ -160,8 +163,9 @@ class PollingDriver(SentinelDriver):
         Returns:
             `ForecastTrajectory` | None: The trajectory if found.
         """
-        watched = self._watches.get(watch_id)
-        return watched.trajectory if watched else None
+        async with self._lock:
+            watched = self._watches.get(watch_id)
+            return watched.trajectory if watched else None
 
     async def _should_update(self, watched: WatchedQuestion) -> bool:
         r"""Determines if a watched question should be updated."""
@@ -243,6 +247,11 @@ REASONING: <brief explanation of any change>
         Returns:
             `int`: Number of questions updated.
         """
+        async with self._lock:
+            return await self._run_once_locked()
+
+    async def _run_once_locked(self) -> int:
+        r"""Performs a single update cycle while holding the driver state lock."""
         updated_count = 0
         now = datetime.now(timezone.utc)
 

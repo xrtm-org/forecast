@@ -25,6 +25,7 @@ from typing import Any, AsyncIterable, Dict, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
 
+from xrtm.forecast.core.cache import InferenceCache
 from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
@@ -56,6 +57,7 @@ class OpenAIProvider(InferenceProvider):
         self.knowledge_cutoff = config.knowledge_cutoff
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
+        self.cache: Optional[InferenceCache] = kwargs.pop("cache", None)
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
         self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
@@ -111,6 +113,12 @@ class OpenAIProvider(InferenceProvider):
                         }
                     )
 
+        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, kwargs)
+        if cache_key and self.cache:
+            cached = self.cache.get(cache_key)
+            if cached is not None:
+                return ModelResponse(text=cached, metadata={"cache_hit": True})
+
         current_turn = 0
         while current_turn < max_tool_turns:
             current_turn += 1
@@ -150,6 +158,9 @@ class OpenAIProvider(InferenceProvider):
                     "completion_tokens": response.usage.completion_tokens,
                     "total_tokens": response.usage.total_tokens,
                 }
+
+            if cache_key and self.cache:
+                self.cache.set(cache_key, text, {"model": self.model_id})
 
             return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs)
 
@@ -221,6 +232,11 @@ class OpenAIProvider(InferenceProvider):
             `ModelResponse`: The standardized model response.
         r"""
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
+        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, kwargs)
+        if cache_key and self.cache:
+            cached = self.cache.get(cache_key)
+            if cached is not None:
+                return ModelResponse(text=cached, metadata={"cache_hit": True})
 
         response = self.sync_client.chat.completions.create(
             model=self.model_id,
@@ -237,7 +253,26 @@ class OpenAIProvider(InferenceProvider):
                 "total_tokens": response.usage.total_tokens,
             }
 
-        return ModelResponse(text=choice.message.content or "", raw=response, usage=usage)
+        text = choice.message.content or ""
+        if cache_key and self.cache:
+            self.cache.set(cache_key, text, {"model": self.model_id})
+
+        return ModelResponse(text=text, raw=response, usage=usage)
+
+    def _cache_key_for_request(
+        self,
+        messages: List[Dict[str, str]],
+        tools: Optional[List[Any]],
+        output_logprobs: bool,
+        kwargs: Dict[str, Any],
+    ) -> Optional[str]:
+        if self.cache is None or tools or output_logprobs or kwargs.get("stream"):
+            return None
+        try:
+            return self.cache.compute_chat_key(self.model_id, messages, **kwargs)
+        except (TypeError, ValueError) as e:
+            logger.debug(f"[OPENAI] Request is not cacheable: {e}")
+            return None
 
     async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
         r"""Streaming implementation."""
