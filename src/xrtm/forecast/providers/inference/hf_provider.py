@@ -22,6 +22,8 @@ streaming responses.
 
 import asyncio
 import logging
+from queue import Empty
+from threading import Event, Thread
 from typing import Any, AsyncIterable
 
 from xrtm.forecast.core.config.inference import HFConfig
@@ -178,9 +180,7 @@ class HuggingFaceProvider(InferenceProvider):
         assert self._tokenizer is not None, "Tokenizer must be initialized"
         assert self._model is not None, "Model must be initialized"
 
-        from threading import Thread
-
-        from transformers import TextIteratorStreamer
+        from transformers import StoppingCriteria, StoppingCriteriaList, TextIteratorStreamer
 
         # 1. Prepare Inputs
         prompt = messages
@@ -191,46 +191,61 @@ class HuggingFaceProvider(InferenceProvider):
         inputs = self._tokenizer(prompt, return_tensors="pt").to(self._model.device)
 
         # 2. Setup Streamer
-        streamer = TextIteratorStreamer(self._tokenizer, skip_prompt=True, skip_special_tokens=True)
+        streamer = TextIteratorStreamer(self._tokenizer, skip_prompt=True, skip_special_tokens=True, timeout=0.1)
+        cancel_event = Event()
+
+        class _CancelCriteria(StoppingCriteria):
+            def __call__(self, input_ids: Any, scores: Any, **_: Any) -> bool:
+                return cancel_event.is_set()
+
         generation_kwargs = dict(
             inputs,
             streamer=streamer,
             max_new_tokens=kwargs.get("max_new_tokens", 512),
             temperature=kwargs.get("temperature", 0.7),
             do_sample=kwargs.get("temperature", 0.7) > 0,
+            stopping_criteria=StoppingCriteriaList([_CancelCriteria()]),
         )
 
-        # 3. Verify Thread Safety: Run generation in a separate thread
-        thread = Thread(target=self._model.generate, kwargs=generation_kwargs)
+        generation_error: list[BaseException] = []
+
+        def _generate() -> None:
+            try:
+                self._model.generate(**generation_kwargs)
+            except BaseException as e:
+                generation_error.append(e)
+                if hasattr(streamer, "on_finalized_text"):
+                    streamer.on_finalized_text("", stream_end=True)
+
+        thread = Thread(target=_generate, daemon=True)
         thread.start()
 
-        # 4. Yield Chunks Asynchronously
-        # The streamer is an iterator, but iterating it blocks.
-        # We need to iterate it in a non-blocking way relative to the event loop.
-        # Since 'for text in streamer' blocks, we can't easily `await` each chunk
-        # unless we wrap the iterator or use run_in_executor for the *entire* loop?
-        # Actually, `TextIteratorStreamer` uses a Queue internally.
-        # We can poll it or iterate it. Iterating blocks until next token.
-        # Best practice for AsyncIO integration:
+        done = object()
+        iterator = iter(streamer)
 
-        # 4. Yield Chunks Asynchronously
-        # The streamer is an iterator, but iterating it blocks.
-        # We need to iterate it in a non-blocking way relative to the event loop.
+        def _next_text() -> Any:
+            try:
+                return next(iterator)
+            except StopIteration:
+                return done
 
-        # Best practice for AsyncIO integration with blocking iterators:
-        # We yield control explicitly with await asyncio.sleep(0)
-
-        # To strictly await, we iterate the sync generator in a thread?
-        # A simpler pattern:
-        for text in streamer:
-            # This blocks the loop briefly per token, but usually acceptable for local inference.
-            # Ideally we'd use `await loop.run_in_executor(None, next, streamer)` but streamer isn't a simple iterator.
-            # Given Python GIL, simple iteration is often the pragmatic choice for HF streamers.
-            # To be "Institutional Grade", we should yield control.
-            await asyncio.sleep(0)  # Yield control
-
-            chunk = {"contentBlockDelta": {"delta": {"text": text}}}
-            yield chunk
+        try:
+            while True:
+                try:
+                    text = await asyncio.to_thread(_next_text)
+                except Empty:
+                    if not thread.is_alive():
+                        if generation_error:
+                            raise generation_error[0]
+                        break
+                    continue
+                if text is done:
+                    if generation_error:
+                        raise generation_error[0]
+                    break
+                yield {"contentBlockDelta": {"delta": {"text": text}}}
+        finally:
+            cancel_event.set()
 
         # 5. Yield Stop Signal
         yield {"messageStop": {"stopReason": "end_turn"}}

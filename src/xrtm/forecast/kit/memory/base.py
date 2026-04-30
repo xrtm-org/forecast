@@ -21,7 +21,7 @@ supporting storage, retrieval, and similarity search operations.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -77,18 +77,54 @@ class MemoryRegistry:
     @classmethod
     def register_provider(cls, name: str, provider: BaseVectorStore):
         r"""Registers a new vector store implementation."""
-        cls._providers[name.upper()] = provider
+        cls._providers[cls._normalize_name(name)] = provider
         logger.info(f"[MEMORY] Registered Vector Store: {name}")
 
     @classmethod
     def get_provider(cls, name: str) -> Optional[BaseVectorStore]:
         r"""Retrieves a registered vector store by name."""
-        return cls._providers.get(name.upper())
+        return cls._providers.get(cls._normalize_name(name))
+
+    @classmethod
+    def get_or_create_provider(cls, name: str, factory: Callable[[], BaseVectorStore]) -> BaseVectorStore:
+        r"""Retrieves a provider by name, creating and registering it when absent."""
+        key = cls._normalize_name(name)
+        provider = cls._providers.get(key)
+        if provider is None:
+            provider = factory()
+            cls._providers[key] = provider
+            logger.info(f"[MEMORY] Registered Vector Store: {name}")
+        return provider
+
+    @classmethod
+    def unregister_provider(cls, name: str, *, close: bool = False) -> bool:
+        r"""Removes a provider from the registry, optionally closing it."""
+        provider = cls._providers.pop(cls._normalize_name(name), None)
+        if provider is None:
+            return False
+        if close and hasattr(provider, "close"):
+            provider.close()  # type: ignore[attr-defined]
+        return True
+
+    @classmethod
+    def clear(cls, *, close: bool = False) -> None:
+        r"""Clears all registered providers, optionally closing each provider first."""
+        if close:
+            for provider in cls._providers.values():
+                if hasattr(provider, "close"):
+                    provider.close()  # type: ignore[attr-defined]
+        cls._providers.clear()
 
     @classmethod
     def list_providers(cls) -> List[str]:
         r"""Returns names of all registered providers."""
         return list(cls._providers.keys())
+
+    @staticmethod
+    def _normalize_name(name: str) -> str:
+        if ":" in name:
+            return name
+        return name.upper()
 
 
 __all__ = ["BaseVectorStore", "MemoryRegistry"]

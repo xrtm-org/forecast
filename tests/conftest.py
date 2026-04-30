@@ -33,17 +33,26 @@ if env_path.exists():
 
 def pytest_addoption(parser):
     parser.addoption("--run-live", action="store_true", default=False, help="run live tests")
+    parser.addoption("--run-local-llm", action="store_true", default=False, help="run local LLM tests")
 
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "live: mark test as live to run")
+    config.addinivalue_line("markers", "local_llm: mark test as requiring a local LLM endpoint")
 
 
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--run-live"):
         # --run-live given in cli: do not skip live tests
-        return
-    skip_live = pytest.mark.skip(reason="need --run-live option to run")
+        skip_live = None
+    else:
+        skip_live = pytest.mark.skip(reason="need --run-live option to run")
+    run_local_llm = config.getoption("--run-local-llm") or os.getenv("XRTM_RUN_LOCAL_LLM") == "1"
+    skip_local_llm = None if run_local_llm else pytest.mark.skip(
+        reason="need --run-local-llm option or XRTM_RUN_LOCAL_LLM=1 to run"
+    )
     for item in items:
-        if "live" in item.keywords:
+        if skip_live is not None and "live" in item.keywords:
             item.add_marker(skip_live)
+        if skip_local_llm is not None and "local_llm" in item.keywords:
+            item.add_marker(skip_local_llm)

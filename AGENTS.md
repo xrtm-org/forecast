@@ -42,6 +42,7 @@ You must enforce the following internal dependency DAG. Violations are critical 
 - **Read Constitution**: Review this `AGENTS.md` file to re-align with your specific mission parameters.
 
 #### ON PR (Pull Request / Code Modification)
+- **Apply PR Policy**: Read `../governance/policies/pr-acceptance-policy.md` before accepting, superseding, rejecting, or deferring PRs.
 - **Verify Architecture**: Check imports in modified files. Did you import `kit` into `core`? If yes, STOP and refactor.
 - **Verify Tests**: Run `uv run pytest tests/unit/` on relevant modules. Ensure core logic maintains 90% coverage.
 

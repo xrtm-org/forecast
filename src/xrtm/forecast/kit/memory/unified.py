@@ -21,6 +21,7 @@ information across reasoning sessions.
 """
 
 import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from xrtm.forecast.core.schemas.base import EpisodicExperience
@@ -42,23 +43,27 @@ class Memory:
     def __init__(self, collection_name: str, persist_directory: Optional[str] = None):
         self.collection_name = collection_name
         self.persist_directory = persist_directory
+        self._provider_key = self._chroma_provider_key(collection_name, persist_directory)
 
-        # Use registry only for default production paths to avoid test contamination,
-        # but ensure at least one registration for agnosticism tests.
-        if persist_directory:
-            from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
+        from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
 
-            self.provider = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
-            if not MemoryRegistry.get_provider("CHROMA"):
-                MemoryRegistry.register_provider("CHROMA", self.provider)
-        else:
-            p = MemoryRegistry.get_provider("CHROMA")
-            if p is None:
-                from xrtm.forecast.providers.memory.chroma_store import ChromaProvider
+        self.provider = MemoryRegistry.get_or_create_provider(
+            self._provider_key,
+            lambda: ChromaProvider(collection_name=collection_name, persist_directory=persist_directory),
+        )
+        if MemoryRegistry.get_provider("CHROMA") is None:
+            MemoryRegistry.register_provider("CHROMA", self.provider)
 
-                p = ChromaProvider(collection_name=collection_name, persist_directory=persist_directory)
-                MemoryRegistry.register_provider("CHROMA", p)
-            self.provider = p
+    @staticmethod
+    def _chroma_provider_key(collection_name: str, persist_directory: Optional[str]) -> str:
+        path = Path(persist_directory or "./data/chroma_db").expanduser().resolve(strict=False)
+        return f"CHROMA:{path}:{collection_name}"
+
+    def close(self) -> None:
+        r"""Close and remove this memory provider from the registry."""
+        if MemoryRegistry.get_provider("CHROMA") is self.provider:
+            MemoryRegistry.unregister_provider("CHROMA")
+        MemoryRegistry.unregister_provider(self._provider_key, close=True)
 
     def store_experience(self, exp: EpisodicExperience):
         r"""Saves a rich EpisodicExperience object to the vector store."""

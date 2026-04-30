@@ -2,7 +2,7 @@
 
 **Script**: `run_local_analyst.py`
 
-This example demonstrates how to run a forecasting agent using a local Small Language Model (SLM) via a provider like Ollama or LocalAI, instead of a cloud-based API.
+This example demonstrates how to run a forecasting agent against a local OpenAI-compatible inference server, such as llama.cpp server, Ollama, or LocalAI, instead of a cloud API.
 
 ## Usage
 
@@ -11,10 +11,24 @@ This example demonstrates how to run a forecasting agent using a local Small Lan
 python3 examples/kit/local_analyst/run_local_analyst.py
 ```
 
-## Prerequisities
-- A local inference server running (e.g., Ollama).
-- `OPENAI_BASE_URL` environment variable pointing to your local server (default: `http://localhost:11434/v1`).
+## Prerequisites
+
+- A local OpenAI-compatible inference server.
+- For the local workspace profile:
+  - start `/home/moy/Workspaces/local-claude-llamacpp` with `./manage.sh start`
+  - use base URL `http://localhost:8080/v1`
+  - use model id `Qwen3.5-27B-Q4_K_M.gguf`
+
+## Local smoke test
+
+```bash
+cd /home/moy/Workspaces/xrtm
+./workspace.sh local-llm-start
+./workspace.sh check-local-llm
+./workspace.sh local-llm-stop
+```
 
 ## Concepts
 - **Privacy-First Inference**: Running reasoning chains without data leaving your machine.
 - **Custom Base URLs**: Configuring the provider to talk to non-standard endpoints.
+- **OpenAI-Compatible Provider**: XRTM uses `OpenAIConfig(base_url="http://localhost:8080/v1")` for llama.cpp server; the separate `LlamaCppProvider` is for in-process GGUF loading.

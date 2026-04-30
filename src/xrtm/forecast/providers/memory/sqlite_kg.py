@@ -17,8 +17,10 @@ r"""
 Reference implementation of FactStore using a local SQLite database.
 r"""
 
+import asyncio
 import json
 import sqlite3
+import threading
 from datetime import datetime
 from typing import List, Optional
 
@@ -41,11 +43,16 @@ class SQLiteFactStore(FactStore):
             db_path (`str`): Path to the SQLite database file.
         r"""
         self.db_path = db_path
+        self._lock = threading.RLock()
+        self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self._conn.row_factory = sqlite3.Row
+        self._closed = False
         self._init_db()
 
     def _init_db(self):
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
+        with self._lock:
+            self._ensure_open()
+            self._conn.execute(
                 r"""
                 CREATE TABLE IF NOT EXISTS facts (
                     subject TEXT,
@@ -60,12 +67,28 @@ class SQLiteFactStore(FactStore):
                 )
                 """
             )
-            conn.commit()
+            self._conn.commit()
 
-    async def remember(self, fact: Fact) -> None:
-        r"""Stores a fact in the database."""
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
+    def _ensure_open(self) -> None:
+        if self._closed:
+            raise RuntimeError("SQLiteFactStore is closed")
+
+    def _row_to_fact(self, row: sqlite3.Row) -> Fact:
+        return Fact(
+            subject=row["subject"],
+            predicate=row["predicate"],
+            object_value=json.loads(row["object_value"]),
+            source_url=row["source_url"],
+            source_hash=row["source_hash"],
+            verified_at=datetime.fromisoformat(row["verified_at"]),
+            expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
+            confidence=row["confidence"],
+        )
+
+    def _remember_sync(self, fact: Fact) -> None:
+        with self._lock:
+            self._ensure_open()
+            self._conn.execute(
                 """
                 INSERT OR REPLACE INTO facts
                 (subject, predicate, object_value, source_url, source_hash, verified_at, expires_at, confidence)
@@ -82,49 +105,58 @@ class SQLiteFactStore(FactStore):
                     fact.confidence,
                 ),
             )
-            conn.commit()
+            self._conn.commit()
+
+    async def remember(self, fact: Fact) -> None:
+        r"""Stores a fact in the database."""
+        await asyncio.to_thread(self._remember_sync, fact)
+
+    def _query_sync(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
+        with self._lock:
+            self._ensure_open()
+            query = "SELECT * FROM facts WHERE subject = ?"
+            params = [subject]
+
+            if predicate:
+                query += " AND predicate = ?"
+                params.append(predicate)
+
+            rows = self._conn.execute(query, params).fetchall()
+            return [self._row_to_fact(row) for row in rows]
 
     async def query(self, subject: str, predicate: Optional[str] = None) -> List[Fact]:
         r"""Queries facts from the database."""
-        query = "SELECT * FROM facts WHERE subject = ?"
-        params = [subject]
+        return await asyncio.to_thread(self._query_sync, subject, predicate)
 
-        if predicate:
-            query += " AND predicate = ?"
-            params.append(predicate)
+    def _forget_sync(self, subject: str, predicate: Optional[str] = None) -> None:
+        with self._lock:
+            self._ensure_open()
+            query = "DELETE FROM facts WHERE subject = ?"
+            params = [subject]
 
-        with sqlite3.connect(self.db_path) as conn:
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute(query, params).fetchall()
+            if predicate:
+                query += " AND predicate = ?"
+                params.append(predicate)
 
-            facts = []
-            for row in rows:
-                facts.append(
-                    Fact(
-                        subject=row["subject"],
-                        predicate=row["predicate"],
-                        object_value=json.loads(row["object_value"]),
-                        source_url=row["source_url"],
-                        source_hash=row["source_hash"],
-                        verified_at=datetime.fromisoformat(row["verified_at"]),
-                        expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
-                        confidence=row["confidence"],
-                    )
-                )
-            return facts
+            self._conn.execute(query, params)
+            self._conn.commit()
 
     async def forget(self, subject: str, predicate: Optional[str] = None) -> None:
         r"""Removes facts from the database."""
-        query = "DELETE FROM facts WHERE subject = ?"
-        params = [subject]
+        await asyncio.to_thread(self._forget_sync, subject, predicate)
 
-        if predicate:
-            query += " AND predicate = ?"
-            params.append(predicate)
+    def close(self) -> None:
+        r"""Close the underlying SQLite connection."""
+        with self._lock:
+            if not self._closed:
+                self._conn.close()
+                self._closed = True
 
-        with sqlite3.connect(self.db_path) as conn:
-            conn.execute(query, params)
-            conn.commit()
+    def __del__(self) -> None:
+        try:
+            self.close()
+        except Exception:
+            pass
 
 
 __all__ = ["SQLiteFactStore"]
