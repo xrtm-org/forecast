@@ -93,7 +93,7 @@ def verify(bundle_path: str, verbose: bool):
 @click.option("--model", default=None, help="Local model id served by the endpoint.")
 @click.option("--api-key", default=None, help="API key for the local endpoint; defaults to test/env.")
 @click.option("--max-tokens", type=int, default=768, show_default=True, help="Maximum completion tokens per question.")
-@click.option("--artifact-dir", type=click.Path(file_okay=False, path_type=Path), default=None, help="Ignored runtime artifact directory.")
+@click.option("--artifact-dir", type=click.Path(file_okay=False, path_type=Path), default=None, help="Directory for JSONL runtime artifacts.")
 @click.option("--no-artifacts", is_flag=True, help="Validate without writing JSONL runtime artifacts.")
 def real_e2e_local_llm(
     limit: int,
