@@ -37,6 +37,10 @@ jobs:
 
           [tool.uv.workspace]
           members = ["data", "eval", "forecast", "train"]
+
+          [tool.uv.sources]
+          xrtm-data = { workspace = true }
+          xrtm-eval = { workspace = true }
           EOF
 
       - name: Install uv
