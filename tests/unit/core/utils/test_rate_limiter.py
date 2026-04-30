@@ -17,10 +17,12 @@ r"""Unit tests for forecast.core.utils.rate_limiter."""
 
 import asyncio
 import time
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 
+from xrtm.forecast.core.runtime import temporal_context_var
 from xrtm.forecast.core.utils.rate_limiter import TokenBucket
 
 
@@ -83,6 +85,51 @@ class TestTokenBucket:
         await bucket.acquire(1)  # This will trigger refill calculation
         # We got at least 1 token back
 
+    @pytest.mark.asyncio
+    async def test_acquire_in_memory_timeout(self):
+        r"""Should time out deterministically when no tokens can be produced."""
+        bucket = TokenBucket(redis_url=None, key="test", rate=0.0, capacity=1.0)
+        await bucket.acquire(1)
+
+        with pytest.raises(TimeoutError, match="Timed out"):
+            await bucket.acquire(1, timeout=0.01)
+
+    @pytest.mark.asyncio
+    async def test_acquire_timeout_uses_wall_clock_in_backtest_context(self):
+        r"""Rate limiting must not busy-loop through Chronos sleep bypasses."""
+        bucket = TokenBucket(redis_url=None, key="test", rate=0.0, capacity=1.0)
+        await bucket.acquire(1)
+        token = temporal_context_var.set(SimpleNamespace(is_backtest=True))
+        start = time.monotonic()
+        try:
+            with pytest.raises(TimeoutError, match="Timed out"):
+                await bucket.acquire(1, timeout=0.02)
+        finally:
+            temporal_context_var.reset(token)
+
+        assert time.monotonic() - start >= 0.015
+
+    @pytest.mark.asyncio
+    async def test_acquire_in_memory_cancellation(self):
+        r"""Should remain cancellable while waiting for tokens."""
+        bucket = TokenBucket(redis_url=None, key="test", rate=0.0, capacity=1.0)
+        await bucket.acquire(1)
+
+        task = asyncio.create_task(bucket.acquire(1))
+        await asyncio.sleep(0)
+        task.cancel()
+
+        with pytest.raises(asyncio.CancelledError):
+            await task
+
+    @pytest.mark.asyncio
+    async def test_acquire_rejects_unsatisfiable_request(self):
+        r"""Should reject requests larger than bucket capacity instead of hanging."""
+        bucket = TokenBucket(redis_url=None, key="test", rate=10.0, capacity=1.0)
+
+        with pytest.raises(ValueError, match="exceeds bucket capacity"):
+            await bucket.acquire(2)
+
     def test_acquire_sync_in_memory_immediate(self):
         r"""Should acquire token synchronously when bucket is full."""
         bucket = TokenBucket(redis_url=None, key="test", rate=10.0, capacity=10.0)
@@ -103,6 +150,14 @@ class TestTokenBucket:
 
         bucket.acquire_sync(2)
         assert bucket._tokens == pytest.approx(5.0, abs=0.1)
+
+    def test_acquire_sync_in_memory_timeout(self):
+        r"""Should time out deterministically in the sync API."""
+        bucket = TokenBucket(redis_url=None, key="test", rate=0.0, capacity=1.0)
+        bucket.acquire_sync(1)
+
+        with pytest.raises(TimeoutError, match="Timed out"):
+            bucket.acquire_sync(1, timeout=0.01)
 
     @pytest.mark.asyncio
     async def test_acquire_redis_fallback_on_error(self):

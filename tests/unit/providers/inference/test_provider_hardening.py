@@ -24,10 +24,12 @@ from typing import Any
 import pytest
 
 from xrtm.forecast.core.cache import InferenceCache
-from xrtm.forecast.core.config.inference import HFConfig, LlamaCppConfig, OpenAIConfig
+from xrtm.forecast.core.config.inference import HFConfig, LlamaCppConfig, OpenAIConfig, VLLMConfig
+from xrtm.forecast.core.exceptions import ProviderError
 from xrtm.forecast.providers.inference.hf_provider import HuggingFaceProvider
 from xrtm.forecast.providers.inference.llamacpp_provider import LlamaCppProvider
 from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
+from xrtm.forecast.providers.inference.vllm_provider import VLLMProvider
 
 
 class FakeOpenAICompletions:
@@ -40,6 +42,10 @@ class FakeOpenAICompletions:
         choice = SimpleNamespace(message=message)
         usage = SimpleNamespace(prompt_tokens=1, completion_tokens=1, total_tokens=2)
         return SimpleNamespace(choices=[choice], usage=usage)
+
+
+def openai_stream_chunk(text: str) -> SimpleNamespace:
+    return SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content=text))])
 
 
 def test_openai_sync_cache_hits_only_for_cacheable_requests(tmp_path):
@@ -59,6 +65,91 @@ def test_openai_sync_cache_hits_only_for_cacheable_requests(tmp_path):
     provider.generate_content("Hello", tools=[{"name": "lookup"}])
     assert completions.call_count == 3
     cache.close()
+
+
+@pytest.mark.asyncio
+async def test_openai_stream_accepts_sync_iterables():
+    provider = OpenAIProvider(OpenAIConfig(model_id="gpt-test", api_key="fake"))
+
+    class CloseableIterator:
+        def __init__(self) -> None:
+            self.items = iter([openai_stream_chunk("hel"), openai_stream_chunk("lo")])
+            self.closed = False
+
+        def __iter__(self) -> "CloseableIterator":
+            return self
+
+        def __next__(self) -> Any:
+            return next(self.items)
+
+        def close(self) -> None:
+            self.closed = True
+
+    stream = CloseableIterator()
+
+    class FakeAsyncCompletions:
+        async def create(self, **kwargs: Any) -> Any:
+            assert kwargs["stream"] is True
+            return stream
+
+    provider.client = SimpleNamespace(  # type: ignore[assignment]
+        chat=SimpleNamespace(completions=FakeAsyncCompletions())
+    )
+
+    chunks = [chunk async for chunk in provider.stream("prompt")]
+
+    deltas = [chunk["contentBlockDelta"]["delta"]["text"] for chunk in chunks if "contentBlockDelta" in chunk]
+    assert deltas == ["hel", "lo"]
+    assert chunks[-1] == {"messageStop": {"stopReason": "end_turn"}}
+    assert stream.closed is True
+
+
+@pytest.mark.asyncio
+async def test_openai_stream_cancellation_propagates_to_async_iterator():
+    provider = OpenAIProvider(OpenAIConfig(model_id="gpt-test", api_key="fake"))
+    first_chunk_seen = asyncio.Event()
+
+    class CancellableStream:
+        def __init__(self) -> None:
+            self.index = 0
+            self.cancelled = False
+
+        def __aiter__(self) -> "CancellableStream":
+            return self
+
+        async def __anext__(self) -> Any:
+            if self.index == 0:
+                self.index += 1
+                return openai_stream_chunk("first")
+            try:
+                await asyncio.sleep(10)
+            except asyncio.CancelledError:
+                self.cancelled = True
+                raise
+            raise StopAsyncIteration
+
+    stream = CancellableStream()
+
+    class FakeAsyncCompletions:
+        async def create(self, **kwargs: Any) -> Any:
+            assert kwargs["stream"] is True
+            return stream
+
+    provider.client = SimpleNamespace(  # type: ignore[assignment]
+        chat=SimpleNamespace(completions=FakeAsyncCompletions())
+    )
+
+    async def consume() -> None:
+        async for _ in provider.stream("prompt"):
+            first_chunk_seen.set()
+
+    task = asyncio.create_task(consume())
+    await asyncio.wait_for(first_chunk_seen.wait(), timeout=1.0)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert stream.cancelled is True
 
 
 class FakeTokenized(dict):
@@ -211,3 +302,47 @@ async def test_llamacpp_async_initialization_is_locked_and_offloaded(monkeypatch
     assert first.text == "ok:one"
     assert second.text == "ok:two"
     assert FakeLlama.init_count == 1
+
+
+@pytest.mark.asyncio
+async def test_llamacpp_stream_closes_sync_iterator_on_consumer_close():
+    class CloseAwareStream:
+        def __init__(self) -> None:
+            self.closed = False
+            self.index = 0
+
+        def __iter__(self) -> "CloseAwareStream":
+            return self
+
+        def __next__(self) -> dict[str, Any]:
+            if self.index == 0:
+                self.index += 1
+                return {"choices": [{"text": "token"}]}
+            raise StopIteration
+
+        def close(self) -> None:
+            self.closed = True
+
+    stream = CloseAwareStream()
+
+    class FakeLlama:
+        def __call__(self, *_: Any, **__: Any) -> CloseAwareStream:
+            return stream
+
+    provider = LlamaCppProvider(LlamaCppConfig(model_id="fake.gguf"))
+    provider._is_initialized = True
+    provider._llm = FakeLlama()
+
+    iterator = provider.stream([{"role": "user", "content": "hi"}]).__aiter__()
+    assert await anext(iterator) == {"contentBlockDelta": {"delta": {"text": "token"}}}
+    await iterator.aclose()
+
+    assert stream.closed is True
+
+
+@pytest.mark.asyncio
+async def test_vllm_stream_unsupported_is_provider_error():
+    provider = VLLMProvider(VLLMConfig(model_id="fake-vllm"))
+
+    with pytest.raises(ProviderError, match="does not support streaming"):
+        await anext(provider.stream([{"role": "user", "content": "hi"}]).__aiter__())

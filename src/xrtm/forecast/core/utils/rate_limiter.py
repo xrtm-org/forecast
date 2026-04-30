@@ -19,8 +19,6 @@ import threading
 import time
 from typing import Optional
 
-from xrtm.forecast.core.runtime import AsyncRuntime
-
 logger = logging.getLogger(__name__)
 
 __all__ = ["TokenBucket"]
@@ -95,8 +93,31 @@ class TokenBucket:
             except Exception as e:
                 logger.warning(f"[RATE-LIMITER] Redis connection failed, falling back to In-Memory: {e}")
 
-    async def acquire(self, tokens: int = 1):
+    def _validate_request(self, tokens: int) -> None:
+        if tokens <= 0:
+            raise ValueError("Token request must be positive.")
+        if tokens > self.capacity:
+            raise ValueError("Token request exceeds bucket capacity and can never be satisfied.")
+
+    @staticmethod
+    def _deadline(timeout: Optional[float]) -> Optional[float]:
+        if timeout is None:
+            return None
+        return time.monotonic() + timeout
+
+    @staticmethod
+    def _retry_delay(deadline: Optional[float]) -> float:
+        if deadline is None:
+            return 1.0
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Timed out waiting for rate-limit tokens.")
+        return min(1.0, remaining)
+
+    async def acquire(self, tokens: int = 1, timeout: Optional[float] = None):
         r"""Blocks until enough tokens are available (Async)."""
+        self._validate_request(tokens)
+        deadline = self._deadline(timeout)
         if self.use_redis:
             while True:
                 try:
@@ -110,7 +131,7 @@ class TokenBucket:
                     logger.error(f"[RATE-LIMITER] Redis error in acquire: {e}. Switching to In-Memory.")
                     self.use_redis = False
                     break
-                await AsyncRuntime.sleep(1.0)
+                await asyncio.sleep(self._retry_delay(deadline))
 
         # Fallback to In-Memory logic
         while True:
@@ -122,10 +143,12 @@ class TokenBucket:
                 if self._tokens >= tokens:
                     self._tokens -= tokens
                     return
-            await AsyncRuntime.sleep(1.0)
+            await asyncio.sleep(self._retry_delay(deadline))
 
-    def acquire_sync(self, tokens: int = 1):
+    def acquire_sync(self, tokens: int = 1, timeout: Optional[float] = None):
         r"""Blocks until enough tokens are available (Sync)."""
+        self._validate_request(tokens)
+        deadline = self._deadline(timeout)
         if self.use_redis:
             try:
                 while True:
@@ -134,7 +157,7 @@ class TokenBucket:
                         keys=[f"{self.key}:tokens", f"{self.key}:ts"], args=[self.rate, self.capacity, now, tokens]
                     ):
                         return
-                    time.sleep(1.0)
+                    time.sleep(self._retry_delay(deadline))
             except Exception as e:
                 logger.error(f"[RATE-LIMITER] Redis error in acquire_sync: {e}. Switching to In-Memory.")
                 self.use_redis = False
@@ -149,4 +172,4 @@ class TokenBucket:
                 if self._tokens >= tokens:
                     self._tokens -= tokens
                     return
-            time.sleep(1.0)
+            time.sleep(self._retry_delay(deadline))

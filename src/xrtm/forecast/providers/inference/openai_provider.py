@@ -20,8 +20,9 @@ API, supporting chat completions, streaming, function calling,
 and structured output with JSON mode.
 """
 
+import asyncio
 import logging
-from typing import Any, AsyncIterable, Dict, List, Optional, cast
+from typing import Any, AsyncGenerator, AsyncIterable, Dict, Iterable, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
 
@@ -274,6 +275,40 @@ class OpenAIProvider(InferenceProvider):
             logger.debug(f"[OPENAI] Request is not cacheable: {e}")
             return None
 
+    async def _iter_stream_chunks(self, stream: Any) -> AsyncGenerator[Any, None]:
+        if hasattr(stream, "__aiter__"):
+            async for chunk in cast(AsyncIterable[Any], stream):
+                yield chunk
+            return
+
+        if hasattr(stream, "__iter__"):
+            iterator = iter(cast(Iterable[Any], stream))
+
+            def safe_next() -> tuple[Any, bool]:
+                try:
+                    return next(iterator), False
+                except StopIteration:
+                    return None, True
+
+            try:
+                while True:
+                    chunk, is_done = await asyncio.to_thread(safe_next)
+                    if is_done:
+                        break
+                    yield chunk
+            finally:
+                close = getattr(iterator, "close", None)
+                if close is not None:
+                    try:
+                        close()
+                    except RuntimeError as exc:
+                        logger.debug(f"[OPENAI] Streaming iterator close deferred: {exc}")
+            return
+
+        from xrtm.forecast.core.exceptions import ProviderError
+
+        raise ProviderError("OpenAI streaming response is not iterable.")
+
     async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
         r"""Streaming implementation."""
         messages = self._normalize_messages(messages)
@@ -284,12 +319,18 @@ class OpenAIProvider(InferenceProvider):
             **kwargs,
         )
 
-        if hasattr(stream, "__aiter__"):
-            async for chunk in cast(AsyncIterable[Any], stream):
+        chunks = self._iter_stream_chunks(stream)
+        completed = False
+        try:
+            async for chunk in chunks:
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield {"contentBlockDelta": {"delta": {"text": chunk.choices[0].delta.content}}}
+            completed = True
+        finally:
+            await chunks.aclose()
 
-        yield {"messageStop": {"stopReason": "end_turn"}}
+        if completed:
+            yield {"messageStop": {"stopReason": "end_turn"}}
 
     def stream(self, messages: Any, **kwargs: Any) -> AsyncIterable[Any]:
         r"""
