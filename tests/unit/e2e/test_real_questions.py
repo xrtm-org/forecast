@@ -13,21 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
+import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 import pytest
-from xrtm.data.corpora import load_real_binary_questions
 
 from xrtm.forecast.core.schemas.forecast import ForecastOutput, MetadataBase
-from xrtm.forecast.e2e.real_questions import (
-    ForecastOutputValidationError,
-    parse_llm_forecast_payload,
-    run_real_question_e2e,
-    validate_forecast_output_integrity,
-)
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
+
+if importlib.util.find_spec("xrtm.data.corpora") is None:
+    pytest.skip("xrtm.data.corpora is not available until the data corpus release lands", allow_module_level=True)
+
+real_corpus = importlib.import_module("xrtm.data.corpora")
+load_real_binary_questions = real_corpus.load_real_binary_questions
+real_questions = importlib.import_module("xrtm.forecast.e2e.real_questions")
+ForecastOutputValidationError = real_questions.ForecastOutputValidationError
+parse_llm_forecast_payload = real_questions.parse_llm_forecast_payload
+run_real_question_e2e = real_questions.run_real_question_e2e
+validate_forecast_output_integrity = real_questions.validate_forecast_output_integrity
 
 
 class FakeProvider(InferenceProvider):
