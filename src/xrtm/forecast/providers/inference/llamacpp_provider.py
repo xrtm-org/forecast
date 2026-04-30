@@ -116,11 +116,19 @@ class LlamaCppProvider(InferenceProvider):
             except StopIteration:
                 return None, True
 
-        while True:
-            chunk, is_done = await asyncio.to_thread(safe_next, iterator)
-            if is_done:
-                break
-            yield chunk
+        try:
+            while True:
+                chunk, is_done = await asyncio.to_thread(safe_next, iterator)
+                if is_done:
+                    break
+                yield chunk
+        finally:
+            close = getattr(iterator, "close", None)
+            if close is not None:
+                try:
+                    close()
+                except RuntimeError as exc:
+                    logger.debug(f"[LLAMACPP] Streaming iterator close deferred: {exc}")
 
     async def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
         await self._ensure_initialized_async()
@@ -137,9 +145,13 @@ class LlamaCppProvider(InferenceProvider):
             stream=True,
         )
 
-        async for chunk in self._async_iter(stream):
-            text = chunk["choices"][0]["text"]
-            yield {"contentBlockDelta": {"delta": {"text": text}}}
+        async_stream = self._async_iter(stream).__aiter__()
+        try:
+            async for chunk in async_stream:
+                text = chunk["choices"][0]["text"]
+                yield {"contentBlockDelta": {"delta": {"text": text}}}
+        finally:
+            await async_stream.aclose()
 
         yield {"messageStop": {"stopReason": "end_turn"}}
 

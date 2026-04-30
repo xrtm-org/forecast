@@ -13,9 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+from types import SimpleNamespace
+
 import pytest
 
-from xrtm.forecast.core.runtime import AsyncRuntime
+from xrtm.forecast.core.runtime import AsyncRuntime, temporal_context_var
 
 
 class TestAsyncRuntime:
@@ -50,3 +53,15 @@ class TestAsyncRuntime:
         # We can't easily test time travel here without mocking,
         # but we verify it doesn't crash.
         await AsyncRuntime.sleep(0.01)
+
+    @pytest.mark.asyncio
+    async def test_sleep_bypasses_wait_in_backtest_context(self):
+        """Verify Chronos backtest contexts short-circuit real sleeps."""
+        token = temporal_context_var.set(SimpleNamespace(is_backtest=True))
+        start = time.monotonic()
+        try:
+            await AsyncRuntime.sleep(60.0)
+        finally:
+            temporal_context_var.reset(token)
+
+        assert time.monotonic() - start < 0.5

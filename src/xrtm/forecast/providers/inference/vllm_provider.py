@@ -24,6 +24,7 @@ import logging
 from typing import Any, AsyncIterable, Dict, List
 
 from xrtm.forecast.core.config.inference import VLLMConfig
+from xrtm.forecast.core.exceptions import ProviderError
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 logger = logging.getLogger(__name__)
@@ -97,10 +98,24 @@ class VLLMProvider(InferenceProvider):
         )
 
     async def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
-        # Placeholder for VLLM streaming
+        r"""
+        Opens a streaming connection to vLLM.
+
+        Args:
+            messages (`List[Dict[str, str]]`):
+                Conversation history.
+            **kwargs:
+                Additional generation parameters.
+
+        Returns:
+            `AsyncIterable[Any]`: A stream of response chunks when supported.
+
+        Raises:
+            ProviderError: Direct vLLM library mode does not support this streaming API.
+        r"""
         if False:
             yield {}
-        raise NotImplementedError("Streaming for VLLMProvider is not yet implemented via direct LLM class.")
+        raise ProviderError("VLLMProvider does not support streaming via direct LLM class.")
 
     @property
     def supports_tools(self) -> bool:
