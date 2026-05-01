@@ -42,6 +42,11 @@ Different ways agents can talk to each other.
 
 ## Categories
 
+### [Providers](file:///workspace/forecast/examples/providers/)
+⭐ **Start with [Provider-Free Analyst](../providers/provider_free_analyst/)** — Learn XRTM without API keys.
+
+Connection examples for LLM backends and data sources.
+
 ### [Features](file:///workspace/forecast/examples/kit/features/)
 Deep dives into specific capabilities like calibration, discovery, and sensitivity analysis.
 

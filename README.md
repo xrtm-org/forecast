@@ -105,6 +105,24 @@ response = provider.generate_content("Reply with exactly XRTM_LOCAL_OK", max_tok
 
 The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-python`. Prefer the OpenAI-compatible path when a llama.cpp server is already running.
 
+### Provider-Free Testing (No API Keys)
+
+To test and learn XRTM without API keys or network calls, use the DeterministicProvider:
+
+```python
+from xrtm.product.providers import DeterministicProvider
+from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+
+# Create provider-free model
+provider = DeterministicProvider()
+agent = ForecastingAnalyst(model=provider)
+
+# Run forecasts deterministically
+result = await agent.run("Will event X happen?")
+```
+
+See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for comprehensive coverage of testing without API keys.
+
 ## Quickstart
 
 Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.

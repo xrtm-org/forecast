@@ -23,3 +23,16 @@ Please describe the tests that you ran to verify your changes.
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
+
+---
+
+## Maintainer Triage (for reviewers)
+_See [xrtm governance triage docs](https://github.com/xrtm-org/governance/blob/main/policies/triage-matrix.md) for classification guidance._
+
+**Scope**: <!-- Core Schema | Package API | Implementation | Infrastructure | Documentation -->
+**Priority**: <!-- Release Blocker | High | Medium | Low -->
+**Risk**: <!-- High | Medium | Low -->
+**Disposition**: <!-- Accept as-is | Accept with changes | Supersede | Defer | Reject -->
+
+**Review Notes**:
+<!-- Brief rationale for disposition. Record full details in governance/policies/pr-disposition-log.md -->
