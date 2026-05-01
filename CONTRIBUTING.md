@@ -21,18 +21,9 @@ This ensures the Core remains domain-agnostic and testable without LLM dependenc
 
 ## Development Environment
 
-We provide a fully isolated development environment using **Docker** and **uv**.
+This repo is **local-tooling first** and uses **uv** as the primary development environment.
 
-### 1. Using Docker (Recommended)
-```bash
-# Build and start services (forecast + redis)
-docker compose -f .devcontainer/docker-compose.yml up -d --build
-
-# Enter the reasoning engine container
-docker compose -f .devcontainer/docker-compose.yml exec forecast bash
-```
-
-### 2. Manual Setup (uv)
+### 1. Preferred local setup (uv)
 ```bash
 # Install uv (https://github.com/astral-sh/uv)
 # Sync dependencies
@@ -40,6 +31,18 @@ uv sync --all-extras
 
 # Run tests
 uv run pytest
+```
+
+### 2. Optional devcontainer / Docker support
+
+Docker support remains available for contributors who want an isolated container workflow, but it is not the primary development path.
+
+```bash
+# Build and start services (forecast + redis)
+docker compose -f .devcontainer/docker-compose.yml up -d --build
+
+# Enter the reasoning engine container
+docker compose -f .devcontainer/docker-compose.yml exec forecast bash
 ```
 
 ### 3. Verification Commands
