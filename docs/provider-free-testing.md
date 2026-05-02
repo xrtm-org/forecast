@@ -25,6 +25,19 @@ Provider-free mode is perfect for:
 
 ---
 
+## Official XRTM proof-point set
+
+The official XRTM product story stays centered on four workflows:
+
+1. **Provider-free first success** — `xrtm start`
+2. **Benchmark and validation workflow** — `xrtm perf run` and `xrtm validate run`
+3. **Monitoring, history, and report workflow** — `xrtm monitor ...`, `xrtm runs ...`, and `xrtm report html`
+4. **Local-LLM advanced workflow** — `xrtm local-llm status` and `xrtm demo --provider local-llm`
+
+This guide focuses on the provider-free foundation that makes workflows 1-3 fast, deterministic, and CI-safe.
+
+---
+
 ## Decision Guide: Mock vs Local-LLM
 
 Choose your inference path based on your goal:
@@ -126,6 +139,17 @@ xrtm perf run \
 
 This measures pipeline performance without network variability.
 
+### Validation Workflow
+
+When you need more than a small benchmark, stay on the same provider-free path and run validation:
+
+```bash
+xrtm validate list-corpora
+xrtm validate run --provider mock --limit 10 --iterations 2 --runs-dir runs-validation
+```
+
+This keeps benchmark and validation evidence aligned with the official product proof-point workflow.
+
 ---
 
 ## Library Usage (Python API)
@@ -165,6 +189,14 @@ Create and test monitors without API calls:
 ```bash
 xrtm monitor start --provider mock --limit 2 --runs-dir runs
 xrtm monitor run-once runs/<run-id>
+```
+
+History and report review stay on the same artifact-backed path:
+
+```bash
+xrtm runs compare <run-id-a> <run-id-b> --runs-dir runs
+xrtm runs export latest --runs-dir runs --output latest-run.json
+xrtm report html --latest --runs-dir runs
 ```
 
 ### WebUI Smoke Testing

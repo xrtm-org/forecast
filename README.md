@@ -129,6 +129,19 @@ result = await agent.run("Will event X happen?")
 
 See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for the full CLI and library workflows.
 
+## Official XRTM proof-point workflows
+
+The public XRTM story is intentionally small. The top-level `xrtm` product shell owns four official proof-point workflows, and `xrtm-forecast` is the runtime underneath each one:
+
+| Workflow | Product surface | How `xrtm-forecast` fits |
+| --- | --- | --- |
+| **Provider-free first success** | `xrtm start` | Runs the forecasting pipeline through the same runtime boundary, paired with XRTM's deterministic provider-free layer. |
+| **Benchmark and validation workflow** | `xrtm perf run`, `xrtm validate run` | Supplies the deterministic forecast execution path used for reproducible benchmark and validation evidence. |
+| **Monitoring, history, and report workflow** | `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html` | Produces the forecast outputs and metadata that feed canonical run artifacts, reports, and history views. |
+| **Local-LLM advanced workflow** | `xrtm local-llm status`, `xrtm demo --provider local-llm` | Powers the OpenAI-compatible local inference path used once the provider-free path is already proven. |
+
+If you are documenting or extending XRTM, align with those four workflows first rather than inventing a separate top-level story for this repo.
+
 ## Quickstart
 
 Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
