@@ -105,9 +105,15 @@ response = provider.generate_content("Reply with exactly XRTM_LOCAL_OK", max_tok
 
 The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-python`. Prefer the OpenAI-compatible path when a llama.cpp server is already running.
 
-### Provider-Free Testing (No API Keys)
+### Provider-Free Testing (No API Keys, via `xrtm`)
 
-To test and learn XRTM without API keys or network calls, use the DeterministicProvider:
+The shipped `DeterministicProvider` lives in the top-level `xrtm` product package, so install that package for the no-key local path:
+
+```bash
+pip install xrtm==0.3.0
+```
+
+Then use the provider alongside the `xrtm-forecast` APIs:
 
 ```python
 from xrtm.product.providers import DeterministicProvider
@@ -121,7 +127,7 @@ agent = ForecastingAnalyst(model=provider)
 result = await agent.run("Will event X happen?")
 ```
 
-See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for comprehensive coverage of testing without API keys.
+See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for the full CLI and library workflows.
 
 ## Quickstart
 
@@ -223,7 +229,6 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **[Debate](examples/kit/topologies/debate_demo/run_debate_demo.py)**: Two agents arguing for opposing sides before a judge.
 *   **[Consensus](examples/kit/topologies/consensus_demo/run_consensus_demo.py)**: Multiple agents varying in temperature converging on a decision.
 *   **[Orchestrator Basics](examples/core/orchestrator_basics/run_orchestrator_basics.py)**: Building a custom state machine from scratch.
-*   **[Epistemic Security](examples/core/run_epistemic_security.py)**: Source trust scoring and automated filtering.
 *   **[Chronos Acceleration](examples/core/run_chronos_sleep.py)**: Using virtual time to bypass real-world delays.
 
 </details>
@@ -233,6 +238,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 *   **[Discovery (Search)](examples/kit/features/discovery/run_discovery.py)**: Automated information retrieval.
 *   **[Streaming](examples/kit/features/streaming_demo/run_streaming_demo.py)**: Real-time token streaming for UIs.
+*   **[Provider-Free Analyst](examples/providers/provider_free_analyst/run_provider_free_analyst.py)**: Deterministic no-key agent smoke when `xrtm` is installed alongside the library.
 *   **[Calibration](https://github.com/xrtm-org/train/blob/main/examples/kit/run_calibration_demo.py)**: Adjusting confidence intervals (in `xrtm-train`).
 *   **[Trace Replay](https://github.com/xrtm-org/train/blob/main/examples/kit/run_trace_replay.py)**: Re-running a saved execution (in `xrtm-train`).
 

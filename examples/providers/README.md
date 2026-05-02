@@ -5,7 +5,7 @@ These examples demonstrate how to connect `xrtm-forecast` to external data sourc
 ## Projects
 
 ### [provider_free_analyst](file:///workspace/forecast/examples/providers/provider_free_analyst/run_provider_free_analyst.py)
-⭐ **Start here** — Use the DeterministicProvider to test and learn XRTM without API keys. Perfect for testing, CI/CD, and rapid iteration.
+⭐ **Start here** — Use the DeterministicProvider to test and learn XRTM without API keys. Install `xrtm==0.3.0` (or an editable checkout of the product package) first, because the provider lives in `xrtm.product.providers`.
 
 ### [inference_direct](file:///workspace/forecast/examples/providers/inference_direct/run_inference_direct.py)
 Direct interaction with inference providers (Gemini, Vertex AI, etc.) outside of a graph.

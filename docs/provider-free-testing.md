@@ -1,8 +1,14 @@
 # Provider-Free Testing Guide
 
-This guide shows you how to use XRTM without API keys, cloud dependencies, or hosted LLM services. 
+This guide shows you how to use XRTM without API keys, cloud dependencies, or hosted LLM services.
 
 **⭐ Start here**: Provider-free mode is the recommended path for getting started, testing, and learning XRTM.
+
+Install the top-level product package once so the shipped CLI and `DeterministicProvider` are available:
+
+```bash
+pip install xrtm==0.3.0
+```
 
 ## Why Provider-Free?
 
@@ -13,9 +19,9 @@ Provider-free mode is perfect for:
 - **CI/CD**: Run validation pipelines that are fast, repeatable, and free
 - **Development**: Iterate on agent logic without burning API credits
 
-**Zero prerequisites.** No API keys, no model downloads, no server setup.
+**Zero service prerequisites.** No API keys, no model downloads, no server setup.
 
-**Instant start.** Run `xrtm demo --provider mock --limit 2` and you're forecasting.
+**Instant start after install.** Run `xrtm demo --provider mock --limit 2` and you're forecasting.
 
 ---
 
@@ -172,9 +178,9 @@ xrtm web --runs-dir runs --smoke
 
 ---
 
-## Library Usage (xrtm-forecast)
+## Library Usage (`xrtm-forecast` + `xrtm`)
 
-The `xrtm-forecast` library provides direct access to the DeterministicProvider for use in agent code, tests, and custom workflows.
+Provider-free library workflows combine the `xrtm-forecast` agent/runtime APIs with the top-level `xrtm` product package, which ships the `DeterministicProvider`.
 
 ### Import the Provider
 
@@ -182,7 +188,7 @@ The `xrtm-forecast` library provides direct access to the DeterministicProvider 
 from xrtm.product.providers import DeterministicProvider
 ```
 
-The DeterministicProvider is part of the product layer (`xrtm.product.providers`), not the core forecast library. This is intentional—it's a testing utility, not a production inference backend.
+The DeterministicProvider is part of the product layer (`xrtm.product.providers`), not the standalone `xrtm-forecast` wheel. This is intentional—it's a testing utility, not a production inference backend.
 
 ### Basic Usage
 
