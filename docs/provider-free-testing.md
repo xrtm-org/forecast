@@ -2,7 +2,7 @@
 
 This guide shows you how to use XRTM without API keys, cloud dependencies, or hosted LLM services.
 
-**⭐ Start here**: Provider-free mode is the recommended path for getting started, testing, and learning XRTM.
+**⭐ Start here**: provider-free mode is the recommended path for getting started, testing, and learning XRTM.
 
 Install the top-level product package once so the shipped CLI and `DeterministicProvider` are available:
 
@@ -25,12 +25,19 @@ Provider-free mode is perfect for:
 
 ---
 
-## Official XRTM proof-point set
+## Choose the entry point
 
-The official XRTM product story stays centered on four workflows:
+- Start with **`xrtm`** when you want the released, provider-free, product-first workflow.
+- Start with **`xrtm-forecast`** when you are embedding forecasting directly in code and only need the runtime APIs.
 
-1. **Provider-free first success** — `xrtm start`
-2. **Benchmark and validation workflow** — `xrtm perf run` and `xrtm validate run`
+This guide focuses on the provider-free foundation that `xrtm` ships and that `xrtm-forecast` can reuse in code.
+
+## Official released product workflows
+
+The official released XRTM product story currently centers on four workflows:
+
+1. **Provider-free first success** — `xrtm doctor`, then `xrtm demo --provider mock --limit 1 --runs-dir runs`
+2. **Benchmark and performance workflow** — `xrtm perf run`
 3. **Monitoring, history, and report workflow** — `xrtm monitor ...`, `xrtm runs ...`, and `xrtm report html`
 4. **Local-LLM advanced workflow** — `xrtm local-llm status` and `xrtm demo --provider local-llm`
 
@@ -139,16 +146,18 @@ xrtm perf run \
 
 This measures pipeline performance without network variability.
 
-### Validation Workflow
+### History, compare, and export review
 
-When you need more than a small benchmark, stay on the same provider-free path and run validation:
+When you need more than a small benchmark, stay on the same provider-free path and review run history:
 
 ```bash
-xrtm validate list-corpora
-xrtm validate run --provider mock --limit 10 --iterations 2 --runs-dir runs-validation
+xrtm profile create local-mock --provider mock --limit 2 --runs-dir runs
+xrtm run profile local-mock
+xrtm runs compare <run-id-a> <run-id-b> --runs-dir runs
+xrtm runs export <run-id> --runs-dir runs --output export.json
 ```
 
-This keeps benchmark and validation evidence aligned with the official product proof-point workflow.
+This keeps follow-up review on the same released artifact workflow.
 
 ---
 
@@ -195,8 +204,8 @@ History and report review stay on the same artifact-backed path:
 
 ```bash
 xrtm runs compare <run-id-a> <run-id-b> --runs-dir runs
-xrtm runs export latest --runs-dir runs --output latest-run.json
-xrtm report html --latest --runs-dir runs
+xrtm runs export <run-id> --runs-dir runs --output run-export.json
+xrtm report html runs/<run-id>
 ```
 
 ### WebUI Smoke Testing
@@ -579,10 +588,10 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Save this as `forecast/examples/providers/provider_free_analyst.py` and run:
+Save this as `forecast/examples/providers/run_provider_free_analyst.py` and run:
 
 ```bash
-python forecast/examples/providers/provider_free_analyst.py
+python forecast/examples/providers/run_provider_free_analyst.py
 ```
 
 ---
@@ -604,8 +613,8 @@ xrtm monitor start --provider mock --limit 2
 # Performance
 xrtm perf run --scenario provider-free-smoke --iterations 3
 
-# Validation
-xrtm validate run --provider mock --limit 10
+# Export review
+xrtm runs export <run-id> --output run.json
 ```
 
 ### Library Examples

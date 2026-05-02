@@ -34,6 +34,15 @@ If XRTM is AI for event forecasting, `xrtm-forecast` is the execution layer that
 
 It provides forecasting agents, orchestration, provider integration, and the runtime boundaries needed for scored, inspectable event-forecasting workflows.
 
+## Start with `xrtm` or `xrtm-forecast`?
+
+| If you want to... | Start with | Why |
+| --- | --- | --- |
+| prove the released, provider-free XRTM workflow first | [`xrtm`](https://github.com/xrtm-org/xrtm) | the product shell owns the honest first-success path, canonical run artifacts, and the deterministic no-key provider |
+| embed forecasting directly in your own Python code or service | `xrtm-forecast` | this package owns the runtime APIs, orchestration, providers, and source examples |
+
+Use `xrtm` first when you still need the product story. Use `xrtm-forecast` once you are building directly against the forecasting runtime.
+
 ## The XRTM Ecosystem
 
 `xrtm-forecast` is one of four packages in the XRTM ecosystem, each with a specific role:
@@ -67,8 +76,9 @@ graph LR
 | **xrtm-forecast** | Orchestrator, agents, inference providers | `pip install xrtm-forecast` |
 | **xrtm-train** | Backtesting, trace replay, calibration | `pip install xrtm-train` |
 
-> **For most users**: `pip install xrtm-forecast` is sufficient—it automatically installs `xrtm-data` and `xrtm-eval`.
-> **For researchers**: `pip install xrtm-train` installs the full stack including backtesting tools.
+> **Product-first, provider-free workflow**: install `xrtm==0.3.0`.
+> **Code-first runtime embedding**: install `xrtm-forecast`.
+> **Research/backtesting stack**: install `xrtm-train` when you also need replay and calibration tools.
 
 ## Installation
 
@@ -131,12 +141,12 @@ See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for the ful
 
 ## Official XRTM proof-point workflows
 
-The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` is the runtime underneath the four official proof workflows:
+The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` is the runtime underneath the released proof workflows documented in the product repo:
 
 | Workflow | Product surface | How `xrtm-forecast` fits |
 | --- | --- | --- |
-| **Provider-free first success** | `xrtm start` | Runs the forecasting pipeline through the same runtime boundary, paired with XRTM's deterministic provider-free layer. |
-| **Benchmark and validation workflow** | `xrtm perf run`, `xrtm validate run` | Supplies the deterministic forecast execution path used for reproducible benchmark and validation evidence. |
+| **Provider-free first success** | `xrtm doctor`, `xrtm demo --provider mock --limit 1 --runs-dir runs` | Runs the same forecasting pipeline through the released product shell, paired with XRTM's deterministic provider-free layer. |
+| **Benchmark and performance workflow** | `xrtm perf run` | Supplies the deterministic forecast execution path used for reproducible benchmark evidence. |
 | **Monitoring, history, and report workflow** | `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html` | Produces the forecast outputs and metadata that feed canonical run artifacts, reports, and history views. |
 | **Local-LLM advanced workflow** | `xrtm local-llm status`, `xrtm demo --provider local-llm` | Powers the OpenAI-compatible local inference path used once the provider-free path is already proven. |
 
