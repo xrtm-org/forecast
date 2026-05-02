@@ -107,6 +107,14 @@ Use the correct vocabulary hierarchy:
 
 ---
 
+## Cross-repo compatibility
+
+`xrtm-forecast` sits between upstream contracts and the downstream `xrtm` product shell. Before merging a change that affects documented APIs, runtime behavior, dependency/version expectations, or cross-repo CI assumptions, follow the canonical [Cross-Repository Compatibility and Coordination Policy](https://github.com/xrtm-org/governance/blob/main/policies/cross-repo-compatibility-policy.md).
+
+Coordinated changes should link sibling PRs, validate with explicit upstream/downstream refs, and avoid same-name branch aliases as the compatibility mechanism.
+
+---
+
 ## Pull Request Process
 
 1. Fork the repo and create your branch from `main`.
