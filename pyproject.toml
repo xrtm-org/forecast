@@ -79,6 +79,11 @@ dev = [
 testpaths = ["tests/unit"]
 asyncio_mode = "strict"
 markers = [
+    "unit: marks tests in the unit layer",
+    "integration: marks tests in the integration layer",
+    "verification: marks tests in the verification layer",
+    "e2e: marks tests in the end-to-end layer",
+    "local: marks tests in the local-environment layer",
     "live: marks tests as live (require API keys)",
     "local_llm: marks tests as requiring a local OpenAI-compatible LLM endpoint",
 ]

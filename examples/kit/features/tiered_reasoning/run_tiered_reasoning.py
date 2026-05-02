@@ -15,7 +15,8 @@
 
 import asyncio
 
-from xrtm.forecast import ModelFactory, RoutingAgent
+from xrtm.forecast.kit.agents.routing import RoutingAgent
+from xrtm.forecast.providers.inference.factory import ModelFactory
 
 
 async def run_tiered_reasoning():

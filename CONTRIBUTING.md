@@ -72,6 +72,11 @@ Every `.py` file must start with the Apache 2.0 license header:
 ### 3. Public API (`__all__`)
 Every module must define `__all__` to control the public namespace.
 
+Top-level packages should stay narrow:
+- `xrtm.forecast`: stable orchestration and assistant entrypoints only
+- `xrtm.forecast.kit`: namespace-oriented; avoid adding unrelated concrete exports at the root
+- `xrtm.forecast.providers.*`: provider-facing APIs live with their provider family
+
 ### 4. Docstrings (Hugging Face Style)
 Use `r""" """` raw docstrings with `Args`, `Returns`, `Example` sections:
 
@@ -121,14 +126,27 @@ Coordinated changes should link sibling PRs, validate with explicit upstream/dow
 2. If you've added code, add tests in the appropriate location:
    - `tests/unit/` for unit tests
    - `tests/integration/` for integration tests
+   - `tests/e2e/` for example-backed end-to-end flows
+   - `tests/local/` for local-environment and local-LLM checks
    - `tests/verification/` for cross-cutting compliance tests
-3. Ensure all checks pass:
+   - `tests/live/` for real-provider smoke tests
+3. Match the directory with the corresponding pytest marker:
+
+   | Layer | Directory | Marker | Typical command |
+   | :--- | :--- | :--- | :--- |
+   | Unit | `tests/unit/` | `unit` | `uv run pytest tests/unit -m unit` |
+   | Integration | `tests/integration/` | `integration` | `uv run pytest tests/integration -m integration` |
+   | Verification | `tests/verification/` | `verification` | `uv run pytest tests/verification -m verification` |
+   | End-to-end | `tests/e2e/` | `e2e` | `uv run pytest tests/e2e -m e2e` |
+   | Local | `tests/local/` | `local` | `uv run pytest tests/local -m local --run-local-llm` |
+   | Live | `tests/live/` | `live` | `uv run pytest tests/live -m live --run-live` |
+4. Ensure all checks pass:
    ```bash
    uv run ruff check .
    uv run mypy .
    uv run pytest tests/unit
    ```
-4. Update documentation if you've added new public APIs.
+5. Update documentation if you've added new public APIs.
 
 ---
 

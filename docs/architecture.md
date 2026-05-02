@@ -103,6 +103,14 @@ graph TD
 - `src/forecast/kit/`: The Applied Layer (Agents, Skills, Topologies).
 - `src/forecast/providers/`: The Hardware Layer (Inference, Memory, Tools).
 
+## Public API Boundaries
+
+- `xrtm.forecast` is the stable convenience surface for orchestration primitives and assistant factories.
+- `xrtm.forecast.kit` is a namespace entrypoint; prefer importing concrete agents, topologies, and sentinels from their subpackages.
+- `xrtm.forecast.providers.inference` is the stable home for provider configuration and factory access.
+
+Legacy convenience imports remain available for compatibility, but new code should prefer the narrower paths above.
+
 ---
 
 ## Class Dependency Diagram
@@ -244,4 +252,3 @@ classDiagram
 1. **Core never imports Kit**: ABCs in `core/` cannot depend on implementations in `kit/`.
 2. **Providers are interchangeable**: Any `InferenceProvider` can be swapped without changing agent code.
 3. **FactStore enables institutional memory**: Agents can optionally connect to a `FactStore` via `set_fact_store()`.
-

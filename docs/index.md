@@ -27,10 +27,11 @@ pip install "xrtm-forecast[standard]"
 ### Basic Usage
 
 ```python
-from xrtm.forecast import Orchestrator, ModelFactory
+from xrtm.forecast import Orchestrator
+from xrtm.forecast.providers.inference import ModelFactory
 
-# Initialize the factory
-factory = ModelFactory()
+# Resolve a provider from the inference boundary
+provider = ModelFactory.get_provider("openai")
 
 # ... more examples coming soon
 ```

@@ -14,8 +14,13 @@
 # limitations under the License.
 
 import pytest
+from pydantic import SecretStr
 
+from xrtm.forecast.core.cache import InferenceCache
+from xrtm.forecast.core.config.inference import OpenAIConfig, XLMConfig
 from xrtm.forecast.providers.inference.factory import ModelFactory
+from xrtm.forecast.providers.inference.hf_provider import HuggingFaceProvider
+from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 
 def test_model_factory_env_profiles(monkeypatch):
@@ -44,3 +49,21 @@ def test_model_factory_gemini_profile(monkeypatch):
 
     p_dev_gem = ModelFactory.get_provider("gemini", env="dev")
     assert p_dev_gem.config.model_id == "gemini-2.0-flash"
+
+
+def test_model_factory_preserves_provider_runtime_kwargs(tmp_path):
+    cache = InferenceCache(db_path=str(tmp_path / "cache.db"))
+    config = OpenAIConfig(model_id="gpt-4o-mini", api_key=SecretStr("mock-key"))
+
+    provider = ModelFactory.get_provider(config, cache=cache)
+
+    assert isinstance(provider, OpenAIProvider)
+    assert provider.cache is cache
+    cache.close()
+
+
+def test_model_factory_supports_xlm_selector():
+    provider = ModelFactory.get_provider("xlm", model_id="sentence-transformers/all-MiniLM-L6-v2")
+
+    assert isinstance(provider, HuggingFaceProvider)
+    assert isinstance(provider.config, XLMConfig)
