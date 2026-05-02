@@ -114,9 +114,11 @@ Use the correct vocabulary hierarchy:
 
 ## Cross-repo compatibility
 
-`xrtm-forecast` sits between upstream contracts and the downstream `xrtm` product shell. Before merging a change that affects documented APIs, runtime behavior, dependency/version expectations, or cross-repo CI assumptions, follow the canonical [Cross-Repository Compatibility and Coordination Policy](https://github.com/xrtm-org/governance/blob/main/policies/cross-repo-compatibility-policy.md).
+`xrtm-forecast` sits between upstream contracts and the downstream `xrtm` product shell. Before merging a change that affects documented APIs, runtime behavior, dependency/version expectations, or cross-repo CI assumptions, follow the canonical [Cross-Repository Compatibility and Coordination Policy](https://github.com/xrtm-org/governance/blob/main/policies/cross-repo-compatibility-policy.md) and the [Release Train Playbook](https://github.com/xrtm-org/governance/blob/main/policies/release-train-playbook.md).
 
 Coordinated changes should link sibling PRs, validate with explicit upstream/downstream refs, and avoid same-name branch aliases as the compatibility mechanism.
+
+Default `push` and `pull_request` CI validates `forecast` against explicit `main` refs for `data` and `eval`. When a coordinated PR family needs unpublished upstream changes, rerun CI with `workflow_dispatch` and set exact `data_ref` / `eval_ref` values (branch, tag, SHA, or PR ref), then record those refs in the PR description or coordination issue.
 
 ---
 
