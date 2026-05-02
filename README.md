@@ -25,14 +25,14 @@ limitations under the License.
 <h1 align="center">xrtm-forecast</h1>
 
 <h3 align="center">
-    <p>Professional engine for generative forecasting and agentic reasoning</p>
+    <p>Runtime package for AI event forecasting</p>
 </h3>
 
-`xrtm-forecast` acts as the rigorous backbone for state-of-the-art agentic workflows, bridging the gap between rapid prototyping and mission-critical deployment.
+`xrtm-forecast` is the runtime package that powers forecasting inside XRTM.
 
-It centralizes the "Reasoning Graph" definition so that agent behaviors are deterministic and auditable. `forecast` is the pivot across the ecosystem: if a provider is supported, it can be plugged into any agent topology (Orchestrator, Debate, Consensus) without changing business logic.
+If XRTM is AI for event forecasting, `xrtm-forecast` is the execution layer that turns questions, models, and topologies into auditable forecast runs.
 
-We pledge to uphold research-grade transparency: strict typing, zero-tolerance verification, and rigorous double-trace auditability for every decision made by an AI.
+It provides forecasting agents, orchestration, provider integration, and the runtime boundaries needed for scored, inspectable event-forecasting workflows.
 
 ## The XRTM Ecosystem
 
@@ -131,7 +131,7 @@ See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for the ful
 
 ## Official XRTM proof-point workflows
 
-The public XRTM story is intentionally small. The top-level `xrtm` product shell owns four official proof-point workflows, and `xrtm-forecast` is the runtime underneath each one:
+The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` is the runtime underneath the four official proof workflows:
 
 | Workflow | Product surface | How `xrtm-forecast` fits |
 | --- | --- | --- |
@@ -144,7 +144,7 @@ If you are documenting or extending XRTM, align with those four workflows first 
 
 ## Quickstart
 
-Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
+Get started with `xrtm-forecast` when you want to build forecasting behavior directly in code. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
 from xrtm.forecast import AsyncRuntime, create_forecasting_analyst
