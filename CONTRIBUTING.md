@@ -114,9 +114,17 @@ Use the correct vocabulary hierarchy:
 
 ## Cross-repo compatibility
 
-`xrtm-forecast` sits between upstream contracts and the downstream `xrtm` product shell. Before merging a change that affects documented APIs, runtime behavior, dependency/version expectations, or cross-repo CI assumptions, follow the canonical [Cross-Repository Compatibility and Coordination Policy](https://github.com/xrtm-org/governance/blob/main/policies/cross-repo-compatibility-policy.md) and the [Release Train Playbook](https://github.com/xrtm-org/governance/blob/main/policies/release-train-playbook.md).
+`xrtm-forecast` sits between upstream contracts and the downstream `xrtm` product shell. Before merging a change that affects documented APIs, runtime behavior, dependency/version expectations, or cross-repo CI assumptions, follow the canonical [Cross-Repository Compatibility and Coordination Policy](https://github.com/xrtm-org/governance/blob/main/policies/cross-repo-compatibility-policy.md), [Release Readiness Policy](https://github.com/xrtm-org/governance/blob/main/policies/release-readiness-policy.md), and [Feature Status and Graduation Policy](https://github.com/xrtm-org/governance/blob/main/policies/feature-status-and-graduation-policy.md).
 
 Coordinated changes should link sibling PRs, validate with explicit upstream/downstream refs, and avoid same-name branch aliases as the compatibility mechanism.
+
+Treat these as stable published surfaces unless documented otherwise:
+
+- documented `xrtm-forecast` APIs and imports
+- README/install snippets and released examples
+- runtime behavior or dependency floors consumed by `xrtm`
+
+If you change one of them, record the coordination issue or PR family, note the exact upstream/downstream refs used for validation, and keep unreleased behavior out of release-pinned `xrtm` or `xrtm.org` docs until the matching package release is real.
 
 Default `push` and `pull_request` CI validates `forecast` against explicit `main` refs for `data` and `eval`. When a coordinated PR family needs unpublished upstream changes, rerun CI with `workflow_dispatch` and set exact `data_ref` / `eval_ref` values (branch, tag, SHA, or PR ref), then record those refs in the PR description or coordination issue.
 
