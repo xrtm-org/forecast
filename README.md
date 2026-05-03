@@ -152,6 +152,19 @@ The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` i
 
 If you are documenting or extending XRTM, align with those four workflows first rather than inventing a separate top-level story for this repo.
 
+## Honest improvement workflow
+
+Use the package stack as a clearly labeled deeper path:
+
+1. **Control first:** use the top-level `xrtm` product shell or the provider-free analyst example as the deterministic baseline.
+2. **Do not oversell the control:** repeated provider-free runs should stay stable, which is useful for learning the artifacts and compare surface but is not visible improvement by itself.
+3. **Introduce a real candidate change here:** local-model inference, runtime-level prompt/configuration work, or training-layer calibration/replay is where behavior can genuinely move.
+4. **Compare back in the product shell:** use the canonical XRTM run artifacts and compare/export workflow to decide whether the candidate earned promotion.
+
+In other words: `xrtm` owns the honest released baseline, while `xrtm-forecast`
+and `xrtm-train` supply the deeper paths where stronger "improve over time"
+proof can become real.
+
 ## Quickstart
 
 Get started with `xrtm-forecast` when you want to build forecasting behavior directly in code. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.

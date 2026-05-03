@@ -32,3 +32,12 @@ cd /home/moy/Workspaces/xrtm
 - **Privacy-First Inference**: Running reasoning chains without data leaving your machine.
 - **Custom Base URLs**: Configuring the provider to talk to non-standard endpoints.
 - **OpenAI-Compatible Provider**: XRTM uses `OpenAIConfig(base_url="http://localhost:8080/v1")` for llama.cpp server; the separate `LlamaCppProvider` is for in-process GGUF loading.
+
+## Why this is an honest advanced path
+
+Use this after you have already proven the provider-free control path.
+
+- the provider-free baseline gives you a deterministic reference point
+- a local analyst run is a real candidate change that can produce different probabilities, scores, and costs
+- compare it against the control on the same question set before calling it an improvement
+- keep the candidate only if the quality gain justifies the added runtime and model-serving complexity

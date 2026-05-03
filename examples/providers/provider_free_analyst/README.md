@@ -43,6 +43,12 @@ This example is perfect for:
 - **CI/CD**: Run validation pipelines that are fast and free
 - **Development**: Iterate on agent logic without API costs
 
+Treat it as a stable control, not as an improvement demo:
+
+- repeated runs should stay effectively unchanged
+- that stability is useful because it makes later provider/model/runtime changes legible
+- if you want a stronger "improved over time" proof, move next to a real local-model or training-layer path
+
 ## Related
 
 - **[Provider-Free Testing Guide](../../../docs/provider-free-testing.md)**: Comprehensive guide to testing without API keys
