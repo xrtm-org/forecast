@@ -1,140 +1,74 @@
 # Contributing to xrtm-forecast
 
-Reference implementation for the XRTM reasoning engine. We welcome contributions!
+`xrtm-forecast` owns the forecasting runtime: providers, orchestration, runtime APIs, and code-first examples. If you still need the released product-first workflow, start in [`xrtm`](https://github.com/xrtm-org/xrtm) and come here once you are working directly on the runtime.
 
-## Architecture Overview
+## Start with the right repo
 
-`xrtm-forecast` follows a strict three-layer architecture:
+| If you are changing... | Start here | Why |
+| --- | --- | --- |
+| runtime APIs, provider integrations, orchestration internals, or library examples | `forecast` | this repo owns the runtime implementation |
+| released CLI/product docs, canonical run artifacts, or provider-free first-success flow | [`xrtm`](https://github.com/xrtm-org/xrtm) | the product shell owns the public workflow |
+| public site navigation or newcomer-facing mirrors of released behavior | [`xrtm.org`](https://github.com/xrtm-org/xrtm.org) | the site presents accepted product/governance truth |
+| schemas, compatibility rules, or org-wide contributor policy | [`governance`](https://github.com/xrtm-org/governance) | shared standards live there |
 
-| Layer | Location | Responsibility | Key Constraint |
-| :--- | :--- | :--- | :--- |
-| **CORE** | `src/forecast/core/` | The "Physics" Engine — Orchestrator, State, Time, Calibration, Telemetry | **Zero Agent Logic.** Pure Python/Math. No prompts. |
-| **KIT** | `src/forecast/kit/` | The "Applied" Layer — Agents, Skills, Topologies, Evaluators | **Composable.** Can import `core`, but `core` NEVER imports `kit`. |
-| **PROVIDERS** | `src/forecast/providers/` | The "Hardware" — Inference (OpenAI/vLLM), Tools (Serp/Exa) | **Interchangeable.** Swappable backends. |
+## Local setup
 
-### The Golden Rule
-> **`core` MUST NOT import from `kit` or `providers`.**
+In the standard sibling-checkout workspace, use the bootstrap script:
 
-This ensures the Core remains domain-agnostic and testable without LLM dependencies.
-
----
-
-## Development Environment
-
-We provide a fully isolated development environment using **Docker** and **uv**.
-
-### 1. Using Docker (Recommended)
 ```bash
-# Build and start services (forecast + redis)
-docker compose -f .devcontainer/docker-compose.yml up -d --build
-
-# Enter the reasoning engine container
-docker compose -f .devcontainer/docker-compose.yml exec forecast bash
+./scripts/setup_dev.sh
 ```
 
-### 2. Manual Setup (uv)
+If you are working on this repo by itself, the minimal local setup is:
+
 ```bash
-# Install uv (https://github.com/astral-sh/uv)
-# Sync dependencies
 uv sync --all-extras
-
-# Run tests
-uv run pytest
 ```
 
-### 3. Verification Commands
+## Standard checks
+
+Run the normal gate before opening a PR:
+
 ```bash
-uv run ruff check .      # Linting
-uv run mypy .            # Type checking (strict)
-uv run pytest tests/unit # Unit tests
+uv run python scripts/audit/check_docs.py
+uv run ruff check .
+uv run mypy .
+uv run pytest tests/unit
 ```
 
----
+Use deeper checks when your change reaches beyond unit-scope behavior:
 
-## Key Coding Standards
-
-### 1. Type Safety (Strict Mypy)
-All code must be fully type-hinted and pass `mypy .` at project root.
-
-### 2. License Headers
-Every `.py` file must start with the Apache 2.0 license header:
-```python
-# coding=utf-8
-# Copyright 2026 XRTM Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# ...
+```bash
+uv run pytest tests/integration
+uv run pytest tests/verification
+uv run pytest tests/live --run-live
 ```
 
-### 3. Public API (`__all__`)
-Every module must define `__all__` to control the public namespace.
+## Where docs, tests, and policy belong
 
-### 4. Docstrings (Hugging Face Style)
-Use `r""" """` raw docstrings with `Args`, `Returns`, `Example` sections:
+- **`forecast`**: runtime/library docs, code examples, provider behavior, and unit/integration/runtime tests.
+- **`xrtm`**: released CLI story, canonical run-artifact behavior, and product-level user flows.
+- **`xrtm.org`**: newcomer-facing navigation and mirrors of accepted released behavior.
+- **`governance`**: Forecast Object schemas, compatibility rules, and contributor/review policy.
 
-```python
-def example_method(self, value: int) -> bool:
-    r"""
-    Brief description of what the method does.
+Use the repo test directories intentionally:
 
-    Args:
-        value (`int`):
-            Detailed description of the argument.
+- `tests/unit` for default runtime coverage and CI-safe checks
+- `tests/integration` / `tests/verification` when the change crosses component boundaries
+- `tests/live` only when you are intentionally validating real provider connectivity
 
-    Returns:
-        `bool`: Description of the return value.
+Do not move branch-only runtime conveniences into release-pinned `xrtm` or `xrtm.org` docs until the package release, downstream docs, and validation evidence move together.
 
-    Example:
-        ```python
-        >>> obj.example_method(42)
-        True
-        ```
-    """
-```
+## PR expectations
 
-### 5. Terminology
-Use the correct vocabulary hierarchy:
-- **Stage** → **Agent** → **Skill** → **Tool**
-- Use "Subject" not "Market", "Value" not "Price" in core modules
+1. Branch from `main`.
+2. Keep examples and tests close to the runtime surface you changed.
+3. When a stable surface changes, note downstream follow-up for `xrtm` and `xrtm.org`.
+4. Use explicit upstream/downstream refs for coordinated validation rather than same-name branch assumptions.
+5. Include the commands you ran in the PR description.
 
-### 6. Naming Conventions
-- **Modules**: `snake_case` (e.g., `calibration.py`)
-- **Classes**: `PascalCase` (e.g., `BetaScaler`)
-- **Examples**: Must start with `run_` (e.g., `run_causal_demo.py`)
+## Related references
 
----
-
-## Pull Request Process
-
-1. Fork the repo and create your branch from `main`.
-2. If you've added code, add tests in the appropriate location:
-   - `tests/unit/` for unit tests
-   - `tests/integration/` for integration tests
-   - `tests/verification/` for cross-cutting compliance tests
-3. Ensure all checks pass:
-   ```bash
-   uv run ruff check .
-   uv run mypy .
-   uv run pytest tests/unit
-   ```
-4. Update documentation if you've added new public APIs.
-
----
-
-## Agentic Engagement Rules
-
-> These rules apply when AI agents contribute to this codebase.
-
-1. **Sovereignty**: Agents MUST NOT commit or push changes unless explicitly instructed.
-2. **Workflow Triggers**: Workflows (`/verify_and_push`, `/create_release`) MUST ONLY be triggered by the USER.
-
----
-
-## Release Process
-
-1. Update version in `src/forecast/version.py`.
-2. Update `CHANGELOG.md` with new features.
-3. Tag the release: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
-4. Push tags: `git push origin vX.Y.Z`
-
-GitHub Actions will automatically publish to PyPI when a release is created.
+- [ARCHITECTURE.md](ARCHITECTURE.md) for the runtime/layer split
+- [AGENTS.md](AGENTS.md) for repo-specific engineering guardrails
+- [`governance` cross-repo policies](https://github.com/xrtm-org/governance/tree/main/policies) when the change affects stable shared surfaces

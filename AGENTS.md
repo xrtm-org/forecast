@@ -43,8 +43,10 @@ You must enforce the following internal dependency DAG. Violations are critical 
 
 #### ON PR (Pull Request / Code Modification)
 - **Apply PR Policy**: Read `../governance/policies/pr-acceptance-policy.md` before accepting, superseding, rejecting, or deferring PRs.
+- **Apply Cross-Repo Policy**: Read `../governance/policies/cross-repo-compatibility-policy.md` before changing package APIs, runtime contracts, dependency expectations, or CI behavior consumed by `xrtm`.
 - **Verify Architecture**: Check imports in modified files. Did you import `kit` into `core`? If yes, STOP and refactor.
 - **Verify Tests**: Run `uv run pytest tests/unit/` on relevant modules. Ensure core logic maintains 90% coverage.
+- **Reject Hidden Coupling**: Do not use same-name sibling branches or undocumented branch aliases as the normal proof of compatibility.
 
 #### ON FAILURE (Test or Lint Error)
 - **Self-Correction**: Do not ask the user for permission to fix syntax errors or lint violations. Fix them immediately.

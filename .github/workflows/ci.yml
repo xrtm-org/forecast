@@ -1,15 +1,35 @@
 name: CI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      coordination_context:
+        description: "Linked issue/PR family or release-train note"
+        required: false
+        type: string
+      data_ref:
+        description: "Explicit xrtm-org/data ref (branch, tag, SHA, or refs/pull/.../head)"
+        required: false
+        default: main
+        type: string
+      eval_ref:
+        description: "Explicit xrtm-org/eval ref (branch, tag, SHA, or refs/pull/.../head)"
+        required: false
+        default: main
+        type: string
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
 
@@ -19,13 +39,70 @@ jobs:
         with:
           path: forecast
 
-      - name: Checkout workspace siblings
+      - name: Resolve workspace refs
+        id: workspace-refs
+        shell: bash
+        env:
+          INPUT_COORDINATION_CONTEXT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.coordination_context || '' }}
+          INPUT_DATA_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.data_ref || '' }}
+          INPUT_EVAL_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.eval_ref || '' }}
         run: |
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          for repo in data eval; do
-            git clone --depth 1 -b "$BRANCH" "https://github.com/xrtm-org/${repo}.git" "$repo" 2>/dev/null \
-              || git clone --depth 1 -b main "https://github.com/xrtm-org/${repo}.git" "$repo"
-          done
+          default_ref="main"
+
+          requested_ref() {
+            local value="$1"
+            if [ -n "$value" ]; then
+              printf '%s' "$value"
+            else
+              printf '%s' "$default_ref"
+            fi
+          }
+
+          {
+            echo "coordination_context=${INPUT_COORDINATION_CONTEXT}"
+            echo "data_ref=$(requested_ref "$INPUT_DATA_REF")"
+            echo "eval_ref=$(requested_ref "$INPUT_EVAL_REF")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout workspace siblings
+        id: workspace-siblings
+        shell: bash
+        run: |
+          checkout_repo() {
+            local repo="$1"
+            local ref="$2"
+            git init -q "$repo"
+            git -C "$repo" remote add origin "https://github.com/xrtm-org/${repo}.git"
+            git -C "$repo" fetch --depth 1 --quiet origin "$ref"
+            git -C "$repo" checkout --detach --quiet FETCH_HEAD
+            git -C "$repo" rev-parse HEAD
+          }
+
+          data_sha="$(checkout_repo data "${{ steps.workspace-refs.outputs.data_ref }}")"
+          eval_sha="$(checkout_repo eval "${{ steps.workspace-refs.outputs.eval_ref }}")"
+
+          {
+            echo "data_sha=$data_sha"
+            echo "eval_sha=$eval_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Summarize workspace refs
+        shell: bash
+        run: |
+          {
+            echo "### Workspace compatibility refs"
+            echo
+            echo "| Repo | Requested ref | Resolved commit |"
+            echo "| --- | --- | --- |"
+            echo "| data | \`${{ steps.workspace-refs.outputs.data_ref }}\` | \`${{ steps.workspace-siblings.outputs.data_sha }}\` |"
+            echo "| eval | \`${{ steps.workspace-refs.outputs.eval_ref }}\` | \`${{ steps.workspace-siblings.outputs.eval_sha }}\` |"
+            echo
+            if [ -n "${{ steps.workspace-refs.outputs.coordination_context }}" ]; then
+              echo "Coordination context: ${{ steps.workspace-refs.outputs.coordination_context }}"
+              echo
+            fi
+            echo "Default push/pull_request CI validates against explicit \`main\` upstream refs. Use workflow_dispatch for coordinated validation against exact upstream refs."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create workspace root
         run: |
@@ -44,7 +121,7 @@ jobs:
           EOF
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
           version: "latest"
@@ -89,13 +166,70 @@ jobs:
         with:
           path: forecast
 
-      - name: Checkout workspace siblings
+      - name: Resolve workspace refs
+        id: workspace-refs
+        shell: bash
+        env:
+          INPUT_COORDINATION_CONTEXT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.coordination_context || '' }}
+          INPUT_DATA_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.data_ref || '' }}
+          INPUT_EVAL_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.eval_ref || '' }}
         run: |
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          for repo in data eval; do
-            git clone --depth 1 -b "$BRANCH" "https://github.com/xrtm-org/${repo}.git" "$repo" 2>/dev/null \
-              || git clone --depth 1 -b main "https://github.com/xrtm-org/${repo}.git" "$repo"
-          done
+          default_ref="main"
+
+          requested_ref() {
+            local value="$1"
+            if [ -n "$value" ]; then
+              printf '%s' "$value"
+            else
+              printf '%s' "$default_ref"
+            fi
+          }
+
+          {
+            echo "coordination_context=${INPUT_COORDINATION_CONTEXT}"
+            echo "data_ref=$(requested_ref "$INPUT_DATA_REF")"
+            echo "eval_ref=$(requested_ref "$INPUT_EVAL_REF")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout workspace siblings
+        id: workspace-siblings
+        shell: bash
+        run: |
+          checkout_repo() {
+            local repo="$1"
+            local ref="$2"
+            git init -q "$repo"
+            git -C "$repo" remote add origin "https://github.com/xrtm-org/${repo}.git"
+            git -C "$repo" fetch --depth 1 --quiet origin "$ref"
+            git -C "$repo" checkout --detach --quiet FETCH_HEAD
+            git -C "$repo" rev-parse HEAD
+          }
+
+          data_sha="$(checkout_repo data "${{ steps.workspace-refs.outputs.data_ref }}")"
+          eval_sha="$(checkout_repo eval "${{ steps.workspace-refs.outputs.eval_ref }}")"
+
+          {
+            echo "data_sha=$data_sha"
+            echo "eval_sha=$eval_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Summarize workspace refs
+        shell: bash
+        run: |
+          {
+            echo "### Workspace compatibility refs"
+            echo
+            echo "| Repo | Requested ref | Resolved commit |"
+            echo "| --- | --- | --- |"
+            echo "| data | \`${{ steps.workspace-refs.outputs.data_ref }}\` | \`${{ steps.workspace-siblings.outputs.data_sha }}\` |"
+            echo "| eval | \`${{ steps.workspace-refs.outputs.eval_ref }}\` | \`${{ steps.workspace-siblings.outputs.eval_sha }}\` |"
+            echo
+            if [ -n "${{ steps.workspace-refs.outputs.coordination_context }}" ]; then
+              echo "Coordination context: ${{ steps.workspace-refs.outputs.coordination_context }}"
+              echo
+            fi
+            echo "Default push/pull_request CI validates against explicit \`main\` upstream refs. Use workflow_dispatch for coordinated validation against exact upstream refs."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create workspace root
         run: |

@@ -12,8 +12,25 @@ Fixes # (issue)
 ## How Has This Been Tested?
 Please describe the tests that you ran to verify your changes.
 
-- [ ] `pytest tests/unit`
-- [ ] `pytest tests/e2e`
+- [ ] `uv run ruff check .`
+- [ ] `uv run mypy .`
+- [ ] `uv run pytest tests/unit`
+- [ ] Additional integration/local/live checks when relevant
+
+## Cross-repo coordination
+Complete this section when the PR changes contracts, packaging/version expectations, CI sibling refs, or release sequencing.
+
+- Coordination record: <!-- issue / PR family / release-train note, or N/A -->
+- Upstream refs validated:
+  - `xrtm-data`: <!-- branch / tag / SHA / PR ref, or N/A -->
+  - `xrtm-eval`: <!-- branch / tag / SHA / PR ref, or N/A -->
+- Downstream follow-up:
+  - `xrtm`: <!-- PR / workflow run / release note, or N/A -->
+
+## Published surface impact
+
+- Stable surface changed: <!-- documented API / runtime behavior consumed by xrtm / dependency floor / README example / N/A -->
+- Release-pinned docs follow-up needed: <!-- xrtm / xrtm.org / none -->
 
 ## Checklist:
 - [ ] My code follows the style guidelines of this project
@@ -23,3 +40,20 @@ Please describe the tests that you ran to verify your changes.
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
+- [ ] Stable-surface changes include compatibility notes/tests and explicit downstream validation or follow-up
+- [ ] Unreleased behavior stays out of release-pinned `xrtm` / `xrtm.org` docs until the package release is published
+- [ ] Coordinated validation, when needed, uses explicit upstream refs rather than same-name branch fallback
+- [ ] Post-merge validation or release-train follow-up is documented when downstream repos are affected
+
+---
+
+## Maintainer Triage (for reviewers)
+_See [xrtm governance triage docs](https://github.com/xrtm-org/governance/blob/main/policies/triage-matrix.md) for classification guidance._
+
+**Scope**: <!-- Core Schema | Package API | Implementation | Infrastructure | Documentation -->
+**Priority**: <!-- Release Blocker | High | Medium | Low -->
+**Risk**: <!-- High | Medium | Low -->
+**Disposition**: <!-- Accept as-is | Accept with changes | Supersede | Defer | Reject -->
+
+**Review Notes**:
+<!-- Brief rationale for disposition. Record full details in governance/policies/pr-disposition-log.md -->

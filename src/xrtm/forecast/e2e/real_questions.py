@@ -25,7 +25,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -67,12 +67,14 @@ def build_real_question_prompt(question: ForecastQuestion) -> list[dict[str, str
     content = question.description or ""
     criteria = question.resolution_criteria or ""
     user_prompt = f"""
-Forecast this binary question using only the information below. Do not browse,
-do not call tools, and do not assume access to resolution data after the snapshot.
+    Forecast this binary question using the details below together with your
+    background world knowledge available before the snapshot time. Do not
+    browse, do not call tools, and do not use information learned after the
+    snapshot time.
 
-Question ID: {question.id}
-Snapshot time: {snapshot_time}
-Title: {question.title}
+    Question ID: {question.id}
+    Snapshot time: {snapshot_time}
+    Title: {question.title}
 Description: {content}
 Resolution criteria: {criteria}
 
@@ -112,6 +114,8 @@ def parse_llm_forecast_payload(text: str) -> dict[str, Any]:
 def run_real_question_e2e(
     *,
     limit: int = 2,
+    questions: Optional[Sequence[ForecastQuestion]] = None,
+    corpus_id: str = REAL_BINARY_CORPUS_ID,
     provider: Optional[InferenceProvider] = None,
     base_url: Optional[str] = None,
     model: Optional[str] = None,
@@ -126,14 +130,15 @@ def run_real_question_e2e(
         raise ValueError("limit must be at least 1")
 
     active_provider = provider or _build_local_openai_provider(base_url=base_url, model=model, api_key=api_key)
-    questions = load_real_binary_questions(limit=limit)
+    selected_questions = list(questions[:limit]) if questions is not None else load_real_binary_questions(limit=limit)
     records: list[ForecastHarnessRecord] = []
-    for question in questions:
+    for question in selected_questions:
         prompt = build_real_question_prompt(question)
         response, output = _generate_valid_forecast_output(
             question=question,
             provider=active_provider,
             prompt=prompt,
+            corpus_id=corpus_id,
             max_tokens=max_tokens,
             temperature=temperature,
         )
@@ -212,10 +217,12 @@ def _generate_valid_forecast_output(
     question: ForecastQuestion,
     provider: InferenceProvider,
     prompt: list[dict[str, str]],
+    corpus_id: str,
     max_tokens: int,
     temperature: float,
 ) -> tuple[ModelResponse, ForecastOutput]:
     token_budgets = _structured_output_token_budgets(max_tokens)
+    last_missing_json_response: ModelResponse | None = None
     for attempt_index, token_budget in enumerate(token_budgets):
         response = provider.generate_content(
             prompt,
@@ -223,10 +230,21 @@ def _generate_valid_forecast_output(
             temperature=temperature,
         )
         try:
-            return response, _build_output_from_response(question, response, provider)
+            return response, _build_output_from_response(question, response, provider, corpus_id=corpus_id)
         except ValueError as exc:
-            if not _is_missing_json_error(exc) or attempt_index == len(token_budgets) - 1:
+            if not _is_missing_json_error(exc):
                 raise
+            if last_missing_json_response is None:
+                last_missing_json_response = response
+            if attempt_index == len(token_budgets) - 1:
+                break
+    if last_missing_json_response is not None:
+        repaired_response = _repair_missing_json_response(
+            provider=provider,
+            response=last_missing_json_response,
+            repair_max_tokens=max(2048, max_tokens),
+        )
+        return repaired_response, _build_output_from_response(question, repaired_response, provider, corpus_id=corpus_id)
     raise ValueError("model response did not contain a JSON object")
 
 
@@ -234,6 +252,8 @@ def _build_output_from_response(
     question: ForecastQuestion,
     response: ModelResponse,
     provider: InferenceProvider,
+    *,
+    corpus_id: str,
 ) -> ForecastOutput:
     raw_text, raw_reasoning = _response_text_and_reasoning(response)
     payload = _parse_response_forecast_payload(raw_text, raw_reasoning)
@@ -254,9 +274,9 @@ def _build_output_from_response(
             snapshot_time=question.metadata.snapshot_time,
             tags=sorted({*question.metadata.tags, "real-question-e2e", "local-llm"}),
             subject_type="binary",
-            source_version=REAL_BINARY_CORPUS_ID,
+            source_version=question.metadata.source_version or corpus_id,
             raw_data={
-                "corpus_id": REAL_BINARY_CORPUS_ID,
+                "corpus_id": question.metadata.source_version or corpus_id,
                 "provider_model": getattr(provider, "model_id", None),
                 "usage": dict(response.usage),
                 "qwen_reasoning_present": bool(payload.get("qwen_reasoning") or raw_reasoning),
@@ -289,6 +309,31 @@ def _structured_output_token_budgets(max_tokens: int) -> list[int]:
     return list(dict.fromkeys(budgets))
 
 
+def _repair_missing_json_response(
+    *,
+    provider: InferenceProvider,
+    response: ModelResponse,
+    repair_max_tokens: int,
+) -> ModelResponse:
+    raw_text, raw_reasoning = _response_text_and_reasoning(response)
+    notes = raw_reasoning if raw_reasoning.strip() else raw_text
+    if not notes.strip():
+        raise ValueError("model response did not contain a JSON object")
+    repair_prompt = [
+        {"role": "system", "content": "Return one valid JSON object only. No analysis. No markdown."},
+        {
+            "role": "user",
+            "content": (
+                "Convert these forecast notes into JSON with keys probability, reasoning, logical_trace, "
+                "and structural_trace. Use exactly one logical_trace item if needed. structural_trace must "
+                'equal ["load_question", "local_llm_forecast", "validate_output"]. Notes:\n'
+                f"{notes}"
+            ),
+        },
+    ]
+    return provider.generate_content(repair_prompt, max_tokens=repair_max_tokens, temperature=0.0)
+
+
 def _strip_qwen_reasoning(text: str) -> tuple[str, str]:
     reasoning_parts = [match.group(1).strip() for match in _THINK_BLOCK_RE.finditer(text) if match.group(1).strip()]
     cleaned = _THINK_BLOCK_RE.sub("", text).strip()
@@ -299,6 +344,7 @@ def _parse_first_json_object(text: str) -> dict[str, Any]:
     candidates = [match.group(1).strip() for match in _FENCE_RE.finditer(text)]
     candidates.append(text.strip())
     decoder = json.JSONDecoder()
+    objects: list[dict[str, Any]] = []
     for candidate in candidates:
         for start in [index for index, char in enumerate(candidate) if char == "{"]:
             try:
@@ -306,8 +352,25 @@ def _parse_first_json_object(text: str) -> dict[str, Any]:
             except json.JSONDecodeError:
                 continue
             if isinstance(parsed, dict):
-                return parsed
-    raise ValueError("model response did not contain a JSON object")
+                objects.append(parsed)
+    if not objects:
+        raise ValueError("model response did not contain a JSON object")
+    return max(objects, key=_forecast_payload_score)
+
+
+def _forecast_payload_score(payload: dict[str, Any]) -> tuple[int, int]:
+    score = 0
+    if "probability" in payload or "confidence" in payload:
+        score += 4
+    if any(key in payload for key in ("reasoning", "rationale", "explanation")):
+        score += 3
+    if "logical_trace" in payload:
+        score += 2
+    if "reasoning_trace" in payload:
+        score += 2
+    if "structural_trace" in payload:
+        score += 1
+    return score, len(payload)
 
 
 def _coerce_probability(value: Any) -> float:

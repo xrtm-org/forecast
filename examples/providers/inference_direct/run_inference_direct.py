@@ -35,7 +35,7 @@ async def main():
     # 3. Get the Provider
     # In Pure Core, you can interact with providers without creating an Agent.
     try:
-        provider = factory.get_provider("openai", config)
+        provider = factory.get_provider(config)
 
         print(f"Using provider: {provider.__class__.__name__}")
 

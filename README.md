@@ -25,14 +25,23 @@ limitations under the License.
 <h1 align="center">xrtm-forecast</h1>
 
 <h3 align="center">
-    <p>Professional engine for generative forecasting and agentic reasoning</p>
+    <p>Runtime package for AI event forecasting</p>
 </h3>
 
-`xrtm-forecast` acts as the rigorous backbone for state-of-the-art agentic workflows, bridging the gap between rapid prototyping and mission-critical deployment.
+`xrtm-forecast` is the runtime package that powers forecasting inside XRTM.
 
-It centralizes the "Reasoning Graph" definition so that agent behaviors are deterministic and auditable. `forecast` is the pivot across the ecosystem: if a provider is supported, it can be plugged into any agent topology (Orchestrator, Debate, Consensus) without changing business logic.
+If XRTM is AI for event forecasting, `xrtm-forecast` is the execution layer that turns questions, models, and topologies into auditable forecast runs.
 
-We pledge to uphold research-grade transparency: strict typing, zero-tolerance verification, and rigorous double-trace auditability for every decision made by an AI.
+It provides forecasting agents, orchestration, provider integration, and the runtime boundaries needed for scored, inspectable event-forecasting workflows.
+
+## Start with `xrtm` or `xrtm-forecast`?
+
+| If you want to... | Start with | Why |
+| --- | --- | --- |
+| prove the released, provider-free XRTM workflow first | [`xrtm`](https://github.com/xrtm-org/xrtm) | the product shell owns the honest first-success path, canonical run artifacts, and the deterministic no-key provider |
+| embed forecasting directly in your own Python code or service | `xrtm-forecast` | this package owns the runtime APIs, orchestration, providers, and source examples |
+
+Use `xrtm` first when you still need the product story. Use `xrtm-forecast` once you are building directly against the forecasting runtime.
 
 ## The XRTM Ecosystem
 
@@ -67,8 +76,9 @@ graph LR
 | **xrtm-forecast** | Orchestrator, agents, inference providers | `pip install xrtm-forecast` |
 | **xrtm-train** | Backtesting, trace replay, calibration | `pip install xrtm-train` |
 
-> **For most users**: `pip install xrtm-forecast` is sufficient—it automatically installs `xrtm-data` and `xrtm-eval`.
-> **For researchers**: `pip install xrtm-train` installs the full stack including backtesting tools.
+> **Product-first, provider-free workflow**: install `xrtm==0.3.0`.
+> **Code-first runtime embedding**: install `xrtm-forecast`.
+> **Research/backtesting stack**: install `xrtm-train` when you also need replay and calibration tools.
 
 ## Installation
 
@@ -105,9 +115,59 @@ response = provider.generate_content("Reply with exactly XRTM_LOCAL_OK", max_tok
 
 The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-python`. Prefer the OpenAI-compatible path when a llama.cpp server is already running.
 
+### Provider-Free Testing (No API Keys, via `xrtm`)
+
+The shipped `DeterministicProvider` lives in the top-level `xrtm` product package, so install that package for the no-key local path:
+
+```bash
+pip install xrtm==0.3.0
+```
+
+Then use the provider alongside the `xrtm-forecast` APIs:
+
+```python
+from xrtm.product.providers import DeterministicProvider
+from xrtm.forecast.kit.agents.specialists.analyst import ForecastingAnalyst
+
+# Create provider-free model
+provider = DeterministicProvider()
+agent = ForecastingAnalyst(model=provider)
+
+# Run forecasts deterministically
+result = await agent.run("Will event X happen?")
+```
+
+See **[Provider-Free Testing Guide](docs/provider-free-testing.md)** for the full CLI and library workflows.
+
+## Official XRTM proof-point workflows
+
+The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` is the runtime underneath the released proof workflows documented in the product repo:
+
+| Workflow | Product surface | How `xrtm-forecast` fits |
+| --- | --- | --- |
+| **Provider-free first success** | `xrtm doctor`, `xrtm demo --provider mock --limit 1 --runs-dir runs` | Runs the same forecasting pipeline through the released product shell, paired with XRTM's deterministic provider-free layer. |
+| **Benchmark and performance workflow** | `xrtm perf run` | Supplies the deterministic forecast execution path used for reproducible benchmark evidence. |
+| **Monitoring, history, and report workflow** | `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html` | Produces the forecast outputs and metadata that feed canonical run artifacts, reports, and history views. |
+| **Local-LLM advanced workflow** | `xrtm local-llm status`, `xrtm demo --provider local-llm` | Powers the OpenAI-compatible local inference path used once the provider-free path is already proven. |
+
+If you are documenting or extending XRTM, align with those four workflows first rather than inventing a separate top-level story for this repo.
+
+## Honest improvement workflow
+
+Use the package stack as a clearly labeled deeper path:
+
+1. **Control first:** use the top-level `xrtm` product shell or the provider-free analyst example as the deterministic baseline.
+2. **Do not oversell the control:** repeated provider-free runs should stay stable, which is useful for learning the artifacts and compare surface but is not visible improvement by itself.
+3. **Introduce a real candidate change here:** local-model inference, runtime-level prompt/configuration work, or training-layer calibration/replay is where behavior can genuinely move.
+4. **Compare back in the product shell:** use the canonical XRTM run artifacts and compare/export workflow to decide whether the candidate earned promotion.
+
+In other words: `xrtm` owns the honest released baseline, while `xrtm-forecast`
+and `xrtm-train` supply the deeper paths where stronger "improve over time"
+proof can become real.
+
 ## Quickstart
 
-Get started with `xrtm-forecast` right away with the `Analyst` API. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
+Get started with `xrtm-forecast` when you want to build forecasting behavior directly in code. The `Analyst` is a high-level reasoning class that supports research, search, and probability estimation.
 
 ```python
 from xrtm.forecast import AsyncRuntime, create_forecasting_analyst
@@ -205,7 +265,6 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **[Debate](examples/kit/topologies/debate_demo/run_debate_demo.py)**: Two agents arguing for opposing sides before a judge.
 *   **[Consensus](examples/kit/topologies/consensus_demo/run_consensus_demo.py)**: Multiple agents varying in temperature converging on a decision.
 *   **[Orchestrator Basics](examples/core/orchestrator_basics/run_orchestrator_basics.py)**: Building a custom state machine from scratch.
-*   **[Epistemic Security](examples/core/run_epistemic_security.py)**: Source trust scoring and automated filtering.
 *   **[Chronos Acceleration](examples/core/run_chronos_sleep.py)**: Using virtual time to bypass real-world delays.
 
 </details>
@@ -215,6 +274,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 *   **[Discovery (Search)](examples/kit/features/discovery/run_discovery.py)**: Automated information retrieval.
 *   **[Streaming](examples/kit/features/streaming_demo/run_streaming_demo.py)**: Real-time token streaming for UIs.
+*   **[Provider-Free Analyst](examples/providers/provider_free_analyst/run_provider_free_analyst.py)**: Deterministic no-key agent smoke when `xrtm` is installed alongside the library.
 *   **[Calibration](https://github.com/xrtm-org/train/blob/main/examples/kit/run_calibration_demo.py)**: Adjusting confidence intervals (in `xrtm-train`).
 *   **[Trace Replay](https://github.com/xrtm-org/train/blob/main/examples/kit/run_trace_replay.py)**: Re-running a saved execution (in `xrtm-train`).
 
@@ -224,6 +284,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 ## Local Development
 
 We use `uv` for dependency management and Python environment handling.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for repo-role guidance, where docs/tests/policy belong across the stack, and the standard contributor check matrix.
 
 ### Prerequisites
 *   [uv](https://github.com/astral-sh/uv) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
@@ -238,8 +299,11 @@ We provide a setup script to bootstrap your environment and install sibling proj
 
 ### Common Commands
 
-*   **Run Check (Lint/Type)**: `uv run scripts/audit/check_docs.py` (and usage of standard tools `ruff check .`, `mypy .`)
-*   **Run Tests**: `uv run pytest tests/`
+*   **Run docs/import gate**: `uv run python scripts/audit/check_docs.py`
+*   **Run lint**: `uv run ruff check .`
+*   **Run type-check**: `uv run mypy .`
+*   **Run unit tests**: `uv run pytest tests/unit`
+*   **Run integration/verification tests when relevant**: `uv run pytest tests/integration` / `uv run pytest tests/verification`
 *   **Run Live Tests**: `uv run pytest tests/live --run-live`
 
 ### Containerized Development (Optional)

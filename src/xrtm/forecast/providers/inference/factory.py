@@ -25,13 +25,13 @@ from typing import Any, Optional
 
 from pydantic import SecretStr
 
-from xrtm.forecast.core.config.inference import (
-    GeminiConfig,
-    HFConfig,
-    LlamaCppConfig,
-    OpenAIConfig,
-    VLLMConfig,
-    XLMConfig,
+from xrtm.forecast.providers.inference._policy import (
+    apply_environment_profile,
+    build_config,
+    coerce_provider_request,
+    inject_api_key_from_settings,
+    instantiate_provider,
+    update_config,
 )
 from xrtm.forecast.providers.inference.base import InferenceProvider
 
@@ -72,102 +72,25 @@ class ModelFactory:
         Returns:
             `InferenceProvider`: An instantiated provider.
         r"""
-        from xrtm.forecast.core.exceptions import ConfigurationError
-
-        # Ergonomic Shortcut: string input
-        if isinstance(config, str):
-            if ":" in config:
-                provider_type, model_id = config.split(":", 1)
-            else:
-                provider_type = config
-            config = None
-
-        if config is None:
-            if not provider_type:
-                raise ConfigurationError(
-                    "Explicitly provide either a `config` object or `provider_type` (or a shortcut string)."
-                )
-
-            if provider_type.upper() == "GEMINI":
-                # model_id is allowed to be None here; the injection layer will handle defaults later?
-                # Actually, GeminiConfig requires model_id. We'll set a smart default if missing.
-                mid = model_id or "gemini-2.0-flash"
-                config = GeminiConfig(model_id=mid, api_key=api_key, **kwargs)
-            elif provider_type.upper() == "OPENAI":
-                mid = model_id or "gpt-4o"
-                config = OpenAIConfig(model_id=mid, api_key=api_key, **kwargs)
-            elif provider_type.upper() in ["HF", "HUGGINGFACE"]:
-                mid = model_id or "sshleifer/tiny-gpt2"  # Minimal default for testing
-                config = HFConfig(model_id=mid, **kwargs)
-            elif provider_type.upper() == "VLLM":
-                mid = model_id or "facebook/opt-125m"
-                config = VLLMConfig(model_id=mid, **kwargs)
-            elif provider_type.upper() in ["LLAMA-CPP", "GGUF"]:
-                mid = model_id or "bartowski/Llama-3.2-1B-Instruct-GGUF"
-                config = LlamaCppConfig(model_id=mid, **kwargs)
-            else:
-                raise ConfigurationError(f"Unsupported provider type: {provider_type}")
-
+        from xrtm.forecast.core.config.inference import ProviderConfig
         from xrtm.forecast.core.config.main import settings
 
-        # Handle Environment Profiles if requested
-        env_profile = kwargs.get("env")
+        request_kwargs = dict(kwargs)
+        env_profile = request_kwargs.pop("env", None)
+        config, provider_type, model_id = coerce_provider_request(config, provider_type, model_id)
+
+        if config is None:
+            config, provider_kwargs = build_config(provider_type=provider_type, model_id=model_id, api_key=api_key, kwargs=request_kwargs)
+        elif isinstance(config, ProviderConfig):
+            config, provider_kwargs = update_config(config=config, model_id=model_id, api_key=api_key, kwargs=request_kwargs)
+        else:
+            provider_kwargs = request_kwargs
+
         if env_profile:
             logger.info(f"Applying Environment Profile: {env_profile}")
-            if env_profile == "production" and isinstance(config, OpenAIConfig):
-                config.model_id = "gpt-4o"  # Override for production
-            elif env_profile == "dev":
-                config.model_id = "gpt-4o-mini" if isinstance(config, OpenAIConfig) else "gemini-2.0-flash"
-
-        # Injection Layer: Resolve API keys from global settings if missing in component config
-
-        if isinstance(config, GeminiConfig):
-            if not config.api_key and settings.gemini_api_key:
-                config.api_key = settings.gemini_api_key
-
-            from xrtm.forecast.providers.inference.gemini_provider import GeminiProvider
-
-            return GeminiProvider(config=config, **kwargs)
-
-        elif isinstance(config, OpenAIConfig):
-            if not config.api_key and settings.openai_api_key:
-                config.api_key = settings.openai_api_key
-
-            from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
-
-            return OpenAIProvider(config=config, **kwargs)
-
-        elif isinstance(config, (HFConfig, XLMConfig)):
-            from xrtm.forecast.providers.inference.hf_provider import HuggingFaceProvider
-
-            return HuggingFaceProvider(config=config)
-
-        elif isinstance(config, VLLMConfig):
-            # Placeholder for VLLMProvider (requires 'vllm' extra)
-            try:
-                from xrtm.forecast.providers.inference.vllm_provider import VLLMProvider
-
-                return VLLMProvider(config=config)
-            except ImportError:
-                raise ConfigurationError(
-                    "VLLMProvider not found. Ensure you have implemented it in "
-                    "forecast.providers.inference.vllm_provider and installed 'vllm' extra."
-                )
-
-        elif isinstance(config, LlamaCppConfig):
-            # Placeholder for LlamaCppProvider (requires 'llama-cpp' extra)
-            try:
-                from xrtm.forecast.providers.inference.llamacpp_provider import LlamaCppProvider
-
-                return LlamaCppProvider(config=config)
-            except ImportError:
-                raise ConfigurationError(
-                    "LlamaCppProvider not found. Ensure you have implemented it in "
-                    "forecast.providers.inference.llamacpp_provider and installed 'llama-cpp' extra."
-                )
-
-        else:
-            raise ConfigurationError(f"Unsupported configuration type: {type(config)}")
+        config = apply_environment_profile(config, env_profile)
+        config = inject_api_key_from_settings(config, settings)
+        return instantiate_provider(config, provider_kwargs)
 
 
 __all__ = ["ModelFactory"]
