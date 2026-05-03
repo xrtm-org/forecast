@@ -284,6 +284,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 ## Local Development
 
 We use `uv` for dependency management and Python environment handling.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for repo-role guidance, where docs/tests/policy belong across the stack, and the standard contributor check matrix.
 
 ### Prerequisites
 *   [uv](https://github.com/astral-sh/uv) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
@@ -298,8 +299,11 @@ We provide a setup script to bootstrap your environment and install sibling proj
 
 ### Common Commands
 
-*   **Run Check (Lint/Type)**: `uv run scripts/audit/check_docs.py` (and usage of standard tools `ruff check .`, `mypy .`)
-*   **Run Tests**: `uv run pytest tests/`
+*   **Run docs/import gate**: `uv run python scripts/audit/check_docs.py`
+*   **Run lint**: `uv run ruff check .`
+*   **Run type-check**: `uv run mypy .`
+*   **Run unit tests**: `uv run pytest tests/unit`
+*   **Run integration/verification tests when relevant**: `uv run pytest tests/integration` / `uv run pytest tests/verification`
 *   **Run Live Tests**: `uv run pytest tests/live --run-live`
 
 ### Containerized Development (Optional)
