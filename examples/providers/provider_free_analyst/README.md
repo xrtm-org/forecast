@@ -8,7 +8,7 @@ Demonstrates using the DeterministicProvider for testing and learning XRTM witho
 
 ```bash
 # Install the top-level product package once so xrtm.product.providers is available
-pip install xrtm==0.3.0
+pip install xrtm==0.3.1
 
 # From repository root
 python examples/providers/provider_free_analyst/run_provider_free_analyst.py
