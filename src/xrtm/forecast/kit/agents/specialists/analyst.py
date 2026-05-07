@@ -23,12 +23,23 @@ structured reasoning into a coherent analytical output.
 import logging
 from typing import Any, Dict, List, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from xrtm.forecast.core.schemas.forecast import CausalEdge, CausalNode, ForecastOutput, ForecastQuestion, MetadataBase
 from xrtm.forecast.kit.agents.llm import LLMAgent
 
 logger = logging.getLogger(__name__)
+
+
+def _default_confidence_interval(probability: float = 0.5) -> Dict[str, float]:
+    r"""Synthesize a bounded confidence interval for legacy payloads."""
+
+    center = min(max(float(probability), 0.0), 1.0)
+    return {
+        "low": round(max(0.0, center - 0.1), 3),
+        "high": round(min(1.0, center + 0.1), 3),
+        "level": 0.9,
+    }
 
 
 class AnalystOutput(BaseModel):
@@ -47,6 +58,18 @@ class AnalystOutput(BaseModel):
     causal_edges: List[Dict[str, Any]] = Field(
         default_factory=list, description="List of directed dependencies with 'source' and 'target'"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _backfill_confidence_interval(cls, data: Any) -> Any:
+        r"""Accept legacy analyst payloads that omitted `confidence_interval`."""
+        if not isinstance(data, dict):
+            return data
+
+        updated = dict(data)
+        if "confidence_interval" not in updated:
+            updated["confidence_interval"] = _default_confidence_interval(updated.get("probability", 0.5))
+        return updated
 
 
 class ForecastingAnalyst(LLMAgent):
@@ -103,7 +126,7 @@ class ForecastingAnalyst(LLMAgent):
 
         # Defaults for safe fallback
         probability = 0.5
-        confidence_interval = {"low": 0.4, "high": 0.6, "level": 0.9}
+        confidence_interval = _default_confidence_interval(probability)
         reasoning = "Parsing failed."
         nodes = []
         edges = []
@@ -116,7 +139,7 @@ class ForecastingAnalyst(LLMAgent):
             edges = [CausalEdge(**e) for e in parsed.causal_edges]
         elif isinstance(parsed, dict):
             probability = parsed.get("probability", 0.5)
-            confidence_interval = parsed.get("confidence_interval", confidence_interval)
+            confidence_interval = parsed.get("confidence_interval", _default_confidence_interval(probability))
             reasoning = parsed.get("reasoning", "Parsing failed fallback.")
             nodes = [CausalNode(**n) for n in parsed.get("causal_nodes", [])]
             edges = [CausalEdge(**e) for e in parsed.get("causal_edges", [])]
