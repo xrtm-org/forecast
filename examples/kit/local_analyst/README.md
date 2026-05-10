@@ -15,14 +15,14 @@ python3 examples/kit/local_analyst/run_local_analyst.py
 
 - A local OpenAI-compatible inference server.
 - For the local workspace profile:
-  - start `/home/moy/Workspaces/local-claude-llamacpp` with `./manage.sh start`
+  - start `/home/moy/workspaces/local-claude-llamacpp` with `./manage.sh start`
   - use base URL `http://localhost:8080/v1`
   - use model id `Qwen3.5-27B-Q4_K_M.gguf`
 
 ## Local smoke test
 
 ```bash
-cd /home/moy/Workspaces/xrtm
+cd /home/moy/workspaces/xrtm
 ./workspace.sh local-llm-start
 ./workspace.sh check-local-llm
 ./workspace.sh local-llm-stop
