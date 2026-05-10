@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.9] - 2026-05-10
+
+### Changed
+- Harden the local analyst example and inference policy path for the coordinated release train.
+- Require the released `xrtm-eval>=0.2.6` floor for the coordinated train.
+
 ## [0.6.8] - 2026-05-07
 
 ### Fixed
