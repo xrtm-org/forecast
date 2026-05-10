@@ -35,6 +35,8 @@ from xrtm.forecast.core.exceptions import ConfigurationError
 
 @dataclass(frozen=True)
 class ProviderSpec:
+    r"""Describe one supported inference-provider family and its resolution defaults."""
+
     aliases: tuple[str, ...]
     config_type: type[ProviderConfig]
     default_model_id: str
