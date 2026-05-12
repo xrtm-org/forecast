@@ -51,7 +51,7 @@ def test_llamacpp_openai_compatible_provider_smoke() -> None:
     _require_local_llm(base_url)
 
     config = OpenAIConfig(
-        model_id=os.getenv("XRTM_LOCAL_LLM_MODEL", "Qwen3.5-27B-Q4_K_M.gguf"),
+        model_id=os.getenv("XRTM_LOCAL_LLM_MODEL", "Qwen3.5-9B-UD-Q4_K_XL.gguf"),
         api_key=SecretStr(os.getenv("XRTM_LOCAL_LLM_API_KEY", "test")),
         base_url=base_url,
     )

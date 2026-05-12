@@ -60,8 +60,8 @@ class OpenAIProvider(InferenceProvider):
         self.base_url = config.base_url
         self.cache: Optional[InferenceCache] = kwargs.pop("cache", None)
 
-        self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
-        self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+        self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
+        self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
 
     def _normalize_messages(self, messages: Any) -> List[Dict[str, str]]:
         if isinstance(messages, str):

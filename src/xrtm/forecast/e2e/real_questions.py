@@ -201,7 +201,7 @@ def validate_forecast_output_integrity(question: ForecastQuestion, output: Forec
 def _build_local_openai_provider(
     *, base_url: Optional[str], model: Optional[str], api_key: Optional[str]
 ) -> InferenceProvider:
-    model_id = model or os.environ.get("XRTM_LOCAL_LLM_MODEL") or "Qwen3.5-27B-Q4_K_M.gguf"
+    model_id = model or os.environ.get("XRTM_LOCAL_LLM_MODEL") or "Qwen3.5-9B-UD-Q4_K_XL.gguf"
     api_key_value = api_key or os.environ.get("XRTM_LOCAL_LLM_API_KEY") or "test"
     base_url_value = base_url or os.environ.get("XRTM_LOCAL_LLM_BASE_URL") or "http://localhost:8080/v1"
     config = OpenAIConfig(

@@ -17,7 +17,7 @@ python3 examples/kit/local_analyst/run_local_analyst.py
 - For the local workspace profile:
   - start `/home/moy/workspaces/local-claude-llamacpp` with `./manage.sh start`
   - use base URL `http://localhost:8080/v1`
-  - use model id `Qwen3.5-27B-Q4_K_M.gguf`
+  - use model id `Qwen3.5-9B-UD-Q4_K_XL.gguf`
 
 ## Local smoke test
 
