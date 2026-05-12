@@ -465,7 +465,7 @@ xrtm local-llm status
 ✓ Endpoint: http://localhost:8080/v1
 ✓ Health check: PASS
 ✓ Models available: 1
-  - Qwen3.5-27B-Q4_K_M.gguf
+  - Qwen3.5-9B-UD-Q4_K_XL.gguf
 ✓ GPU: NVIDIA GeForce RTX 3090 (8192 MiB used / 24576 MiB total)
 ```
 

@@ -52,7 +52,7 @@ def test_real_question_e2e_local_llm_subset() -> None:
     records = run_real_question_e2e(
         limit=int(os.getenv("XRTM_FORECAST_REAL_E2E_LIMIT", "1")),
         base_url=base_url,
-        model=os.getenv("XRTM_LOCAL_LLM_MODEL", "Qwen3.5-27B-Q4_K_M.gguf"),
+        model=os.getenv("XRTM_LOCAL_LLM_MODEL", "Qwen3.5-9B-UD-Q4_K_XL.gguf"),
         api_key=os.getenv("XRTM_LOCAL_LLM_API_KEY", "test"),
         max_tokens=int(os.getenv("XRTM_LOCAL_LLM_MAX_TOKENS", "768")),
         artifact_dir=Path("output/real-e2e-tests"),

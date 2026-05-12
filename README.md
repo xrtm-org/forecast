@@ -105,7 +105,7 @@ from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.factory import ModelFactory
 
 config = OpenAIConfig(
-    model_id="Qwen3.5-27B-Q4_K_M.gguf",
+    model_id="Qwen3.5-9B-UD-Q4_K_XL.gguf",
     api_key=SecretStr("test"),
     base_url="http://localhost:8080/v1",
 )
