@@ -7,7 +7,7 @@ This guide shows you how to use XRTM without API keys, cloud dependencies, or ho
 Install the top-level product package once so the shipped CLI and `DeterministicProvider` are available:
 
 ```bash
-pip install xrtm==0.3.1
+pip install xrtm==0.3.3
 ```
 
 ## Why Provider-Free?
@@ -36,9 +36,9 @@ This guide focuses on the provider-free foundation that `xrtm` ships and that `x
 
 The official released XRTM product story currently centers on four workflows:
 
-1. **Provider-free first success** — `xrtm doctor`, then `xrtm demo --provider mock --limit 1 --runs-dir runs`
+1. **Provider-free first success** — `xrtm start`, then review the saved run with `xrtm runs show latest --runs-dir runs` and `xrtm report html --latest --runs-dir runs`
 2. **Benchmark and performance workflow** — `xrtm perf run`
-3. **Monitoring, history, and report workflow** — `xrtm monitor ...`, `xrtm runs ...`, and `xrtm report html`
+3. **Monitoring, history, and export workflow** — `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html`, and `xrtm runs export`
 4. **Local-LLM advanced workflow** — `xrtm local-llm status` and `xrtm demo --provider local-llm`
 
 This guide focuses on the provider-free foundation that makes workflows 1-3 fast, deterministic, and CI-safe.
@@ -106,17 +106,18 @@ The `xrtm` CLI provides the highest-level interface for provider-free testing.
 
 ### Quick Start
 
-Run a complete forecasting pipeline locally:
+Run the released guided first-success path:
 
 ```bash
-xrtm demo --provider mock --limit 2
+xrtm start
+xrtm runs show latest --runs-dir runs
+xrtm report html --latest --runs-dir runs
 ```
 
 This:
-- Loads 2 questions from the embedded corpus
-- Generates forecasts using the mock provider
-- Evaluates forecast quality with Brier scores
-- Writes a complete run directory under `runs/`
+- Verifies the installed stack and local readiness
+- Writes the first provider-free scored run under `runs/`
+- Shows you the latest-run review command and report path
 
 **Expected runtime**: < 5 seconds
 
@@ -678,7 +679,7 @@ from xrtm.product.providers import DeterministicProvider
 If you're using the `xrtm-forecast` library standalone (without the `xrtm` product shell), you'll need to install the full `xrtm` package:
 
 ```bash
-pip install xrtm==0.3.1
+pip install xrtm==0.3.3
 ```
 
 #### Output Doesn't Look Realistic
@@ -875,7 +876,7 @@ export XRTM_LOCAL_LLM_API_KEY=test  # Usually "test" for local servers
 
 | Goal | CLI Command | Library Code |
 |------|------------|--------------|
-| **Learn XRTM** | `xrtm demo --provider mock --limit 2` | `model = DeterministicProvider()` |
+| **Learn XRTM** | `xrtm start` | `model = DeterministicProvider()` |
 | **Test agent logic** | N/A | Use in unit tests with `pytest` |
 | **CI pipeline** | `xrtm perf run --scenario provider-free-smoke` | N/A |
 | **Rapid iteration** | `xrtm profile create local-mock --provider mock` | Reuse provider instance |
@@ -896,4 +897,4 @@ For production forecasts, switch to a real provider by changing one line of conf
 
 ---
 
-**Ready to test?** Start with `xrtm demo --provider mock --limit 2` at the CLI, or `model = DeterministicProvider()` in your code.
+**Ready to test?** Start with `xrtm start` at the CLI, or `model = DeterministicProvider()` in your code.

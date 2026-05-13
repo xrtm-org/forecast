@@ -17,7 +17,7 @@ limitations under the License.
 <p align="center">
     <br>
     <img src="https://img.shields.io/badge/status-release-forestgreen.svg?style=flat-square" alt="Status">
-    <img src="https://img.shields.io/badge/version-0.6.0-blue.svg?style=flat-square" alt="Version">
+    <img src="https://img.shields.io/badge/version-0.6.10-blue.svg?style=flat-square" alt="Version">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build">
     <a href="https://www.xrtm.org"><img src="https://img.shields.io/website/https/www.xrtm.org.svg?style=flat-square&label=website&up_message=online&down_message=offline" alt="Website"></a>
 </p>
@@ -76,7 +76,7 @@ graph LR
 | **xrtm-forecast** | Orchestrator, agents, inference providers | `pip install xrtm-forecast` |
 | **xrtm-train** | Backtesting, trace replay, calibration | `pip install xrtm-train` |
 
-> **Product-first, provider-free workflow**: install `xrtm==0.3.1`.
+> **Product-first, provider-free workflow**: install `xrtm==0.3.3` and start with `xrtm start`.
 > **Code-first runtime embedding**: install `xrtm-forecast`.
 > **Research/backtesting stack**: install `xrtm-train` when you also need replay and calibration tools.
 
@@ -120,7 +120,7 @@ The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-
 The shipped `DeterministicProvider` lives in the top-level `xrtm` product package, so install that package for the no-key local path:
 
 ```bash
-pip install xrtm==0.3.1
+pip install xrtm==0.3.3
 ```
 
 Then use the provider alongside the `xrtm-forecast` APIs:
@@ -145,9 +145,9 @@ The top-level `xrtm` product shell owns the public XRTM story. `xrtm-forecast` i
 
 | Workflow | Product surface | How `xrtm-forecast` fits |
 | --- | --- | --- |
-| **Provider-free first success** | `xrtm doctor`, `xrtm demo --provider mock --limit 1 --runs-dir runs` | Runs the same forecasting pipeline through the released product shell, paired with XRTM's deterministic provider-free layer. |
+| **Provider-free first success** | `xrtm start`, `xrtm runs show latest --runs-dir runs`, `xrtm report html --latest --runs-dir runs` | Runs the released guided product-shell path, then reviews the same canonical artifacts and report it created. |
 | **Benchmark and performance workflow** | `xrtm perf run` | Supplies the deterministic forecast execution path used for reproducible benchmark evidence. |
-| **Monitoring, history, and report workflow** | `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html` | Produces the forecast outputs and metadata that feed canonical run artifacts, reports, and history views. |
+| **Monitoring, history, and export workflow** | `xrtm monitor ...`, `xrtm runs ...`, `xrtm report html`, `xrtm runs export` | Produces the forecast outputs and metadata that feed canonical run artifacts, reports, exports, and history views. |
 | **Local-LLM advanced workflow** | `xrtm local-llm status`, `xrtm demo --provider local-llm` | Powers the OpenAI-compatible local inference path used once the provider-free path is already proven. |
 
 If you are documenting or extending XRTM, align with those four workflows first rather than inventing a separate top-level story for this repo.
