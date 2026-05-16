@@ -76,9 +76,13 @@ graph LR
 | **xrtm-forecast** | Orchestrator, agents, inference providers | `pip install xrtm-forecast` |
 | **xrtm-train** | Backtesting, trace replay, calibration | `pip install xrtm-train` |
 
-> **Product-first, provider-free workflow**: install `xrtm==0.3.3` and start with `xrtm start`.
+> **Product-first, provider-free workflow**: install `xrtm==0.7.0` and start with `xrtm start`.
 > **Code-first runtime embedding**: install `xrtm-forecast`.
 > **Research/backtesting stack**: install `xrtm-train` when you also need replay and calibration tools.
+
+When docs talk about the “current XRTM release,” they mean the published `xrtm`
+product package. `xrtm-forecast` keeps its own package versioning. See the
+governance [Stack Versioning Policy](https://github.com/xrtm-org/governance/blob/main/policies/stack-versioning-policy.md).
 
 ## Installation
 
@@ -120,7 +124,7 @@ The direct `LlamaCppProvider` is for in-process GGUF loading through `llama-cpp-
 The shipped `DeterministicProvider` lives in the top-level `xrtm` product package, so install that package for the no-key local path:
 
 ```bash
-pip install xrtm==0.3.3
+pip install xrtm==0.7.0
 ```
 
 Then use the provider alongside the `xrtm-forecast` APIs:

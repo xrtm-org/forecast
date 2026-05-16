@@ -7,7 +7,7 @@ This guide shows you how to use XRTM without API keys, cloud dependencies, or ho
 Install the top-level product package once so the shipped CLI and `DeterministicProvider` are available:
 
 ```bash
-pip install xrtm==0.3.3
+pip install xrtm==0.7.0
 ```
 
 ## Why Provider-Free?
@@ -31,6 +31,11 @@ Provider-free mode is perfect for:
 - Start with **`xrtm-forecast`** when you are embedding forecasting directly in code and only need the runtime APIs.
 
 This guide focuses on the provider-free foundation that `xrtm` ships and that `xrtm-forecast` can reuse in code.
+
+When this guide says “current XRTM release,” it means the published `xrtm`
+package version for the product-first workflow. `xrtm-forecast` versions
+independently; see the governance
+[Stack Versioning Policy](https://github.com/xrtm-org/governance/blob/main/policies/stack-versioning-policy.md).
 
 ## Official released product workflows
 
@@ -679,7 +684,7 @@ from xrtm.product.providers import DeterministicProvider
 If you're using the `xrtm-forecast` library standalone (without the `xrtm` product shell), you'll need to install the full `xrtm` package:
 
 ```bash
-pip install xrtm==0.3.3
+pip install xrtm==0.7.0
 ```
 
 #### Output Doesn't Look Realistic
