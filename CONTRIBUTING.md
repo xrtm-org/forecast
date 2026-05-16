@@ -9,7 +9,7 @@
 | runtime APIs, provider integrations, orchestration internals, or library examples | `forecast` | this repo owns the runtime implementation |
 | released CLI/product docs, canonical run artifacts, or provider-free first-success flow | [`xrtm`](https://github.com/xrtm-org/xrtm) | the product shell owns the public workflow |
 | public site navigation or newcomer-facing mirrors of released behavior | [`xrtm.org`](https://github.com/xrtm-org/xrtm.org) | the site presents accepted product/governance truth |
-| schemas, compatibility rules, or org-wide contributor policy | [`governance`](https://github.com/xrtm-org/governance) | shared standards live there |
+| schemas, compatibility rules, stack versioning, or org-wide contributor policy | [`governance`](https://github.com/xrtm-org/governance) | shared standards live there |
 
 ## Local setup
 
@@ -59,11 +59,16 @@ Use the repo test directories intentionally:
 
 Do not move branch-only runtime conveniences into release-pinned `xrtm` or `xrtm.org` docs until the package release, downstream docs, and validation evidence move together.
 
+For versioning and release-train questions, use the governance
+[Stack Versioning Policy](https://github.com/xrtm-org/governance/blob/main/policies/stack-versioning-policy.md):
+`xrtm` anchors top-level product release claims, while `xrtm-forecast` keeps its
+own package versioning.
+
 ## PR expectations
 
 1. Branch from `main`.
 2. Keep examples and tests close to the runtime surface you changed.
-3. When a stable surface changes, note downstream follow-up for `xrtm` and `xrtm.org`.
+3. When a stable surface changes, note downstream follow-up for `xrtm` and `xrtm.org`, including the anchor `xrtm` release or explicit package refs when docs/contracts move together.
 4. Use explicit upstream/downstream refs for coordinated validation rather than same-name branch assumptions.
 5. Include the commands you ran in the PR description.
 
@@ -71,4 +76,5 @@ Do not move branch-only runtime conveniences into release-pinned `xrtm` or `xrtm
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) for the runtime/layer split
 - [AGENTS.md](AGENTS.md) for repo-specific engineering guardrails
+- [Stack Versioning Policy](https://github.com/xrtm-org/governance/blob/main/policies/stack-versioning-policy.md) for product-anchor release claims vs package-local versioning
 - [`governance` cross-repo policies](https://github.com/xrtm-org/governance/tree/main/policies) when the change affects stable shared surfaces
