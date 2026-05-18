@@ -1,11 +1,11 @@
 # Core Examples (Primitives)
 
-These examples demonstrate the fundamental building blocks of the `xrtm-forecast` reasoning engine. Start here when you want to understand the lower-level runtime primitives rather than the higher-level kit examples.
+These examples demonstrate the lower-level building blocks behind a forecast run.
 
 ## Projects
 
 ### [orchestrator_basics](./orchestrator_basics/)
-Demonstrates how to register nodes and edges to build a directed acyclic graph (DAG) for reasoning.
+Shows how to register nodes and edges to build an execution graph.
 
 ### [state_management](./state_management/)
-Shows how `BaseGraphState` evolves through the graph, carrying context, reports, and token usage.
+Shows how `BaseGraphState` evolves through an execution graph, carrying context, reports, and token usage.

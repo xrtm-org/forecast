@@ -41,8 +41,8 @@ class TelemetryManager:
     A management layer for structured telemetry and observability.
 
     `TelemetryManager` coordinates the lifecycle of traces and spans, ensuring
-    alignment with OpenTelemetry standards. It provides utilities for tracking
-    agent execution paths and exporting results for auditing.
+        alignment with OpenTelemetry standards. It provides utilities for tracking
+        agent execution traces and exporting results for auditing.
 
     This implementation uses `contextvars` to ensure that traces and spans are
     isolated to the current execution task, preventing leakage in parallel environments.

@@ -2,7 +2,7 @@
 
 **Script**: `run_inference_direct.py`
 
-This example demonstrates how to use the `xrtm-forecast` inference layer directly, bypassing the graph orchestrator. This is useful for testing model connectivity or building simple scripts that need LLM access.
+This example demonstrates how to use the `xrtm-forecast` inference layer directly, bypassing the execution-graph orchestrator. This is useful for testing model connectivity or building simple scripts that need LLM access.
 
 ## Usage
 

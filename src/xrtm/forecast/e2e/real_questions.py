@@ -85,8 +85,10 @@ Return exactly one JSON object with this schema:
   "logical_trace": [
     {{"event": <key assumption>, "probability": <number from 0 to 1>, "description": <why it matters>}}
   ],
-  "structural_trace": ["load_question", "local_llm_forecast", "validate_output"]
+  "execution_trace": ["load_question", "local_llm_forecast", "validate_output"]
 }}
+
+`execution_trace` is the preferred user-facing name. The runtime still stores it on `ForecastOutput.structural_trace`.
 """.strip()
     return [
         {
@@ -182,9 +184,9 @@ def validate_forecast_output_integrity(question: ForecastQuestion, output: Forec
     reasoning_trace = output.reasoning_trace
     if not isinstance(reasoning_trace.get("narrative"), str) or not reasoning_trace["narrative"].strip():
         errors.append("reasoning_trace narrative is unusable")
-    causal_graph = reasoning_trace.get("causal_graph")
-    if not isinstance(causal_graph, dict) or not isinstance(causal_graph.get("nodes"), list):
-        errors.append("reasoning_trace causal graph nodes are unusable")
+    reasoning_graph = _reasoning_graph_payload(reasoning_trace)
+    if not isinstance(reasoning_graph, dict) or not isinstance(reasoning_graph.get("nodes"), list):
+        errors.append("reasoning_trace reasoning graph nodes are unusable")
 
     output.model_dump(mode="json")
     try:
@@ -261,7 +263,7 @@ def _build_output_from_response(
     reasoning = _coerce_reasoning(payload, raw_reasoning)
     logical_trace = _coerce_logical_trace(_trace_nodes_payload(payload), probability, reasoning, question.id)
     structural_trace = _coerce_string_list(
-        payload.get("structural_trace"),
+        payload.get("structural_trace", payload.get("execution_trace")),
         default=["load_question", "local_llm_forecast", "validate_output"],
     )
     return ForecastOutput(
@@ -325,7 +327,7 @@ def _repair_missing_json_response(
             "role": "user",
             "content": (
                 "Convert these forecast notes into JSON with keys probability, reasoning, logical_trace, "
-                "and structural_trace. Use exactly one logical_trace item if needed. structural_trace must "
+                "and execution_trace. Use exactly one logical_trace item if needed. execution_trace must "
                 'equal ["load_question", "local_llm_forecast", "validate_output"]. Notes:\n'
                 f"{notes}"
             ),
@@ -368,9 +370,20 @@ def _forecast_payload_score(payload: dict[str, Any]) -> tuple[int, int]:
         score += 2
     if "reasoning_trace" in payload:
         score += 2
-    if "structural_trace" in payload:
+    if "structural_trace" in payload or "execution_trace" in payload:
         score += 1
     return score, len(payload)
+
+
+def _reasoning_graph_payload(reasoning_trace: Any) -> Any:
+    if reasoning_trace is not None and hasattr(reasoning_trace, "model_dump") and not isinstance(reasoning_trace, dict):
+        reasoning_trace = reasoning_trace.model_dump()
+    if isinstance(reasoning_trace, dict):
+        for key in ("reasoning_graph", "causal_graph"):
+            value = reasoning_trace.get(key)
+            if isinstance(value, dict):
+                return value
+    return None
 
 
 def _coerce_probability(value: Any) -> float:
@@ -404,10 +417,9 @@ def _trace_nodes_payload(payload: dict[str, Any]) -> Any:
     if "logical_trace" in payload:
         return payload["logical_trace"]
     reasoning_trace = payload.get("reasoning_trace")
-    if isinstance(reasoning_trace, dict):
-        causal_graph = reasoning_trace.get("causal_graph")
-        if isinstance(causal_graph, dict) and "nodes" in causal_graph:
-            return causal_graph["nodes"]
+    reasoning_graph = _reasoning_graph_payload(reasoning_trace)
+    if isinstance(reasoning_graph, dict) and "nodes" in reasoning_graph:
+        return reasoning_graph["nodes"]
     return None
 
 

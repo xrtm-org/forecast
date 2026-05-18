@@ -1,18 +1,18 @@
 # Composable Topologies
 
-The `forecast.kit.patterns` module provides pre-wired architectural patterns for reasoning. Instead of manually wiring every edge in an `Orchestrator`, you can use these factories to instantiate robust, institutional-grade topologies.
+The `forecast.kit.patterns` module provides pre-wired execution-graph patterns. Instead of wiring every edge manually in an `Orchestrator`, use these factories to assemble reusable forecast paths.
 
 ## Philosophy
-We adhere to the "Pure Core, Practical Shell" philosophy:
-*   **Pure Core**: The `Orchestrator` engine handles execution, state, and parallelism.
-*   **Practical Shell**: Topologies are just factory functions that configure the core engine. They do not introduce new runtime logic.
 
-## Supported Topologies
+- **Pure core**: the `Orchestrator` owns execution, state, and parallelism.
+- **Practical shell**: topologies are factories that configure the execution graph. They do not create a second reasoning layer.
 
-### 1. Debate Topology
+## Supported topologies
+
+### 1. Debate topology
 *Factory*: `create_debate_graph()`
 
-The Debate topology wires three agents into a structured argumentative loop. This pattern is essential for Consensus Building and Adversarial Verification.
+The Debate topology wires three agents into a structured argumentative loop.
 
 ```mermaid
 graph LR
@@ -23,23 +23,22 @@ graph LR
     Judge --End--> End
 ```
 
-**Usage:**
 ```python
 from xrtm.forecast.kit.patterns import create_debate_graph
 
-graph = create_debate_graph(
+execution_graph = create_debate_graph(
     pro_agent=pro_agent,
     con_agent=con_agent,
     judge_agent=judge_agent,
-    max_rounds=3
+    max_rounds=3,
 )
-result = await graph.run("Thesis: Inflation is transitory.")
+result = await execution_graph.run("Thesis: Inflation is transitory.")
 ```
 
-### 2. Fan-Out Topology
+### 2. Fan-out topology
 *Factory*: `create_fanout_graph()`
 
-The Fan-Out topology executes N worker Stages **in parallel** (concurrently) and then aggregates their results. This is critical for **Horizontal Scaling** (e.g., analyzing 50 stock tickers at once).
+The Fan-Out topology executes N worker stages in parallel and then aggregates their results.
 
 ```mermaid
 graph LR
@@ -53,14 +52,13 @@ graph LR
     Aggregator --> End
 ```
 
-**Usage:**
 ```python
 from xrtm.forecast.kit.patterns import create_fanout_graph
 
 workers = [analyst_1, analyst_2, analyst_3]
-graph = create_fanout_graph(
+execution_graph = create_fanout_graph(
     workers=workers,
-    aggregator=portfolio_manager
+    aggregator=portfolio_manager,
 )
-result = await graph.run("Analyze Q3 Earnings")
+result = await execution_graph.run("Analyze Q3 Earnings")
 ```

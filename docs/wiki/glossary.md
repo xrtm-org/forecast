@@ -1,79 +1,59 @@
 # Glossary & Terminology
 
-This glossary defines the "Institutional Language" used throughout the `xrtm-forecast` ecosystem. It is designed to be the single source of truth for developers and users.
+This glossary is the forecast-runtime source of truth for XRTM terminology.
 
-## Core Entities
+## Product vs runtime
+
+### Workflow
+A released, user-facing journey in the top-level `xrtm` product (for example the provider-free first-success path).
+
+### Run
+One concrete execution of `xrtm-forecast` for a forecast request.
+
+## Execution layer
+
+### Execution graph
+The orchestrator DAG that moves state through a run.
+*Code*: `forecast.core.orchestrator.Orchestrator`
+
+### Node
+The engine's registered execution unit. Nodes are what the orchestrator schedules.
+
+### Stage
+The role a node plays in an execution graph. A stage is the documentation-facing term; a node is the engine-facing term.
+
+### Parallel group
+A named set of nodes that execute concurrently before the run continues.
+
+### Topology
+A reusable pattern for wiring nodes and edges into an execution graph.
+*Code*: `forecast.kit.patterns`, `forecast.kit.topologies.*`
+
+### Pipeline
+A pre-assembled helper that builds or runs a forecast path from one or more stages or topologies. Some module and directory names keep `pipeline` for compatibility.
+
+### Graph state
+The shared state object passed through an execution graph.
+*Code*: `forecast.core.schemas.graph.BaseGraphState`
+
+### Execution trace
+The ordered record of nodes visited during a run. In runtime state this is stored as `execution_path`, with `execution_trace` as the preferred user-facing alias.
+
+## Reasoning layer
+
+### Reasoning trace
+The forecast rationale plus its serialized reasoning graph. In `ForecastOutput`, `reasoning_trace` is the canonical serialized view; `reasoning`, `logical_trace`, and `logical_edges` remain compatibility inputs and legacy mirrored properties.
+
+### Reasoning graph
+The causal or logical structure inside a reasoning trace. Current serialized compatibility payloads may still use the nested key `causal_graph`.
 
 ### Agent
 An autonomous software entity capable of perceiving context, reasoning via an LLM, and executing actions.
-*   *See*: [Concepts > Agents](concepts/agents.md)
-*   *Code*: `forecast.kit.agents.Agent`
+*See*: [Concepts > Agents](concepts/agents.md)
+*Code*: `forecast.kit.agents.Agent`
 
 ### Tool
-A granular, low-level Python function that performs a single action.
-*   *Analogy*: A hammer.
-*   *Code*: Any function wrapped by `FunctionTool`.
+A granular, low-level Python function that performs one action.
 
 ### Skill
-A high-level **Capability** that often bundles several tools and specific logic for a domain.
-*   *Analogy*: Carpentry (the ability to use hammer, saw, and nails to build a table).
-*   *Examples*: `SQLSkill` (bundles connection logic, security checks, and query tools).
-
-### Capability
-An abstract interface allowing an Agent to acquire context from the outside world.
-
----
-
-## Integration Patterns
-
-Often, a single piece of logic (like a "Statistical Model" or "Subject Fetcher") can be used in two different ways. The choice depends on who is in charge.
-
-### The Instrument Pattern (Skill/Tool)
-The Agent is in charge. It decides *when* and *if* to call the logic during its reasoning loop.
-*   *Analogy*: A surgeon (Agent) using a scalpel (Tool).
-
-### The Station Pattern (Stage)
-The Orchestrator is in charge. The logic runs automatically as a mandatory step in the workflow process.
-*   *Analogy*: An assembly line (Graph) where an item moves to a station (Stage).
-
----
-
-## Orchestration Engine
-
-### Orchestrator
-The state-machine engine that manages the workflow.
-*   *See*: [Concepts > Orchestration](concepts/orchestration.md)
-*   *Code*: `forecast.core.orchestrator.Orchestrator`
-
-### GraphState
-The shared memory object passed between Stages during execution.
-*   *See*: [Concepts > Orchestration](concepts/orchestration.md#graphstate)
-
-### Stage
-A single step in a workflow (implemented as a `Node` in the engine).
-*   *See*: [Concepts > Orchestration](concepts/orchestration.md#stages-the-functional-slots)
-
-### Parallel Group
-A set of Stages that execute at the same time (concurrently).
-*   *See*: [Concepts > Orchestration](concepts/orchestration.md#parallel-groups)
-
-### Topology
-A pre-defined, reusable pattern of Stages and Edges.
-*   *See*: [Patterns > Topologies](patterns/topologies.md)
-*   *Code*: `forecast.kit.patterns`
-
----
-
-## Infrastructure
-
-### Inference Provider
-The adapter layer connecting `xrtm-forecast` to an LLM backend.
-*   *See*: [Standards > Streaming](standards/streaming.md)
-
-### Symmetry
-The guarantee that your code works exactly the same way whether using a cloud model or a local model.
-*   *See*: [Standards > Streaming](standards/streaming.md#local-streaming-hugging-face)
-
-### Telemetry (OTel)
-The system for recording logs, traces, and metrics in a standard format.
-*   *Analogy*: The flight recorder (Black Box).
+A higher-level capability that bundles tools and domain logic.

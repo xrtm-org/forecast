@@ -47,12 +47,17 @@ class SovereigntyVerifier:
         if errors:
             return False, errors
 
+        execution_trace = manifest.get("execution_trace", manifest.get("execution_path"))
+        if execution_trace is None:
+            errors.append("Missing required manifest field: execution_trace")
+            return False, errors
+
         # 2. Re-compute Merkle Hash of the final state
         try:
             state = BaseGraphState(
                 subject_id=manifest["subject_id"],
                 node_reports=manifest["reasoning_trace"],
-                execution_path=manifest["execution_path"],
+                execution_trace=execution_trace,
                 cycle_count=manifest.get("cycle_count", 0),
             )
             state.context = manifest.get("context", {})

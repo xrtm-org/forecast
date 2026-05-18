@@ -52,7 +52,7 @@ class FakeProvider(InferenceProvider):
   "probability": "62%",
   "reasoning": "Rates were elevated but a pause was plausible.",
   "logical_trace": [{"event": "central bank setup", "probability": 0.62, "description": "Policy context"}],
-  "structural_trace": ["load_question", "local_llm_forecast", "validate_output"]
+  "execution_trace": ["load_question", "local_llm_forecast", "validate_output"]
 }
 ```''',
             raw=raw,
@@ -88,7 +88,7 @@ class ReasoningOnlyProvider(FakeProvider):
   "probability": 0.37,
   "reasoning": "Reasoning-only backends may place the final answer in reasoning_content.",
   "logical_trace": [{"event": "reasoning only", "probability": 0.37, "description": "JSON was emitted outside content"}],
-  "structural_trace": ["load_question", "local_llm_forecast", "validate_output"]
+  "execution_trace": ["load_question", "local_llm_forecast", "validate_output"]
 }
 ```'''
                     )
@@ -116,7 +116,7 @@ class RepairingReasoningProvider(FakeProvider):
   "probability": 0.38,
   "reasoning": "The target required a sizable Q4 rally with mixed macro support.",
   "logical_trace": [{"event": "market_gap_analysis", "probability": 0.38, "description": "Required move versus prevailing conditions"}],
-  "structural_trace": ["load_question", "local_llm_forecast", "validate_output"]
+  "execution_trace": ["load_question", "local_llm_forecast", "validate_output"]
 }
 ```'''
                         )
@@ -154,7 +154,7 @@ def test_parse_llm_forecast_payload_prefers_forecast_shaped_object() -> None:
     payload = parse_llm_forecast_payload(
         '''{"step": "calculate_gap", "description": "intermediate note"}
 ```json
-{"probability": 0.38, "reasoning": "final answer", "logical_trace": [{"event": "driver", "probability": 0.38, "description": "why"}], "structural_trace": ["load_question", "local_llm_forecast", "validate_output"]}
+{"probability": 0.38, "reasoning": "final answer", "logical_trace": [{"event": "driver", "probability": 0.38, "description": "why"}], "execution_trace": ["load_question", "local_llm_forecast", "validate_output"]}
 ```'''
     )
 
@@ -193,7 +193,37 @@ def test_real_question_e2e_builds_valid_records_without_provider_network(tmp_pat
     assert record.output.metadata.created_at is not None
     assert record.output.metadata.snapshot_time == question.metadata.snapshot_time
     assert record.output.reasoning_trace["causal_graph"]["nodes"]
+    assert record.output.structural_trace == ["load_question", "local_llm_forecast", "validate_output"]
     assert record.provider_metadata["usage"]["total_tokens"] == 7
+
+
+def test_real_question_e2e_accepts_reasoning_graph_alias() -> None:
+    question = load_real_binary_questions(limit=1)[0]
+
+    response = ModelResponse(
+        text="""{
+  \"probability\": 0.44,
+  \"reasoning_trace\": {
+    \"narrative\": \"A moderate move remains plausible.\",
+    \"reasoning_graph\": {
+      \"nodes\": [{\"event\": \"macro backdrop\", \"probability\": 0.44, \"description\": \"mixed inputs\"}]
+    }
+  },
+  \"execution_trace\": [\"load_question\", \"local_llm_forecast\", \"validate_output\"]
+}""",
+        usage={},
+    )
+
+    output = real_questions._build_output_from_response(
+        question,
+        response,
+        FakeProvider(),
+        corpus_id=real_corpus.REAL_BINARY_CORPUS_ID,
+    )
+
+    assert output.reasoning == "A moderate move remains plausible."
+    assert output.logical_trace[0].event == "macro backdrop"
+    assert output.structural_trace == ["load_question", "local_llm_forecast", "validate_output"]
 
 
 def test_real_question_e2e_retries_reasoning_only_responses() -> None:

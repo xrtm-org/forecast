@@ -36,7 +36,7 @@ To maintain a lean engine, we distinguish between structural abstractions and sp
 2.  **Specialists (The "Roles")**: Pre-assembled kits like `ForecastingAnalyst` (Bayesian reasoning) or `FactCheckerAgent` (NLI verification).
 
 ## Agents as Stages
-While an Agent is an object, it is often consumed as a Stage in an Orchestrator graph. 
+While an Agent is an object, it is often consumed as a Stage in an Orchestrator execution graph.
 
 We use **Topologies** (like `RecursiveConsensus`) to wrap agents automatically so they can communicate via the `GraphState`.
 

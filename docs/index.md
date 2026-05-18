@@ -1,37 +1,24 @@
 # xrtm-forecast
 
-Institutional-grade parallelized agentic reasoning engine.
+Institutional-grade runtime for auditable forecast runs.
 
 ## Overview
 
-`xrtm-forecast` is a high-performance framework designed for complex agentic workflows. It provides the building blocks for creating resilient, explainable, and parallelized reasoning systems.
+`xrtm-forecast` supplies the code-level execution graph, reasoning instrumentation, and provider boundaries behind XRTM forecasting.
+
+## Terminology quick map
+
+- **Workflow**: a released user journey in the top-level `xrtm` product.
+- **Run**: one concrete execution of the forecast runtime.
+- **Execution graph**: the orchestrator DAG of nodes and edges that drives a run.
+- **Reasoning trace**: the narrative plus reasoning graph recorded in `ForecastOutput`.
+- **Topology**: a reusable pattern for wiring an execution graph.
+- **Pipeline**: a pre-assembled helper that builds a forecast path from one or more stages or topologies.
 
 ## Key Features
 
-- **Sequential & Parallel Orchestration**: Manage complex multi-agent flows with a robust state machine.
-- **Unified Memory**: Provider-agnostic interface for episodic and semantic memory using vector stores.
-- **Provider Agnostic Inference**: Standardized interactions with Gemini, OpenAI, and other LLMs.
-- **Audit-First Design**: Every reasoning step is logged, hashed, and signed for total accountability.
-- **Institutional Scale**: Built for speed and consistency using `uv` and Docker.
-
-## Quick Start
-
-### Installation
-
-For develTo use the Researcher Kit (Pandas, SQL, Visualization, Vector Memory), install the **Standard** workbench:
-
-```bash
-pip install "xrtm-forecast[standard]"
-```
-
-### Basic Usage
-
-```python
-from xrtm.forecast import Orchestrator
-from xrtm.forecast.providers.inference import ModelFactory
-
-# Resolve a provider from the inference boundary
-provider = ModelFactory.get_provider("openai")
-
-# ... more examples coming soon
-```
+- **Sequential & Parallel Orchestration**: manage execution-graph stages with a robust state machine.
+- **Unified Memory**: provider-agnostic interface for episodic and semantic memory using vector stores.
+- **Provider-Agnostic Inference**: standardized interactions with Gemini, OpenAI, and other LLMs.
+- **Audit-First Design**: every reasoning trace and execution trace can be logged, hashed, and signed.
+- **Institutional Scale**: built for speed and consistency using `uv` and Docker.

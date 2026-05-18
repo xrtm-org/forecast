@@ -32,7 +32,22 @@ limitations under the License.
 
 If XRTM is AI for event forecasting, `xrtm-forecast` is the execution layer that turns questions, models, and topologies into auditable forecast runs.
 
-It provides forecasting agents, orchestration, provider integration, and the runtime boundaries needed for scored, inspectable event-forecasting workflows.
+It provides forecasting agents, orchestration, provider integration, and the runtime boundaries needed for scored, inspectable forecast runs.
+
+## Terminology quick map
+
+`xrtm-forecast` now distinguishes the runtime execution graph from the forecast reasoning graph:
+
+- **Workflow**: a released user journey in the top-level `xrtm` product.
+- **Run**: one concrete execution of this runtime against a forecast request.
+- **Execution graph**: the orchestrator DAG of nodes and edges that drives a run.
+- **Reasoning graph**: the causal or logical structure recorded in `ForecastOutput.reasoning_trace`.
+- **Topology**: a reusable pattern for wiring an execution graph.
+- **Pipeline**: a pre-assembled helper that builds a forecast path from one or more topologies or stages.
+- **Node**: the engine's registered execution unit.
+- **Stage**: the role a node plays inside a topology or pipeline.
+
+When docs use the bare word `graph`, they should qualify which layer they mean.
 
 ## Start with `xrtm` or `xrtm-forecast`?
 
@@ -53,7 +68,7 @@ graph LR
         Train["xrtm-train<br/><i>Backtesting & Calibration</i>"]
     end
     subgraph "Layer 3: Reasoning"
-        Forecast["xrtm-forecast<br/><i>Graph Engine & Agents</i>"]
+        Forecast["xrtm-forecast<br/><i>Execution Graph Engine & Agents</i>"]
     end
     subgraph "Layer 2: Scoring"
         Eval["xrtm-eval<br/><i>Metrics & Evaluation</i>"]
@@ -213,7 +228,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 *   **Advanced Reasoning**:
     *   **Recursive Consensus**: Peer-review topology that loops until confidence threshold is met.
     *   **Fact-Checking**: Dedicated `FactCheckerAgent` to verify claims against external tools.
-    *   **Orchestrator**: Async graph engine with conditional edge support.
+    *   **Orchestrator**: Async execution-graph engine with conditional edge support.
 *   **Safety & Compliance**:
     *   **Async Runtime**: Managed event loop facade.
     *   **Provider Interface**: Swap out OpenAI for Anthropic, Gemini, or vLLM with zero code changes.
@@ -235,7 +250,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
     *   Move beyond static snapshots. Our architecture supports continuous forecasting, allowing agents to ingest streaming news and output probability updates over time without expensive re-runs.
 
 5. **Hybrid "Quant-Qual" Intelligence**:
-    *   Seamlessly mix fast statistical models (e.g., ARIMA, XGBoost) with slow, deliberative LLM Agents in the same graph.
+    *   Seamlessly mix fast statistical models (e.g., ARIMA, XGBoost) with slow, deliberative LLM agents in the same execution graph.
     *   Orchestrate complex "Consensus" topologies where multiple agents debate to reduce variance.
 
 6. **Institutional-Grade Compliance**:
@@ -245,7 +260,7 @@ To understand our vision for "Institutional Grade" forecasting, including our fo
 
 ## Why shouldn't I use xrtm-forecast?
 
-*   You need a generic "Chat with PDF" or "Customer Support" bot. We are hyper-focused on Forecasting and Research workflows.
+*   You need a generic "Chat with PDF" or "Customer Support" bot. We are hyper-focused on forecasting and research runs.
 *   You want "magic" autoscaling or loose typing. We prioritize correctness, repeatability, and type-safety over ease of prototyping.
 *   You don't care about backtesting or time-travel debugging.
 
