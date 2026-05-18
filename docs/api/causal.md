@@ -1,6 +1,8 @@
 # Causal Interpretability API
 
-The Causal Interpretability layer moves the platform from "Black Box" reasoning to explicit Directed Acyclic Graph (DAG) explanations.
+The causal interpretability layer moves the platform from black-box outputs to explicit reasoning-graph explanations.
+
+This API describes the logical or causal structure inside a forecast result. It is separate from the runtime execution graph managed by the orchestrator.
 
 ## Core: Schemas
 
@@ -13,7 +15,7 @@ Represents a directed dependency between two nodes in a reasoning graph.
       show_source: true
 
 ### ForecastOutput.to_networkx
-Exports the logical trace as a `networkx.DiGraph` for graph analysis.
+Exports the reasoning graph as a `networkx.DiGraph` for downstream analysis.
 
 ---
 
@@ -28,7 +30,7 @@ Verifies that a reasoning graph is a valid DAG (acyclic).
       show_source: true
 
 ### get_downstream_impact
-Identifies all nodes affected by a change to a starting node.
+Identifies all reasoning-graph nodes affected by a change to a starting node.
 
 ::: forecast.core.utils.causal.get_downstream_impact
     options:
@@ -40,7 +42,7 @@ Identifies all nodes affected by a change to a starting node.
 ## Kit: Interventions
 
 ### InterventionEngine
-Performs "What-If" simulations via do-calculus.
+Performs what-if simulations via do-calculus.
 
 ::: forecast.kit.eval.intervention.InterventionEngine
     options:

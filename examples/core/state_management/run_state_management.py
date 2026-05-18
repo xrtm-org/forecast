@@ -25,14 +25,14 @@ from xrtm.forecast.core.schemas.graph import BaseGraphState
 # 1. Define a Custom State
 # Inherit from BaseGraphState to keep required fields like subject_id and context.
 class ResearchState(BaseGraphState):
-    r"""Custom state container for the researcher agent workflow."""
+    r"""Custom state container for a researcher run."""
 
     query: str
     findings: List[str] = Field(default_factory=list)
     is_complete: bool = False
 
 
-# 2. Define Nodes that use the Custom State
+# 2. Define execution-graph nodes that use the custom state
 async def gather_data(state: ResearchState, progress=None) -> str:
     print(f"Gathering data for: {state.query}")
     state.findings.append("Found evidence A")
@@ -65,10 +65,10 @@ async def main():
     # 4. Initialize the State
     # Pydantic will validate that 'query' is provided.
     initial_state = ResearchState(
-        subject_id="res_001", query="The impact of agentic workflows on developer productivity"
+        subject_id="res_001", query="The impact of agentic forecast runs on developer productivity"
     )
 
-    # 5. Run the Graph
+    # 5. Run the execution graph
     final_state = await orch.run(initial_state)
 
     print("\n--- Final Research State ---")
@@ -76,6 +76,7 @@ async def main():
     print(f"Findings: {final_state.findings}")
     print(f"Is Complete: {final_state.is_complete}")
     print(f"Context snapshot: {final_state.context}")
+    print(f"Execution Trace: {' -> '.join(final_state.execution_trace)}")
 
 
 if __name__ == "__main__":

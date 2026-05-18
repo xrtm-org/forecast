@@ -31,8 +31,8 @@ class ToolAgent(Agent):
     A specialized Agent that wraps a deterministic Python function or Tool.
 
     `ToolAgent` allows any standalone function to be treated as a first-class agent
-    within the xrtm-forecast ecosystem. This is useful for integrating existing
-    utilities into a reasoning graph.
+        within the xrtm-forecast ecosystem. This is useful for integrating existing
+        utilities into an execution graph.
 
     Args:
         fn (`Callable`):

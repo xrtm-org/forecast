@@ -145,4 +145,5 @@ class TestAudit:
 
         report = audit.generate_execution_report(mock_state, mock_output)
 
-        assert "No logical trace data provided" in report
+        assert "Execution Trace" in report
+        assert "No reasoning trace data provided" in report

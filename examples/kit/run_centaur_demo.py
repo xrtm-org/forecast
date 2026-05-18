@@ -73,7 +73,7 @@ async def run_centaur_demo() -> None:
     print(f"Subject: {final_state.subject_id}")
     print(f"Human Input: {final_state.node_reports.get(f'human:{prompt}')}")
     print(f"Merkle Hash: {final_state.state_hash[:16]}...")
-    print(f"Audit Trail: {' -> '.join(final_state.execution_path)}")
+    print(f"Execution Trace: {' -> '.join(final_state.execution_trace)}")
 
 
 if __name__ == "__main__":

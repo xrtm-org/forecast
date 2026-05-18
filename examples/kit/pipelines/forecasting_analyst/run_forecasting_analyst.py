@@ -32,7 +32,7 @@ logger = logging.getLogger("showcase")
 
 async def run_showcase():
     r"""
-    Executes the standard forecasting analyst showcase pipeline.
+    Executes the standard forecasting analyst showcase path built by the compatibility pipeline helper.
     """
     # 1. Setup Inference
     # Ensure GEMINI_API_KEY is set in your environment
@@ -51,7 +51,7 @@ async def run_showcase():
     # 2. Setup Data Source (Local mode for stability)
     data_source = LocalDataSource("examples/kit/pipelines/forecasting_analyst/data/subject_sample.json")
 
-    # 3. Setup Agent & Pipeline
+    # 3. Setup agent and compatibility pipeline helper
     analyst = ForecastingAnalyst(model=provider)
     pipeline = GenericAnalystPipeline(data_source=data_source, analyst=analyst)
 

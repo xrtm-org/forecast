@@ -1,6 +1,6 @@
 # Architecture & Design Principles
 
-`xrtm-forecast` is built on a "Platform vs. Application" architecture. We distinguish clearly between the **Engine** (the structural bricks) and the **Experts** (the pre-assembled kits).
+`xrtm-forecast` is built on a "Platform vs. Application" architecture. We distinguish clearly between the **Engine** (the execution-graph bricks) and the **Experts** (the pre-assembled kits).
 
 ## Ecosystem Overview
 
@@ -9,11 +9,21 @@
 | Layer | Package | Role | Can Import From |
 |-------|---------|------|-----------------|
 | 4 | `xrtm-train` | Backtesting, calibration | forecast, eval, data |
-| 3 | `xrtm-forecast` | Graph engine, agents | eval, data |
+| 3 | `xrtm-forecast` | Execution-graph engine, agents | eval, data |
 | 2 | `xrtm-eval` | Metrics, trust primitives | data |
 | 1 | `xrtm-data` | Schemas, snapshots | *(none)* |
 
 > See [.agent/rules/governance.md](../.agent/rules/governance.md) for detailed import rules.
+
+## Terminology
+
+- **Workflow** belongs to the released top-level `xrtm` product story.
+- **Run** is one concrete execution of the forecast runtime.
+- **Execution graph** is the orchestrator DAG of nodes and edges.
+- **Reasoning graph** is the causal structure captured inside a forecast result.
+- **Topology** is a reusable execution-graph pattern.
+- **Pipeline** is a pre-assembled helper that builds a forecast path from stages or topologies.
+- **Node** is the engine term; **stage** is the role that node plays in docs and examples.
 
 ---
 
@@ -33,10 +43,10 @@ We organize the `agents/` directory to reflect this split. This ensures the engi
 
 ### 1. Structural Abstractions (`src/forecast/kit/agents/*.py`)
 These are the Shapes. They define mechanical behavior, not business logic.
-- **`Agent`**: The base contract. Defines how an object interacts with a Graph.
+- **`Agent`**: The base contract. Defines how an object interacts with an execution graph.
 - **`LLMAgent`**: The bridge to intelligence. Knows how to prompt, parse, and handle model context.
-- **`ToolAgent`**: The wrapper for deterministic code. Allows standard functions to live in the graph.
-- **`GraphAgent`**: The recursion brick. Allows an entire pipeline to be treated as a single agent.
+- **`ToolAgent`**: The wrapper for deterministic code. Allows standard functions to live in the execution graph.
+- **`GraphAgent`**: The recursion brick. Allows an entire execution graph (often assembled by a pipeline helper) to be treated as a single agent.
 
 ### 2. Specialist Implementations (`src/forecast/kit/agents/specialists/*.py`)
 These are the Roles. They are built by inheriting from the abstractions above.
@@ -50,7 +60,7 @@ These are the Roles. They are built by inheriting from the abstractions above.
 ## System Layers
 
 ### 1. The Orchestration Layer (`src/forecast/core/`)
-The `Orchestrator` is the state machine. It doesn't "think"—it just moves the `BaseGraphState` from one node to the next based on your configuration.
+The `Orchestrator` is the state machine. It doesn't "think"—it just moves the `BaseGraphState` from one execution-graph node to the next based on your configuration.
 
 ### 2. The Inference Layer (`src/forecast/providers/inference/`)
 Standardizes LLM communication. Whether you use Gemini, OpenAI, or a local model, the agent only sees the `InferenceProvider` interface.
@@ -79,28 +89,28 @@ To keep the system modular, we strictly distinguish between:
 
 ## Data Flow & Traceability
 
-We use a Double-Trace methodology for every forecast:
+We use a double-trace methodology for every forecast:
 
 ```mermaid
 graph TD
     A[Input Question] --> B[Orchestrator]
-    B --> C{Nodes}
-    C -- "Agent 1" --> D[Structural Trace]
+    B --> C{Execution Graph Nodes}
+    C -- "Agent 1" --> D[Execution Trace]
     C -- "Agent 2" --> D
     D --> E[Audit Log]
-    C -- "Reasoning" --> F[Logical Trace]
+    C -- "Reasoning" --> F[Reasoning Trace]
     F --> G[Final Forecast]
 ```
 
-- Structural Trace: "Which agents were involved in this decision?" (The Audit Trail).
-- Logical Trace: "What assumptions were made by the agents?" (The Mental Model).
+- **Execution Trace**: which execution-graph stages were involved in this decision?
+- **Reasoning Trace**: what assumptions were made inside the forecast result? (`ForecastOutput.logical_trace` / `reasoning_trace`)
 
 ---
 
 ## Directory Map
 
-- `src/forecast/core/`: The "Bus", Interfaces, and Physics (Orchestrator, Runtime, Guardian).
-- `src/forecast/kit/`: The Applied Layer (Agents, Skills, Topologies).
+- `src/forecast/core/`: the execution engine, interfaces, and runtime physics (Orchestrator, Runtime, Guardian).
+- `src/forecast/kit/`: the applied layer (agents, skills, topologies, and pipeline helpers).
 - `src/forecast/providers/`: The Hardware Layer (Inference, Memory, Tools).
 
 ## Public API Boundaries

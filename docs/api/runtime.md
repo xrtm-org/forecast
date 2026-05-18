@@ -1,13 +1,13 @@
 # Async Runtime API
 
-The `AsyncRuntime` is the institutional abstraction for all `asyncio` operations in `xrtm-forecast`. It ensures high performance, temporal integrity, and auditability across the reasoning graph.
+The `AsyncRuntime` is the institutional abstraction for all `asyncio` operations in `xrtm-forecast`. It ensures high performance, temporal integrity, and auditability across the execution graph.
 
 ## Rationale
 
 - **Temporal Integrity**: standard `asyncio.sleep` cannot be intercepted. `AsyncRuntime.sleep` is point-in-time aware for backtesting.
 - **Structured Concurrency**: centralizing task spawning via TaskGroups prevents background task leakage.
 - **Performance**: transparently installs `uvloop` if available.
-- **Auditability**: provides hooks for OpenTelemetry (OTel) trace propagation.
+- **Auditability**: provides hooks for propagating execution traces through telemetry.
 
 ## Reference
 

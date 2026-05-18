@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-r"""Graph state and temporal context schemas.
+r"""Execution-graph state and temporal context schemas.
 
 Defines ``BaseGraphState`` — the mutable state object that flows
-through the orchestrator — and ``TemporalContext`` for temporal
-sandboxing during backtests.
+through the orchestrator execution graph — and ``TemporalContext``
+for temporal sandboxing during backtests.
 """
 
 import hashlib
@@ -25,7 +25,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class TemporalContext(BaseModel):
@@ -53,16 +53,16 @@ class TemporalContext(BaseModel):
 
 class BaseGraphState(BaseModel):
     r"""
-    A unified state object for tracking the reasoning lifecycle across an orchestrated graph.
+    A unified state object for tracking the forecast run lifecycle across an orchestrated execution graph.
 
     `BaseGraphState` carries the cumulative intelligence gathered by multiple
-    agents and provides operational context for loop control and performance tracking.
+    agents, records execution traces, and provides operational context for loop control and performance tracking.
 
     Attributes:
         subject_id (`str`):
             The unique identifier for the subject being analyzed (e.g., question ID).
         node_reports (`Dict[str, Any]`):
-            A generic storage bucket for outputs from various graph nodes.
+            A generic storage bucket for outputs from various execution-graph nodes.
         past_critique (`str`):
             Stored feedback for iterative loops.
         cycle_count (`int`):
@@ -76,7 +76,7 @@ class BaseGraphState(BaseModel):
         usage (`Dict[str, int]`):
             Global token consumption statistics.
         execution_path (`List[str]`):
-            An ordered record of the agent/node sequence executed.
+            The internal runtime field for the ordered execution trace.
         temporal_context (`Optional[TemporalContext]`):
             Context for temporal sandboxing, defining the reference time.
     r"""
@@ -101,7 +101,10 @@ class BaseGraphState(BaseModel):
     )
 
     # Communication & Audit
-    execution_path: List[str] = Field(default_factory=list, description="Ordered list of agent names executed.")
+    execution_path: List[str] = Field(
+        default_factory=list,
+        description="Ordered list of execution-graph node names executed. Prefer `execution_trace` in user-facing language.",
+    )
 
     # Temporal Sandboxing
     temporal_context: Optional[TemporalContext] = Field(default=None, description="Metadata for temporal sandboxing.")
@@ -121,6 +124,27 @@ class BaseGraphState(BaseModel):
     # Merkle Integrity (Institutional Grade)
     state_hash: Optional[str] = Field(default=None, description="SHA-256 hash of the current state.")
     parent_hash: Optional[str] = Field(default=None, description="Hash of the preceding state in the reasoning chain.")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _apply_execution_trace_alias(cls, data: Any) -> Any:
+        r"""Accept `execution_trace` as a compatibility alias for `execution_path`."""
+        if not isinstance(data, dict) or "execution_trace" not in data or "execution_path" in data:
+            return data
+
+        updated = dict(data)
+        updated["execution_path"] = updated["execution_trace"]
+        return updated
+
+    @property
+    def execution_trace(self) -> List[str]:
+        r"""Preferred user-facing alias for the ordered execution trace."""
+        return self.execution_path
+
+    @execution_trace.setter
+    def execution_trace(self, value: List[str]) -> None:
+        r"""Backward-compatible setter for the ordered execution trace."""
+        self.execution_path = value
 
     def compute_hash(self) -> str:
         r"""

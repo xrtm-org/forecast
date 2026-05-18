@@ -109,27 +109,27 @@ class Audit:
 
     def generate_execution_report(self, state: Any, output: Any) -> str:
         r"""
-        Generates a human-readable 'Double-Trace' report.
-        Combines Structural Trace (nodes) and Logical Trace (Bayesian chains).
+        Generates a human-readable double-trace report.
+        Combines the execution trace and the reasoning trace.
         r"""
         report = [
-            "# Forecast Execution Report",
+            "# Forecast Run Report",
             f"Subject: {state.subject_id}",
             f"Timestamp: {datetime.now(timezone.utc).isoformat()}",
-            "\n## 1. Structural Trace (The 'How')",
-            "Path through the reasoning graph:",
+            "\n## 1. Execution Trace (The 'How')",
+            "Path through the execution graph:",
         ]
 
         for i, node in enumerate(state.execution_path):
             report.append(f"{i + 1}. **{node}**")
 
-        report.append("\n## 2. Logical Trace (The 'Why')")
+        report.append("\n## 2. Reasoning Trace (The 'Why')")
         if hasattr(output, "logical_trace"):
             for entry in output.logical_trace:
                 prob_str = f" [{entry.probability * 100:.1f}%]" if entry.probability is not None else ""
                 report.append(f"- {entry.event}{prob_str}: *{entry.description or ''}*")
         else:
-            report.append("No logical trace data provided by the analyst.")
+            report.append("No reasoning trace data provided by the analyst.")
 
         report.append("\n## 3. Final Confidence")
         if hasattr(output, "confidence"):

@@ -45,8 +45,8 @@ class AsyncRuntime:
     2.  **Structured Concurrency**: Centralizing task spawning enables lifecycle tracking
         and prevents background task leakage.
     3.  **Performance**: Handlers for high-performance loops (uvloop) are handled transparently.
-    4.  **Auditability**: Provides the hook for OpenTelemetry (OTel) to trace task causality
-        across the reasoning graph.
+        4.  **Auditability**: Provides the hook for OpenTelemetry (OTel) to trace task causality
+            across the execution graph.
     """
 
     @staticmethod

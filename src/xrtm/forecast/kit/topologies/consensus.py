@@ -81,7 +81,7 @@ class RecursiveConsensus:
             self.aggregator = aggregator_wrapper
 
     def build_graph(self) -> Orchestrator:
-        r"""Constructs the executable Orchestrator graph."""
+        r"""Constructs the executable Orchestrator execution graph."""
         # Orchestrator uses max_cycles for total node visits.
         # We want max_cycles to be revision loops.
         # We allow ~10 nodes per revision loop to be very safe.

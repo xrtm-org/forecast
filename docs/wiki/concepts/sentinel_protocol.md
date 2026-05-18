@@ -18,7 +18,7 @@ tracking how a forecast's confidence changes as new information arrives.
 | Expensive re-runs | Delta updates (~500 tokens) |
 
 ### The Delta Function
-Instead of re-running the full research graph for every update, we use
+Instead of re-running the full research execution graph for every update, we use
 **Bayesian Updating**:
 
 1. Agent receives: `previous_reasoning + new_evidence`

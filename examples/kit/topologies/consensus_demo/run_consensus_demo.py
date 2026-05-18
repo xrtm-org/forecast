@@ -106,9 +106,9 @@ async def main():
     final_state = await orch.run(initial_state)
 
     print("\n=== Final Trace ===")
-    print("Execution Path:", " -> ".join(final_state.execution_path))
+    print("Execution Trace:", " -> ".join(final_state.execution_trace))
     print("Final Decision:", final_state.context.get("decision"))
-    print("Total Nodes Visited:", final_state.cycle_count)
+    print("Total Stages Visited:", final_state.cycle_count)
 
 
 if __name__ == "__main__":

@@ -1,10 +1,10 @@
-# Customizing Agents & Graphs
+# Customizing Agents & Execution Graphs
 
-The `xrtm-forecast` library is designed as a "Lego-piece" architecture. Here is how you can extend it.
+`xrtm-forecast` is designed as a composable runtime. Extend the runtime by adding agents, tools, and execution-graph nodes.
 
-## 1. Creating a Custom Agent
+## 1. Creating a custom agent
 
-To build a custom agent, inherit from `forecast.Agent` and implement the `run` method.
+To build a custom agent, inherit from `forecast.Agent` and implement `run`.
 
 ```python
 from xrtm.forecast import Agent
@@ -14,26 +14,24 @@ class SentimentAgent(Agent):
         super().__init__(name)
 
     async def run(self, text: str, **kwargs):
-        # Your custom logic here
         return {"sentiment": "bullish", "score": 0.8}
 ```
 
-## 2. Designing a Custom Graph
+## 2. Designing a custom execution graph
 
-Graphs are managed by the `Orchestrator`. A graph is a set of "Nodes" (can be agents or functions) and a "Transition Logic".
+The `Orchestrator` manages an execution graph: registered nodes plus transition logic.
 
-### Step 1: Define your Nodes
-Every node must accept `state` (BaseGraphState) and `on_progress` (Callable).
+### Step 1: define nodes
+Every node must accept `state` (`BaseGraphState`) and `on_progress` (`Callable`).
 
 ```python
 async def research_node(state, on_progress):
-    # Call an agent
     result = await my_agent.run(state.subject_id)
     state.context["research"] = result
-    return "analysis" # Name of the target node
+    return "analysis"
 ```
 
-### Step 2: Assemble with the Orchestrator
+### Step 2: assemble with the orchestrator
 
 ```python
 from xrtm.forecast import Orchestrator
@@ -42,12 +40,13 @@ orchestrator = Orchestrator()
 orchestrator.register_node("research", research_node)
 orchestrator.register_node("analysis", analysis_node)
 
-# Run the graph
 final_state = await orchestrator.run(state, entry_node="research")
 ```
 
-## 4. Real-World Example
-See [custom_sentiment_workflow.py](examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py) for a complete, runnable example featuring:
-- Custom Pydantic result schemas.
-- Conditional branching (Sentiment -> Trend check).
-- Multi-agent orchestration.
+## 3. Real-world example
+
+See [custom_sentiment_workflow.py](examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py) for a runnable example that keeps the legacy directory name but demonstrates:
+
+- custom Pydantic result schemas,
+- conditional branching between stages,
+- multi-agent orchestration inside one execution graph.

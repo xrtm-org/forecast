@@ -259,11 +259,15 @@ print(f"Metadata: {response.metadata}")
 ```json
 {
   "probability": 0.732,
-  "reasoning": "Deterministic provider-free forecast for <question-id>.",
-  "logical_trace": [...],
-  "structural_trace": [...]
+  "reasoning_trace": {
+    "narrative": "Deterministic provider-free forecast for <forecast-request-id>.",
+    "causal_graph": {"nodes": [...], "edges": [...]}
+  },
+  "execution_trace": [...]
 }
 ```
+
+`execution_trace` is the canonical serialized name for the ordered runtime steps. Compatibility helpers still accept legacy `structural_trace` inputs when needed.
 
 ### Async Usage
 

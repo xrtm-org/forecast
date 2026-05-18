@@ -65,7 +65,7 @@ def get_trend_multiplier(sentiment: str) -> float:
     return mapping.get(sentiment, 1.0)
 
 
-# 3. Custom Node Functions (The 'Lego' assembly)
+# 3. Custom execution-graph nodes (the Lego assembly)
 async def fetch_news_node(state: BaseGraphState, on_progress: Callable) -> str:
     await on_progress(1, "Data", "PROCESSING", f"Fetching news for {state.subject_id}")
     # In a real app, this would be an API call
@@ -108,10 +108,10 @@ async def report_node(state: BaseGraphState, on_progress: Callable) -> None:
     return None
 
 
-# 4. Assembling the Custom Pipeline
+# 4. Assemble the custom execution graph
 async def run_custom_pipeline():
     r"""
-    Executes a custom multi-agent sentiment analysis workflow.
+    Executes a custom multi-agent sentiment analysis path.
     """
     # Setup Inference
     api_key = os.getenv("GEMINI_API_KEY")
@@ -142,7 +142,7 @@ async def run_custom_pipeline():
     state = BaseGraphState(subject_id="Nuclear Fusion")
     state.context["agents"] = {"sentiment": sentiment_agent, "trend_multiplier": trend_tool}
 
-    print(">>> Starting Advanced Custom Pipeline (Institutional Grade)")
+    print(">>> Starting Advanced Custom Execution Graph (Institutional Grade)")
     await orchestrator.run(state, entry_node="fetch_news")
 
 

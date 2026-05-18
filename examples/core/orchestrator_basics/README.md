@@ -2,16 +2,16 @@
 
 **Script**: `run_orchestrator_basics.py`
 
-This example demonstrates the fundamental building blocks of the `xrtm-forecast` reasoning engine: the Graph, Nodes, and Edges. It shows how to construct a simple Directed Acyclic Graph (DAG) for orchestrated execution.
+This example demonstrates the fundamental building blocks of the `xrtm-forecast` runtime: the execution graph, nodes, and edges.
 
 ## Usage
 
 ```bash
-# From repository root
 python3 examples/core/orchestrator_basics/run_orchestrator_basics.py
 ```
 
 ## What it does
-1.  **Registers Nodes**: Defines simple Python functions as runnable graph nodes.
-2.  **Defines Topology**: Connects nodes with dependencies (Edges).
-3.  **Executes Graph**: Runs the graph and prints the execution order.
+
+1. **Registers nodes**: defines simple Python functions as runnable execution-graph nodes.
+2. **Defines control flow**: connects nodes with edges.
+3. **Runs a forecast path**: executes the graph and prints the execution trace.

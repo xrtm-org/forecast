@@ -2,15 +2,16 @@
 
 **Script**: `run_custom_sentiment_workflow.py`
 
-A dedicated pipeline for analyzing the aggregate sentiment of multiple text inputs. This example shows how to build a specialized workflow that processes data in parallel and synthesizes a final report.
+This example keeps its legacy directory name for compatibility, but the code demonstrates a custom execution graph for aggregate sentiment analysis.
 
 ## Usage
 
 ```bash
-# From repository root
 python3 examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py
 ```
 
 ## Concepts
-- **Map-Reduce**: Processing many inputs (Map) and summarizing them (Reduce).
-- **Specialized Prompting**: Using focused prompts for specific analytical tasks (sentiment extraction).
+
+- **Map-reduce**: process many inputs and summarize them.
+- **Custom execution graph**: combine sentiment, aggregation, and reporting stages inside one forecast path.
+- **Specialized prompting**: use focused prompts for analytical tasks such as sentiment extraction.

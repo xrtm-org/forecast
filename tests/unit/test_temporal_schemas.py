@@ -35,6 +35,12 @@ def test_graph_state_temporal_integration():
     assert state.temporal_context.reference_time == ref_time
 
 
+def test_graph_state_execution_trace_alias():
+    state = BaseGraphState(subject_id="test", execution_trace=["research", "synthesize"])
+    assert state.execution_path == ["research", "synthesize"]
+    assert state.execution_trace == ["research", "synthesize"]
+
+
 def test_provider_knowledge_cutoff_metadata():
     cutoff = datetime(2023, 11, 1)
     config = OpenAIConfig(model_id="gpt-4", api_key="fake", knowledge_cutoff=cutoff)

@@ -35,7 +35,7 @@ class ManifestBundler:
     r"""
     Generates an institutional-grade research proof (.xrtm manifest).
 
-    The manifest includes the full reasoning trace, Merkle hashes for every step,
+    The manifest includes the full reasoning trace, execution trace, Merkle hashes for every step,
     and system metadata to enable external verification of the forecast.
     """
 
@@ -58,6 +58,7 @@ class ManifestBundler:
             "subject_id": state.subject_id,
             "cycle_count": state.cycle_count,
             "final_state_hash": state.state_hash,
+            "execution_trace": state.execution_trace,
             "execution_path": state.execution_path,
             "reasoning_trace": state.node_reports,
             "telemetry": {

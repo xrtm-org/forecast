@@ -2,16 +2,16 @@
 
 **Script**: `run_state_management.py`
 
-This example illustrates how state flows through the `xrtm-forecast` graph. It focuses on the `BaseGraphState` object, which acts as the "context carrier" across all nodes in a reasoning chain.
+This example illustrates how state flows through an `xrtm-forecast` execution graph. It focuses on `BaseGraphState`, which acts as the shared context carrier across the run.
 
 ## Usage
 
 ```bash
-# From repository root
 python3 examples/core/state_management/run_state_management.py
 ```
 
-## Key Concepts
-- **BaseGraphState**: The immutable-style object passed between nodes.
-- **Context Updates**: How nodes append data to the shared state.
-- **State Evolution**: Observing how the state changes from the first node to the last.
+## Key concepts
+
+- **BaseGraphState**: the shared object passed between execution-graph nodes.
+- **Context updates**: how nodes append data to shared state.
+- **State evolution**: how the run state changes from the first stage to the last.

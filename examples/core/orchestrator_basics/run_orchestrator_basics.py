@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger("CORE_DEMO")
 
 
-# 1. Define Nodes (Pure Python Functions)
+# 1. Define execution-graph nodes (pure Python functions)
 # Nodes receive the current state and return the name of the next node (or None).
 
 
@@ -43,7 +43,7 @@ async def counter_step(state: BaseGraphState, progress=None) -> Optional[str]:
 
 
 async def final_step(state: BaseGraphState, progress=None) -> None:
-    logger.info("Reached the end of the graph!")
+    logger.info("Reached the end of the execution graph!")
     state.context["status"] = "finished"
     return None  # Stop execution
 
@@ -62,7 +62,7 @@ async def main():
     # 4. Set Entry Point
     orch.set_entry_point("counter_step")
 
-    # 5. Execute
+    # 5. Execute the forecast path
     initial_state = BaseGraphState(subject_id="demo_001")
     initial_state.context["count"] = 0
 
@@ -71,6 +71,7 @@ async def main():
     print("\n--- Execution Result ---")
     print(f"Final Count: {final_state.context['count']}")
     print(f"Status: {final_state.context['status']}")
+    print(f"Execution Trace: {' -> '.join(final_state.execution_trace)}")
 
 
 if __name__ == "__main__":

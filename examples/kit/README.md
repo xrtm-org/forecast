@@ -7,8 +7,8 @@ These examples show the high-level `xrtm-forecast` runtime surface you use once 
 ## Start here
 
 1. **No-key learning path**: [Provider-Free Analyst](../providers/provider_free_analyst/) — uses the deterministic provider from `xrtm`.
-2. **Smallest code-first entry**: [Minimal Agent](./minimal_agent/) — a compact forecasting-agent script with an explicit model configuration.
-3. **Typical end-to-end runtime path**: [Forecasting Analyst](./pipelines/forecasting_analyst/) — research, reasoning, and probability estimation for a market question.
+2. **Smallest code-first entry**: [Minimal Agent](./minimal_agent/) — a compact forecasting-agent script with explicit model configuration.
+3. **Typical end-to-end runtime path**: [Forecasting Analyst](./pipelines/forecasting_analyst/) — an assembled pipeline that runs research, reasoning, and probability estimation for a market question.
 
 ## Example catalog
 
@@ -31,8 +31,8 @@ These examples show the high-level `xrtm-forecast` runtime surface you use once 
 ### Pipelines
 | Project | Description | Use case |
 | :--- | :--- | :--- |
-| [Forecasting Analyst](./pipelines/forecasting_analyst/) | Research, reasoning, and probability estimation for a market question. | The standard forecasting runtime workflow. |
-| [Custom Sentiment Workflow](./pipelines/custom_sentiment_workflow/) | Analyzes aggregate sentiment from multiple text sources. | Signal extraction from news or social media. |
+| [Forecasting Analyst](./pipelines/forecasting_analyst/) | Research, reasoning, and probability estimation for a market question. | A standard forecast path assembled by `GenericAnalystPipeline`. |
+| [Custom Sentiment Workflow](./pipelines/custom_sentiment_workflow/) | Analyzes aggregate sentiment from multiple text sources. | A compatibility-named example that assembles a custom execution graph. |
 
 ### Topologies
 | Project | Description | Use case |
@@ -44,5 +44,5 @@ These examples show the high-level `xrtm-forecast` runtime surface you use once 
 
 - [Providers](../providers/) — provider setup, provider-free entry, and inference-layer examples
 - [Features](./features/) — focused capabilities
-- [Pipelines](./pipelines/) — end-to-end workflows
-- [Topologies](./topologies/) — multi-agent interaction patterns
+- [Pipelines](./pipelines/) — pre-assembled forecast paths
+- [Topologies](./topologies/) — reusable execution-graph interaction patterns
