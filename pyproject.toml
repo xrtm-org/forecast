@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xrtm-forecast"
-version = "0.6.10"
+version = "0.6.11"
 description = "Institutional-grade modular engine for generative forecasting and agentic reasoning."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -31,8 +31,8 @@ dependencies = [
     "matplotlib>=3.7.0",
     "seaborn>=0.12.0",
     "networkx>=3.0",
-    "xrtm-data>=0.2.6",
-    "xrtm-eval>=0.2.6"
+    "xrtm-data>=0.2.7",
+    "xrtm-eval>=0.2.7"
 ]
 
 [project.scripts]
