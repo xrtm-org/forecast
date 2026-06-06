@@ -27,7 +27,7 @@ from typing import Any
 from xrtm.forecast.core.orchestrator import Orchestrator
 from xrtm.forecast.core.runtime import AsyncRuntime
 from xrtm.forecast.core.schemas.graph import BaseGraphState, TemporalContext
-from xrtm.forecast.kit.assistants.main import create_forecasting_analyst, create_local_analyst
+from xrtm.forecast.kit.assistants.main import create_forecasting_analyst
 from xrtm.forecast.version import __author__, __contact__, __copyright__, __license__, __version__
 
 _LEGACY_EXPORTS: dict[str, tuple[str, str]] = {
@@ -48,7 +48,6 @@ __all__ = [
     "BaseGraphState",
     "TemporalContext",
     "create_forecasting_analyst",
-    "create_local_analyst",
     "__version__",
     "__author__",
     "__contact__",

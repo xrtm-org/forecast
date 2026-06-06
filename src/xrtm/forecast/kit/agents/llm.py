@@ -45,7 +45,7 @@ class LLMAgent(Agent):
 
     Args:
         model (`InferenceProvider`):
-            The provider used to perform LLM inference (e.g., Gemini, OpenAI).
+            The provider used to perform LLM inference (e.g., OpenAI).
         name (`str`, *optional*):
             The logical name of the agent. Defaults to the class name.
     r"""

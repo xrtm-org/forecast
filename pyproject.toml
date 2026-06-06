@@ -18,7 +18,6 @@ dependencies = [
     "aiohttp>=3.9.0",
     "rich>=13.0.0",
     "freezegun>=1.2.0",
-    "click>=8.0.0",
     "openai>=1.0.0",
     "numpy>=1.24.0",
     "sqlalchemy>=2.0.0",

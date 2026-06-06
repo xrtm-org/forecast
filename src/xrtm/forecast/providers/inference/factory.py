@@ -59,7 +59,7 @@ class ModelFactory:
 
         Args:
             config (`ProviderConfig` or `str`, *optional*):
-                The configuration object or a shortcut string (e.g. "gemini:gemini-2.0-flash").
+                The configuration object or a shortcut string (e.g. "openai:gpt-4o-mini").
             provider_type (`str`, *optional*):
                 Explicitly request "GEMINI" or "OPENAI" if config is not provided.
             model_id (`str`, *optional*):

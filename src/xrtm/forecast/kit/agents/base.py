@@ -67,7 +67,7 @@ class Agent(abc.ABC):
 
         Args:
             model (`Any`, *optional*):
-                The model instance or a shortcut string (e.g. "gemini").
+                The model instance or a shortcut string (e.g. "openai").
             name (`str`, *optional*):
                 The agent's logical name.
             **kwargs:
