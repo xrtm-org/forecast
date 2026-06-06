@@ -12,3 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+r"""Graph compilation — blueprint → orchestrator conversion."""
+
+from xrtm.forecast.graph.workflow_graph import (
+    CompiledGraph,
+    WorkflowGraphState,
+    compile_workflow_blueprint,
+    graph_trace_rows,
+)
+
+__all__ = [
+    "CompiledGraph",
+    "WorkflowGraphState",
+    "compile_workflow_blueprint",
+    "graph_trace_rows",
+]

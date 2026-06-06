@@ -59,6 +59,12 @@ class OpenAIProvider(InferenceProvider):
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
         self.cache: Optional[InferenceCache] = kwargs.pop("cache", None)
+        # Enable default cache if none provided
+        if self.cache is None:
+            try:
+                self.cache = InferenceCache()
+            except Exception:
+                pass  # cache is optional
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
         self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
@@ -123,14 +129,27 @@ class OpenAIProvider(InferenceProvider):
         current_turn = 0
         while current_turn < max_tool_turns:
             current_turn += 1
-            response = await self.client.chat.completions.create(
-                model=self.model_id,
-                messages=messages,
-                tools=cast(Any, openai_tools),
-                logprobs=output_logprobs,
-                top_logprobs=5 if output_logprobs else None,
-                **kwargs,
-            )
+
+            # Retry loop for transient API errors (timeouts, rate limits)
+            max_retries = 2
+            for attempt in range(max_retries + 1):
+                try:
+                    response = await self.client.chat.completions.create(
+                        model=self.model_id,
+                        messages=messages,
+                        tools=cast(Any, openai_tools),
+                        logprobs=output_logprobs,
+                        top_logprobs=5 if output_logprobs else None,
+                        **kwargs,
+                    )
+                    break
+                except Exception as exc:
+                    if attempt < max_retries:
+                        wait = 2 ** attempt
+                        logger.warning(f"[OPENAI] API error, retry {attempt+1}/{max_retries} in {wait}s: {exc}")
+                        await asyncio.sleep(wait)
+                    else:
+                        raise
 
             choice = response.choices[0]
             if choice.message.tool_calls:
@@ -138,19 +157,14 @@ class OpenAIProvider(InferenceProvider):
                 messages.append(choice.message)
                 tool_outputs = await self._execute_tool_calls(choice.message.tool_calls, tools or [])
                 messages.extend(tool_outputs)
-                continue  # Handle the tool outputs in the next turn
+                continue
 
             text = choice.message.content or ""
             normalized_logprobs = None
             if output_logprobs and choice.logprobs and choice.logprobs.content:
                 normalized_logprobs = []
                 for lp in choice.logprobs.content:
-                    normalized_logprobs.append(
-                        {
-                            "token": lp.token,
-                            "logprob": lp.logprob,
-                        }
-                    )
+                    normalized_logprobs.append({"token": lp.token, "logprob": lp.logprob})
 
             usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
             if response.usage:
