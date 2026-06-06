@@ -31,14 +31,15 @@ logger = logging.getLogger(__name__)
 
 
 def create_forecasting_analyst(
-    model_id: str = "gemini:gemini-2.0-flash", name: Optional[str] = None, **kwargs
+    model_id: str = "openai:gpt-4o-mini", name: Optional[str] = None, **kwargs
 ) -> ForecastingAnalyst:
     r"""
     A high-level factory to create a pre-configured Forecasting Analyst.
 
     Args:
-        model_id (`str`, *optional*, defaults to `"gemini:gemini-2.0-flash"`):
-            The model identifier or shortcut string.
+        model_id (`str`, *optional*, defaults to `"openai:gpt-4o-mini"`):
+            The model identifier or shortcut string. Any OpenAI-compatible
+            provider is supported (e.g., ``"openai:gpt-4o"`` or pass a config).
         name (`str`, *optional*):
             The logical name of the analyst.
         **kwargs:
@@ -48,40 +49,9 @@ def create_forecasting_analyst(
         `ForecastingAnalyst`: A fully wired specialist agent.
     r"""
     logger.debug(f"Creating pre-configured ForecastingAnalyst with model: {model_id}")
-
-    # Resolver logic: ModelFactory handles strings or Config objects
     model = ModelFactory.get_provider(model_id)
-
-    # Specialist instantiation
     return ForecastingAnalyst(model=model, name=name, **kwargs)
 
 
-def create_local_analyst(
-    model_path: str = "sshleifer/tiny-gpt2", name: Optional[str] = None, **kwargs
-) -> ForecastingAnalyst:
-    r"""
-    Creates a Forecasting Analyst backed by a local Hugging Face model.
+__all__ = ["create_forecasting_analyst"]
 
-    This is the primary entry point for 'Air-gapped' or 'Sovereign' reasoning
-    pipelines where data privacy is requirements.
-
-    Args:
-        model_path (`str`, *optional*, defaults to `"sshleifer/tiny-gpt2"`):
-            The local path or Hugging Face repo ID.
-        name (`str`, *optional*):
-            The logical name of the analyst.
-        **kwargs:
-            Additional arguments passed to the specialist (e.g., quantization="4bit").
-
-    Returns:
-        `ForecastingAnalyst`: A private specialist agent.
-    r"""
-    logger.info(f"Creating local ForecastingAnalyst from: {model_path}")
-
-    # Use 'hf:' prefix to force local resolution in ModelFactory
-    model = ModelFactory.get_provider(f"hf:{model_path}", **kwargs)
-
-    return ForecastingAnalyst(model=model, name=name, **kwargs)
-
-
-__all__ = ["create_forecasting_analyst", "create_local_analyst"]

@@ -60,7 +60,7 @@ class InferenceProvider(ABC):
     Abstract Base Class for Large Language Model (LLM) providers.
 
     `InferenceProvider` standardizes the interface for interacting with various
-    LLM SDKs (e.g., Gemini, OpenAI, Anthropic, Hugging Face). This allows the rest
+    LLM SDKs (e.g., OpenAI and OpenAI-compatible backends). This allows the rest
     of the platform to remain agnostic to the specific backend being used.
     r"""
 

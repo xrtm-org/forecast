@@ -63,7 +63,7 @@ class RoutingAgent(Agent):
         name: str = "Router",
     ):
         super().__init__(name=name)
-        self.router_model = router_model or ModelFactory.get_provider("gemini:gemini-2.0-flash")
+        self.router_model = router_model or ModelFactory.get_provider("openai:gpt-4o-mini")
         self.fast_tier = fast_tier
         self.smart_tier = smart_tier
         self.routes = routes or {}

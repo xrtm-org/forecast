@@ -21,8 +21,8 @@ content-addressable hashing.
 Example:
     >>> from xrtm.forecast.core.cache import InferenceCache
     >>> cache = InferenceCache()
-    >>> key = cache.compute_key("gemini", "What is 2+2?", temperature=0.0)
-    >>> cache.set(key, "4", {"model": "gemini"})
+    >>> key = cache.compute_key("openai", "What is 2+2?", temperature=0.0)
+    >>> cache.set(key, "4", {"model": "openai"})
     >>> cache.get(key)
     '4'
 """
@@ -112,7 +112,7 @@ class InferenceCache:
 
         Args:
             model_id (`str`):
-                The model identifier (e.g., "gemini", "gpt-4").
+                The model identifier (e.g., "openai", "gpt-4").
             prompt (`str`):
                 The prompt text to hash.
             **params:
@@ -123,7 +123,7 @@ class InferenceCache:
 
         Example:
             >>> cache = InferenceCache()
-            >>> key = cache.compute_key("gemini", "Hello world", temperature=0.5)
+            >>> key = cache.compute_key("openai", "Hello world", temperature=0.5)
             >>> len(key)
             64
         """
