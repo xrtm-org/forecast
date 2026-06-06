@@ -172,3 +172,4 @@ output/
 
 # macOS
 .DS_Store
+.env

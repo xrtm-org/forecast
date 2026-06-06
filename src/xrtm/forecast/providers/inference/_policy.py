@@ -22,13 +22,8 @@ from typing import Any, Optional
 from pydantic import SecretStr
 
 from xrtm.forecast.core.config.inference import (
-    GeminiConfig,
-    HFConfig,
-    LlamaCppConfig,
     OpenAIConfig,
     ProviderConfig,
-    VLLMConfig,
-    XLMConfig,
 )
 from xrtm.forecast.core.exceptions import ConfigurationError
 
@@ -47,51 +42,14 @@ class ProviderSpec:
 
 
 _PROVIDER_SPECS: dict[str, ProviderSpec] = {
-    "GEMINI": ProviderSpec(
-        aliases=("GEMINI",),
-        config_type=GeminiConfig,
-        default_model_id="gemini-2.0-flash",
-        provider_module="xrtm.forecast.providers.inference.gemini_provider",
-        provider_name="GeminiProvider",
-        settings_api_key_field="gemini_api_key",
-        accepts_provider_kwargs=True,
-    ),
     "OPENAI": ProviderSpec(
-        aliases=("OPENAI",),
+        aliases=("OPENAI", "OPENAI-COMPATIBLE"),
         config_type=OpenAIConfig,
         default_model_id="gpt-4o",
         provider_module="xrtm.forecast.providers.inference.openai_provider",
         provider_name="OpenAIProvider",
         settings_api_key_field="openai_api_key",
         accepts_provider_kwargs=True,
-    ),
-    "HF": ProviderSpec(
-        aliases=("HF", "HUGGINGFACE"),
-        config_type=HFConfig,
-        default_model_id="sshleifer/tiny-gpt2",
-        provider_module="xrtm.forecast.providers.inference.hf_provider",
-        provider_name="HuggingFaceProvider",
-    ),
-    "VLLM": ProviderSpec(
-        aliases=("VLLM",),
-        config_type=VLLMConfig,
-        default_model_id="facebook/opt-125m",
-        provider_module="xrtm.forecast.providers.inference.vllm_provider",
-        provider_name="VLLMProvider",
-    ),
-    "LLAMA-CPP": ProviderSpec(
-        aliases=("LLAMA-CPP", "GGUF"),
-        config_type=LlamaCppConfig,
-        default_model_id="bartowski/Llama-3.2-1B-Instruct-GGUF",
-        provider_module="xrtm.forecast.providers.inference.llamacpp_provider",
-        provider_name="LlamaCppProvider",
-    ),
-    "XLM": ProviderSpec(
-        aliases=("XLM",),
-        config_type=XLMConfig,
-        default_model_id="sentence-transformers/all-MiniLM-L6-v2",
-        provider_module="xrtm.forecast.providers.inference.hf_provider",
-        provider_name="HuggingFaceProvider",
     ),
 }
 
@@ -178,8 +136,6 @@ def apply_environment_profile(config: ProviderConfig, env_profile: Optional[str]
     if env_profile == "dev":
         if isinstance(config, OpenAIConfig):
             return config.model_copy(update={"model_id": "gpt-4o-mini"})
-        if isinstance(config, GeminiConfig):
-            return config.model_copy(update={"model_id": "gemini-2.0-flash"})
 
     return config
 
@@ -208,20 +164,7 @@ def instantiate_provider(config: ProviderConfig, provider_kwargs: dict[str, Any]
     if spec is None:
         raise ConfigurationError(f"Unsupported configuration type: {type(config)}")
 
-    try:
-        provider_cls = getattr(import_module(spec.provider_module), spec.provider_name)
-    except ImportError as exc:
-        if spec.provider_name == "VLLMProvider":
-            raise ConfigurationError(
-                "VLLMProvider not found. Ensure you have implemented it in "
-                "forecast.providers.inference.vllm_provider and installed 'vllm' extra."
-            ) from exc
-        if spec.provider_name == "LlamaCppProvider":
-            raise ConfigurationError(
-                "LlamaCppProvider not found. Ensure you have implemented it in "
-                "forecast.providers.inference.llamacpp_provider and installed 'llama-cpp' extra."
-            ) from exc
-        raise
+    provider_cls = getattr(import_module(spec.provider_module), spec.provider_name)
 
     if spec.accepts_provider_kwargs:
         return provider_cls(config=config, **provider_kwargs)

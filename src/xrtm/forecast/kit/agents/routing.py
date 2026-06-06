@@ -91,7 +91,7 @@ class RoutingAgent(Agent):
 
         Example:
             ```python
-            >>> router = RoutingAgent(fast_tier=hf_provider, smart_tier=gemini_provider)
+            >>> router = RoutingAgent(fast_tier=openai_fast, smart_tier=openai_smart)
             >>> result = await router.run("Summarize this text.")
             ```
         r"""

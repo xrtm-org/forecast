@@ -39,11 +39,7 @@ _LEGACY_EXPORTS: dict[str, tuple[str, str]] = {
     "GraphAgent": ("xrtm.forecast.kit.agents.graph", "GraphAgent"),
     "RoutingAgent": ("xrtm.forecast.kit.agents.routing", "RoutingAgent"),
     "ModelFactory": ("xrtm.forecast.providers.inference.factory", "ModelFactory"),
-    "Memory": ("xrtm.forecast.kit.memory.unified", "Memory"),
-    "auditor": ("xrtm.forecast.core.telemetry.audit", "auditor"),
-    "tool_registry": ("xrtm.forecast.providers.tools", "tool_registry"),
-    "SQLSkill": ("xrtm.forecast.providers.tools", "SQLSkill"),
-    "PandasSkill": ("xrtm.forecast.providers.tools", "PandasSkill"),
+    "tool_registry": ("xrtm.forecast.core.tools.registry", "tool_registry"),
 }
 
 __all__ = [

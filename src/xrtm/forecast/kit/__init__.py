@@ -15,7 +15,7 @@
 
 r"""Namespace entrypoint for higher-level forecasting building blocks.
 
-Prefer importing concrete agents, topologies, and sentinels from their
+Prefer importing concrete agents, topologies, and skills from their
 subpackages. The kit root intentionally favors namespaces over becoming a
 catch-all surface.
 """
@@ -23,15 +23,9 @@ catch-all surface.
 from importlib import import_module
 from typing import Any
 
-from xrtm.forecast.kit.workbench import AnalystWorkbench
-
 _NAMESPACE_EXPORTS: dict[str, str] = {
     "agents": "xrtm.forecast.kit.agents",
-    "memory": "xrtm.forecast.kit.memory",
-    "pipelines": "xrtm.forecast.kit.pipelines",
-    "sentinel": "xrtm.forecast.kit.sentinel",
     "skills": "xrtm.forecast.kit.skills",
-    "stages": "xrtm.forecast.kit.stages",
     "topologies": "xrtm.forecast.kit.topologies",
 }
 
@@ -39,14 +33,9 @@ _LEGACY_EXPORTS: dict[str, tuple[str, str]] = {
     "RecursiveConsensus": ("xrtm.forecast.kit.topologies", "RecursiveConsensus"),
     "create_ivw_aggregator": ("xrtm.forecast.kit.topologies", "create_ivw_aggregator"),
     "create_simple_aggregator": ("xrtm.forecast.kit.topologies", "create_simple_aggregator"),
-    "RedTeamAgent": ("xrtm.forecast.kit.agents.red_team", "RedTeamAgent"),
-    "FactCheckerAgent": ("xrtm.forecast.kit.agents.fact_checker", "FactCheckerAgent"),
-    "PollingDriver": ("xrtm.forecast.kit.sentinel", "PollingDriver"),
-    "SentinelDriver": ("xrtm.forecast.kit.sentinel", "SentinelDriver"),
-    "TriggerRules": ("xrtm.forecast.kit.sentinel", "TriggerRules"),
 }
 
-__all__ = [*_NAMESPACE_EXPORTS, "AnalystWorkbench"]
+__all__ = [*_NAMESPACE_EXPORTS]
 
 
 def __getattr__(name: str) -> Any:

@@ -15,8 +15,7 @@
 
 r"""Unified platform configuration.
 
-Central ``Settings`` class that aggregates all sub-configurations
-(inference, graph, telemetry, tools) and loads values from environment
+Central ``Settings`` class that loads values from environment
 variables with the ``FORECAST_`` prefix.
 """
 
@@ -34,7 +33,7 @@ class Settings(BaseSettings):
     Unified configuration settings for the xrtm-forecast platform.
 
     Settings are automatically loaded from environment variables with an optional
-    `FORECAST_` prefix (e.g., `FORECAST_GEMINI_API_KEY`).
+    `FORECAST_` prefix (e.g., `FORECAST_OPENAI_API_KEY`).
     r"""
 
     model_config = SettingsConfigDict(
@@ -44,19 +43,13 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # API Keys are loaded from environment for convenience, but NOT used for global defaults.
-    gemini_api_key: Optional[SecretStr] = Field(default=None, validation_alias="GEMINI_API_KEY")
     openai_api_key: Optional[SecretStr] = Field(default=None, validation_alias="OPENAI_API_KEY")
-    tavily_api_key: Optional[SecretStr] = Field(default=None, validation_alias="TAVILY_API_KEY")
 
-    # Global connection defaults
     default_rpm: int = 15
     default_timeout: int = 30
 
 
 # Singleton instance for library-wide usage
-# We initialize without arguments to allow Pydantic to load from environment variables automatically.
-# The 'None' values in the previous version were confusing Mypy about the singleton's state.
 settings = Settings()
 
 __all__ = ["Settings", "settings"]

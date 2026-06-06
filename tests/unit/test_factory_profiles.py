@@ -17,9 +17,8 @@ import pytest
 from pydantic import SecretStr
 
 from xrtm.forecast.core.cache import InferenceCache
-from xrtm.forecast.core.config.inference import OpenAIConfig, XLMConfig
+from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.factory import ModelFactory
-from xrtm.forecast.providers.inference.hf_provider import HuggingFaceProvider
 from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 
@@ -27,28 +26,17 @@ def test_model_factory_env_profiles(monkeypatch):
     r"""Verifies that Environment Profiles correctly influence model selection."""
     monkeypatch.setenv("OPENAI_API_KEY", "mock-key")
 
-    # 1. Dev Profile (OpenAI)
+    # Dev Profile (OpenAI)
     p_dev_oa = ModelFactory.get_provider("openai", env="dev")
     assert p_dev_oa.config.model_id == "gpt-4o-mini"
 
-    # 2. Production Profile (OpenAI)
+    # Production Profile (OpenAI)
     p_prod_oa = ModelFactory.get_provider("openai", env="production")
     assert p_prod_oa.config.model_id == "gpt-4o"
 
-    # 3. Explicit model_id should still work or be overridden?
-    # Current implementation: Profiles override if provided.
-    # This is standard institutional behavior for 'enforcement' of environments.
+    # Explicit model_id is overridden by env profile
     p_explicit = ModelFactory.get_provider("openai", model_id="gpt-3.5-turbo", env="production")
     assert p_explicit.config.model_id == "gpt-4o"
-
-
-def test_model_factory_gemini_profile(monkeypatch):
-    r"""Verifies Gemini environment profiles require google.genai."""
-    pytest.importorskip("google.genai")
-    monkeypatch.setenv("GEMINI_API_KEY", "mock-key")
-
-    p_dev_gem = ModelFactory.get_provider("gemini", env="dev")
-    assert p_dev_gem.config.model_id == "gemini-2.0-flash"
 
 
 def test_model_factory_preserves_provider_runtime_kwargs(tmp_path):
@@ -60,10 +48,3 @@ def test_model_factory_preserves_provider_runtime_kwargs(tmp_path):
     assert isinstance(provider, OpenAIProvider)
     assert provider.cache is cache
     cache.close()
-
-
-def test_model_factory_supports_xlm_selector():
-    provider = ModelFactory.get_provider("xlm", model_id="sentence-transformers/all-MiniLM-L6-v2")
-
-    assert isinstance(provider, HuggingFaceProvider)
-    assert isinstance(provider.config, XLMConfig)

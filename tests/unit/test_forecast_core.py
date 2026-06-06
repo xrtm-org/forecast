@@ -17,18 +17,15 @@ from typing import Any, Callable, Dict, Optional
 
 import pytest
 
-from xrtm.forecast.core.config.inference import GeminiConfig
+from xrtm.forecast.core.config.graph import GraphConfig
 from xrtm.forecast.core.orchestrator import Orchestrator
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 from xrtm.forecast.kit.agents.llm import LLMAgent
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 
-# 1. Mock Provider for tests
 class MockProvider(InferenceProvider):
-    r"""
-    A fake inference provider for high-level core tests.
-    """
+    r"""A fake inference provider for high-level core tests."""
 
     def __init__(self, config=None, tier="SMART"):
         self.config = config
@@ -44,15 +41,11 @@ class MockProvider(InferenceProvider):
         return self.generate_content(prompt)
 
     async def stream(self, messages, **kwargs):
-        """Standardized streaming interface."""
         yield self.generate_content("")
 
 
-# 2. Mock Agent
 class MockAgent(LLMAgent):
-    r"""
-    A fake agent implementation for unit testing.
-    """
+    r"""A fake agent implementation for unit testing."""
 
     async def run(self, input_data: Any, **kwargs: Any) -> Dict[str, Any]:
         result = await self.model.generate_content_async(str(input_data))
@@ -61,23 +54,15 @@ class MockAgent(LLMAgent):
 
 @pytest.mark.asyncio
 async def test_library_standalone_orchestration():
-    r"""
-    Ensures xrtm-forecast core can run a reasoning chain standalone.
-    """
-    """
-    Ensures xrtm-forecast core can run a reasoning chain standalone.
-    """
+    r"""Ensures xrtm-forecast core can run a reasoning chain standalone."""
     mock_provider = MockProvider()
     _ = MockAgent(model=mock_provider)
 
-    from xrtm.forecast.core.config.graph import GraphConfig
-
     orchestrator = Orchestrator(config=GraphConfig(max_cycles=2))
 
-    # Define a simple node
     async def hello_node(state: BaseGraphState, on_progress: Callable) -> Optional[str]:
         state.context["node_visited"] = True
-        return None  # Terminate
+        return None
 
     orchestrator.register_node("start", hello_node)
 
@@ -91,12 +76,7 @@ async def test_library_standalone_orchestration():
 
 @pytest.mark.asyncio
 async def test_agent_parsing_logic():
-    r"""
-    Verifies that Agent correctly parses markdown JSON from model responses.
-    """
-    """
-    Verifies that Agent correctly parses markdown JSON.
-    """
+    r"""Verifies that Agent correctly parses markdown JSON from model responses."""
     mock_provider = MockProvider()
     agent = MockAgent(model=mock_provider)
 
@@ -109,17 +89,3 @@ async def test_agent_parsing_logic():
     parsed = agent.parse_output(raw_text)
     assert parsed["value"] == 42
     assert parsed["status"] == "active"
-
-
-@pytest.mark.asyncio
-async def test_model_factory_tier_handling():
-    r"""
-    Verifies the factory correctly returns providers based on performance tiers.
-    """
-    """
-    Verifies the factory correctly returns providers based on tiers.
-    """
-    _ = GeminiConfig(api_key="mock", model_id="primary", flash_model_id="cheap")
-    # We can't easily test the actual library factory without real keys or more mocking,
-    # but we can verify our MockProvider logic here if needed.
-    pass

@@ -14,6 +14,5 @@
 # limitations under the License.
 
 from xrtm.forecast.kit.skills.definitions import BaseSkill, Skill
-from xrtm.forecast.kit.skills.web_search import WebSearchSkill
 
-__all__ = ["Skill", "BaseSkill", "WebSearchSkill"]
+__all__ = ["Skill", "BaseSkill"]
