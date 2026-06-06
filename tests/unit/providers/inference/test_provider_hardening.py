@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import asyncio
-import sys
 from types import SimpleNamespace
 from typing import Any
 
