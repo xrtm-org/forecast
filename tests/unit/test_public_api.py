@@ -15,7 +15,6 @@
 
 import xrtm.forecast as forecast
 import xrtm.forecast.kit as kit
-from xrtm.forecast.kit.agents.fact_checker import FactCheckerAgent
 from xrtm.forecast.kit.agents.llm import LLMAgent
 from xrtm.forecast.providers.inference.factory import ModelFactory
 
@@ -36,10 +35,7 @@ def test_top_level_legacy_aliases_remain_available() -> None:
 
 
 def test_kit_root_prefers_namespaces_but_keeps_legacy_aliases() -> None:
-    from xrtm.forecast.kit import FactCheckerAgent as imported_fact_checker_agent
     from xrtm.forecast.kit import agents
 
     assert "agents" in kit.__all__
-    assert "FactCheckerAgent" not in kit.__all__
-    assert imported_fact_checker_agent is FactCheckerAgent
     assert agents.LLMAgent is LLMAgent

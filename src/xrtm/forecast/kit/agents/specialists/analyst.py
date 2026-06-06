@@ -42,6 +42,14 @@ def _default_confidence_interval(probability: float = 0.5) -> Dict[str, float]:
     }
 
 
+def _sanitize_edge(edge_data: Dict[str, Any]) -> CausalEdge:
+    r"""Coerce edge weight to [0, 1] range, taking abs for negative weights."""
+    data = dict(edge_data)
+    if "weight" in data:
+        data["weight"] = max(0.0, min(1.0, abs(float(data["weight"]))))
+    return CausalEdge(**data)
+
+
 class AnalystOutput(BaseModel):
     r"""
     Internal schema for structured output from the Forecasting Analyst.
@@ -136,13 +144,13 @@ class ForecastingAnalyst(LLMAgent):
             confidence_interval = parsed.confidence_interval
             reasoning = parsed.reasoning
             nodes = [CausalNode(**n) for n in parsed.causal_nodes]
-            edges = [CausalEdge(**e) for e in parsed.causal_edges]
+            edges = [_sanitize_edge(e) for e in parsed.causal_edges]
         elif isinstance(parsed, dict):
             probability = parsed.get("probability", 0.5)
             confidence_interval = parsed.get("confidence_interval", _default_confidence_interval(probability))
             reasoning = parsed.get("reasoning", "Parsing failed fallback.")
             nodes = [CausalNode(**n) for n in parsed.get("causal_nodes", [])]
-            edges = [CausalEdge(**e) for e in parsed.get("causal_edges", [])]
+            edges = [_sanitize_edge(e) for e in parsed.get("causal_edges", [])]
 
         # Wrap the parsed output into the standardized ForecastOutput
         return ForecastOutput(

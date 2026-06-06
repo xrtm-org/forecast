@@ -20,7 +20,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from xrtm.forecast.e2e import run_real_question_e2e
+from xrtm.forecast.e2e.real_questions import run_real_question_e2e
 
 
 def _local_base_url() -> str:

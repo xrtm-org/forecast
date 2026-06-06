@@ -13,15 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-r"""Tool execution configuration.
+r"""Tool execution configuration."""
 
-Defines ``ToolConfig`` with settings for external tool timeouts,
-API keys, and HTTP client parameters.
-"""
-
-from typing import Optional
-
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field
 
 from xrtm.forecast.version import __version__
 
@@ -30,7 +24,6 @@ class ToolConfig(BaseModel):
     r"""Configuration for external tools and skill execution."""
 
     timeout: int = Field(default=30, description="Global timeout for tool execution in seconds.")
-    tavily_api_key: Optional[SecretStr] = Field(default=None, description="API key for web search capabilities.")
     user_agent: str = Field(default=f"xrtm-forecast/{__version__}", description="User agent string for HTTP requests.")
 
 

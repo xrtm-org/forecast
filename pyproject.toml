@@ -19,18 +19,9 @@ dependencies = [
     "rich>=13.0.0",
     "freezegun>=1.2.0",
     "click>=8.0.0",
-    "google-genai>=0.1.0",
     "openai>=1.0.0",
-    "anthropic>=0.1.0",
-    "chromadb>=0.4.0",
-    "redis>=5.0.0",
-    "pandas>=2.0.0",
     "numpy>=1.24.0",
-    "scikit-learn>=1.3.0",
     "sqlalchemy>=2.0.0",
-    "matplotlib>=3.7.0",
-    "seaborn>=0.12.0",
-    "networkx>=3.0",
     "xrtm-data>=0.2.7",
     "xrtm-eval>=0.2.7"
 ]
@@ -44,26 +35,6 @@ Repository = "https://github.com/xrtm-org/forecast"
 Issues = "https://github.com/xrtm-org/forecast/issues"
 
 [project.optional-dependencies]
-# Hardware-Specific Local Inference
-transformers = [
-    "torch>=2.0.0",
-    "transformers>=4.40.0",
-    "accelerate>=0.26.0",
-    "bitsandbytes>=0.41.0",
-    "sentencepiece>=0.2.0"
-]
-vllm = [
-    "vllm>=0.3.0"
-]
-llama-cpp = [
-    "llama-cpp-python>=0.2.0"
-]
-xlm = [
-    "transformers>=4.40.0",
-    "torch>=2.0.0"
-]
-
-# Development Environment
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",

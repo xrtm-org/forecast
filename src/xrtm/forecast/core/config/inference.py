@@ -15,9 +15,8 @@
 
 r"""Inference provider configuration schemas.
 
-Pydantic settings for each supported LLM backend (Gemini, OpenAI,
-HuggingFace, vLLM, LlamaCpp), including API keys, model identifiers,
-generation parameters, and rate limiting.
+Pydantic settings for the OpenAI (and OpenAI-compatible) LLM backend,
+including API keys, model identifiers, generation parameters.
 """
 
 from datetime import datetime
@@ -27,12 +26,7 @@ from pydantic import BaseModel, Field, SecretStr
 
 __all__ = [
     "ProviderConfig",
-    "GeminiConfig",
     "OpenAIConfig",
-    "HFConfig",
-    "VLLMConfig",
-    "XLMConfig",
-    "LlamaCppConfig",
 ]
 
 
@@ -53,44 +47,7 @@ class ProviderConfig(BaseModel):
     extra: Dict[str, Any] = Field(default_factory=dict)
 
 
-class GeminiConfig(ProviderConfig):
-    r"""Specific configuration for Google Gemini."""
-
-    redis_url: Optional[str] = None
-
-
 class OpenAIConfig(ProviderConfig):
     r"""Specific configuration for OpenAI or compatible backends."""
 
     base_url: str = "https://api.openai.com/v1"
-
-
-class HFConfig(ProviderConfig):
-    r"""Configuration for local Hugging Face models."""
-
-    device: str = "cpu"  # cpu, cuda, mps
-    quantization: Optional[str] = None  # 4bit, 8bit
-    trust_remote_code: bool = False
-    cache_dir: Optional[str] = None
-
-
-class VLLMConfig(ProviderConfig):
-    r"""Configuration for vLLM high-throughput local serving."""
-
-    tensor_parallel_size: int = 1
-    gpu_memory_utilization: float = 0.9
-    max_model_len: Optional[int] = None
-
-
-class XLMConfig(HFConfig):
-    r"""Specific configuration for XLM (Local Encoder) specialists."""
-
-    use_fast_tokenizer: bool = True
-
-
-class LlamaCppConfig(ProviderConfig):
-    r"""Configuration for CPU-optimized local inference via Llama-CPP."""
-
-    n_ctx: int = 2048
-    n_threads: Optional[int] = None
-    n_gpu_layers: int = 0

@@ -18,22 +18,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from pydantic import SecretStr
 
-from xrtm.forecast.core.config.inference import GeminiConfig, OpenAIConfig
+from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.factory import ModelFactory
-
-
-def test_gemini_provider_instantiation():
-    r"""
-    Verifies that the ModelFactory correctly instantiates a GeminiProvider.
-    """
-    config = GeminiConfig(
-        model_id="gemini-2.0-flash",
-        api_key=SecretStr("mock-key"),
-        redis_url=None,  # Disable rate limiter for test
-    )
-    provider = ModelFactory.get_provider(config)
-    assert provider.model_id == "gemini-2.0-flash"
-    assert provider.supports_tools is True
 
 
 def test_openai_provider_instantiation():
