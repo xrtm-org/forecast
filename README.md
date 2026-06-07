@@ -21,6 +21,9 @@ from xrtm.forecast.core.config.inference import OpenAIConfig
 from xrtm.forecast.providers.inference.factory import ModelFactory
 
 # Use any OpenAI-compatible endpoint
+
+[![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
+
 config = OpenAIConfig(
     model_id="deepseek-v4-pro",
     base_url="https://api.deepseek.com",
