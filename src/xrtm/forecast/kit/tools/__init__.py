@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from xrtm.forecast.kit.skills.definitions import BaseSkill, Skill
-from xrtm.forecast.kit.skills.web_search import WebSearchSkill
+r"""Standalone tools for agent capabilities."""
 
-__all__ = ["Skill", "BaseSkill", "WebSearchSkill"]
+from xrtm.forecast.kit.tools.search import TavilySearchTool
+
+__all__ = ["TavilySearchTool"]
