@@ -25,8 +25,8 @@ from xrtm.forecast.providers.inference.factory import ModelFactory
 [![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 
 config = OpenAIConfig(
-    model_id="deepseek-v4-pro",
-    base_url="https://api.deepseek.com",
+    model_id="your-model",
+    base_url="$OPENAI_BASE_URL",
     api_key="your-api-key",
 )
 provider = ModelFactory.get_provider(config)
@@ -45,7 +45,7 @@ print(f"Probability: {forecast.probability:.2f}")
 ## What's Included
 
 ### OpenAI-compatible Provider
-One provider that works with any OpenAI-compatible API: OpenAI, DeepSeek, Anthropic (via proxy), local llama.cpp servers. Set `base_url` to point anywhere.
+One provider that works with any OpenAI-compatible API: any OpenAI-compatible endpoint. Set `base_url` to point anywhere.
 
 ### Agents
 - **`ForecastingAnalyst`** — Full forecast agent: structured prompts, causal reasoning traces, JSON output parsing
