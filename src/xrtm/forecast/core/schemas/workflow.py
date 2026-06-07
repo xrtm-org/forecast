@@ -30,7 +30,7 @@ from typing import Any
 WORKFLOW_SCHEMA_VERSION = "xrtm.workflow.v1"
 DEFAULT_LOCAL_WORKFLOWS_DIR = Path(".xrtm/workflows")
 _WORKFLOW_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
-_SUPPORTED_PROVIDERS = {"deterministic", "local-llm"}
+_SUPPORTED_PROVIDERS = {"deterministic", "local-llm", "openai", "openai-compatible"}
 _SUPPORTED_QUESTION_SOURCES = {"real-binary-corpus"}
 _WORKFLOW_ALIASES = {"demo-deterministic": "demo-deterministic"}
 ALLOWED_PRODUCT_NODE_KINDS = frozenset({"tool", "model", "scorer", "aggregator", "router", "human-gate", "agent"})
