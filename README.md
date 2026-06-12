@@ -1,5 +1,7 @@
 # xrtm-forecast v0.7.0
 
+[![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
@@ -22,7 +24,6 @@ from xrtm.forecast.providers.inference.factory import ModelFactory
 
 # Use any OpenAI-compatible endpoint
 
-[![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 
 config = OpenAIConfig(
     model_id="your-model",
