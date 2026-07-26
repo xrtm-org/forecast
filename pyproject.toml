@@ -77,4 +77,4 @@ exclude = ["build/", "dist/"]
 
 [[tool.mypy.overrides]]
 module = "numpy"
-follow_imports = "skip"
+ignore_errors = true
