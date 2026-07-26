@@ -73,4 +73,8 @@ python_version = "3.11"
 ignore_missing_imports = true
 strict = false
 explicit_package_bases = true
-exclude = ["build/", "dist/", ".venv/"]
+exclude = ["build/", "dist/"]
+
+[[tool.mypy.overrides]]
+module = "numpy"
+follow_imports = "skip"
