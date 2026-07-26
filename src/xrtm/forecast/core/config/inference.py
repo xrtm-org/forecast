@@ -48,6 +48,13 @@ class ProviderConfig(BaseModel):
 
 
 class OpenAIConfig(ProviderConfig):
-    r"""Specific configuration for OpenAI or compatible backends."""
+    r"""Specific configuration for OpenAI or compatible backends.
+
+    Args:
+        max_retries: Maximum retry attempts for transient API errors (default 2).
+        backoff_base: Base for exponential backoff in seconds (default 2.0).
+    """
 
     base_url: str = "https://api.openai.com/v1"
+    max_retries: int = Field(default=2, ge=0, description="Maximum retry attempts for transient API errors")
+    backoff_base: float = Field(default=2.0, gt=1.0, description="Base for exponential backoff in seconds")

@@ -131,7 +131,8 @@ class OpenAIProvider(InferenceProvider):
             current_turn += 1
 
             # Retry loop for transient API errors (timeouts, rate limits)
-            max_retries = 2
+            max_retries = self.config.max_retries
+            backoff_base = self.config.backoff_base
             for attempt in range(max_retries + 1):
                 try:
                     response = await self.client.chat.completions.create(
@@ -145,8 +146,8 @@ class OpenAIProvider(InferenceProvider):
                     break
                 except Exception as exc:
                     if attempt < max_retries:
-                        wait = 2 ** attempt
-                        logger.warning(f"[OPENAI] API error, retry {attempt+1}/{max_retries} in {wait}s: {exc}")
+                        wait = backoff_base ** attempt
+                        logger.warning(f"[OPENAI] API error, retry {attempt+1}/{max_retries} in {wait:.1f}s: {exc}")
                         await asyncio.sleep(wait)
                     else:
                         raise

@@ -30,17 +30,30 @@ from xrtm.forecast.providers.inference.base import InferenceProvider, ModelRespo
 
 
 class MockProvider(InferenceProvider):
-    """Hash-derived provider for CI smoke testing — zero cost, no API key."""
+    """Hash-derived provider for CI smoke testing — zero cost, no API key.
+
+    Args:
+        seed: Optional integer seed for varied but reproducible probability
+            mappings. Same prompt + same seed = same output. Different seeds
+            produce different output. Omit for existing behavior.
+    """
 
     model_id = "xrtm-mock"
     base_url = "mock://"
     supports_tools = False
 
-    def __init__(self) -> None:
+    def __init__(self, seed: int | None = None) -> None:
         self._cache: dict[str, ModelResponse] = {}
+        self._seed = seed
+
+    def _make_key(self, prompt: Any) -> str:
+        payload = json.dumps(prompt, sort_keys=True, default=str)
+        if self._seed is not None:
+            payload = f"{self._seed}:{payload}"
+        return hashlib.sha256(payload.encode()).hexdigest()
 
     def generate_content(self, prompt: Any, **kwargs: Any) -> ModelResponse:
-        key = hashlib.sha256(json.dumps(prompt, sort_keys=True, default=str).encode()).hexdigest()
+        key = self._make_key(prompt)
         if key in self._cache:
             return self._cache[key]
         bucket = int(key[:8], 16) / 0xFFFFFFFF
