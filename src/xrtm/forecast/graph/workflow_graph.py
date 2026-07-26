@@ -275,7 +275,7 @@ def _resolve_agent(target: Any, node_name: str) -> Agent:
         return target
     if inspect.isclass(target) and issubclass(target, Agent):
         try:
-            return target(name=node_name)
+            return target(name=node_name)  # type: ignore[call-arg]
         except TypeError:
             return target()
     if callable(target):

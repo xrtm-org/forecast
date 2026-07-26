@@ -21,6 +21,7 @@ Uses Tavily Search API to give agents real-time web search capability.
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any
 
 from xrtm.forecast.kit.skills.definitions import BaseSkill
@@ -47,19 +48,31 @@ class WebSearchSkill(BaseSkill):
     def __init__(self, search_tool: TavilySearchTool | None = None):
         self._search_tool = search_tool or TavilySearchTool()
 
-    async def execute(self, **kwargs: Any) -> str:
-        r"""Execute a web search and return formatted results.
+    async def execute(self, **kwargs: Any) -> dict[str, Any]:
+        r"""Execute a web search and return structured results.
 
         Args:
             query: The search query string.
             max_results: Optional max results (default 5).
 
         Returns:
-            Formatted search results as a text block.
+            Dict with keys: ``formatted`` (text for LLM prompts),
+            ``query``, ``results_count``, ``sources``, ``search_time_ms``.
         """
         query = kwargs.get("query", "")
         max_results = kwargs.get("max_results")
-        return self._search_tool.search_formatted(query, max_results=max_results)
+        start = time.perf_counter()
+        results = self._search_tool.search(query, max_results=max_results)
+        elapsed_ms = round((time.perf_counter() - start) * 1000)
+        sources = [r.get("url", "") for r in results if r.get("url")]
+        formatted = self._search_tool.search_formatted(query, max_results=max_results)
+        return {
+            "formatted": formatted,
+            "query": query,
+            "results_count": len(results),
+            "sources": sources,
+            "search_time_ms": elapsed_ms,
+        }
 
 
 __all__ = ["WebSearchSkill"]
