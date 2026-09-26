@@ -757,15 +757,6 @@ wheels = [
 ]
 
 [[package]]
-name = "networkx"
-version = "3.6.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6a/51/63fe664f3908c97be9d2e4f1158eb633317598cfa6e1fc14af5383f17512/networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509", size = 2517025, upload-time = "2025-12-08T17:02:39.908Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl", hash = "sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762", size = 2068504, upload-time = "2025-12-08T17:02:38.159Z" },
-]
-
-[[package]]
 name = "numpy"
 version = "2.2.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1342,22 +1333,19 @@ wheels = [
 
 [[package]]
 name = "xrtm-eval"
-version = "0.2.7"
+version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "networkx" },
-    { name = "numpy" },
     { name = "pydantic" },
-    { name = "xrtm-data" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/e1/4c8e1074169861ee40ac117bb189a75b055be080d0b2999d28ec004adc5e/xrtm_eval-0.2.7.tar.gz", hash = "sha256:475fca1bd3b4323f848237977a573662a8b6080613b245952beacc9eb7bb1329", size = 33675, upload-time = "2026-05-18T20:22:45.995Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/3c/1d121bed6eb39e440bb7d31576f5cdfa085f12f9f86ed800067e691c2b22/xrtm_eval-0.3.1.tar.gz", hash = "sha256:0eb6c34c5be12a4fec9871d9a51c452f35cf49def960790861f72209a3bf4484", size = 15208, upload-time = "2026-06-19T22:22:19.002Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/bb/4d618c6ddf1dac9f79d1d77fc84085fa9d96cd3e12342fe246b6e88088d5/xrtm_eval-0.2.7-py3-none-any.whl", hash = "sha256:83025db43c4a2c891bbbf523bd7b4cf3cbe434e74940971c45377193adff00d9", size = 40296, upload-time = "2026-05-18T20:22:44.797Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/3c/b6781b5ba9e72de42807ada443c5143cf07c2f198133e468e2050a01c6b4/xrtm_eval-0.3.1-py3-none-any.whl", hash = "sha256:93fedbbfd2499d5d9dc868d047b272df4e9431a8250ee8aaa76fe1624a456472", size = 18797, upload-time = "2026-06-19T22:22:17.984Z" },
 ]
 
 [[package]]
 name = "xrtm-forecast"
-version = "0.9.0"
+version = "0.10.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -1403,7 +1391,7 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
     { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "xrtm-data", specifier = ">=0.4.0" },
-    { name = "xrtm-eval", specifier = ">=0.2.7" },
+    { name = "xrtm-eval", specifier = ">=0.3.1" },
 ]
 provides-extras = ["dev"]
 
