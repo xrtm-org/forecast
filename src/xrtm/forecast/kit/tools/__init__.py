@@ -15,6 +15,7 @@
 
 r"""Standalone tools for agent capabilities."""
 
+from xrtm.forecast.kit.tools.caching import CachedSearchTool
 from xrtm.forecast.kit.tools.search import TavilySearchTool
 
-__all__ = ["TavilySearchTool"]
+__all__ = ["TavilySearchTool", "CachedSearchTool"]

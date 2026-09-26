@@ -1,4 +1,4 @@
-# xrtm-forecast v0.10.1
+# xrtm-forecast v0.11.0
 
 [![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 
@@ -8,6 +8,10 @@
 **The Runtime Engine for XRTM.**
 
 `xrtm-forecast` provides the agents, providers, topologies, and orchestration to build AI forecasting systems. It's a composable framework — import the pieces you need and wire them together.
+
+## What's new in v0.11
+
+- **Search-result cache**: `CachedSearchTool` caches tool results with a TTL, cutting external API calls and making backtests reproducible.
 
 ## What's new in v0.10
 
