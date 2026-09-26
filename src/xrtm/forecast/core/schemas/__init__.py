@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-r"""Framework schemas — runtime state, forecast types, and workflow blueprints."""
+r"""Framework schemas — runtime state, forecast types, workflow blueprints, and decisions."""
 
+from xrtm.forecast.core.schemas.decision import DecisionOption, DecisionResult
 from xrtm.forecast.core.schemas.workflow import (
     WORKFLOW_SCHEMA_VERSION,
     ArtifactPolicy,
@@ -34,6 +35,8 @@ __all__ = [
     "WORKFLOW_SCHEMA_VERSION",
     "ArtifactPolicy",
     "ConditionalRouteSpec",
+    "DecisionOption",
+    "DecisionResult",
     "EdgeSpec",
     "GraphSpec",
     "NodeSpec",

@@ -57,6 +57,7 @@ nav:
       - Overview: api/index.md
       - Agents: api/agents.md
       - Skills: api/skills.md
+      - Decisions: api/decisions.md
       - Orchestration: api/orchestration.md
       - Runtime: api/runtime.md
       - Topologies: api/topologies.md

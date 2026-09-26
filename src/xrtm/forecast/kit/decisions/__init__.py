@@ -13,20 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from xrtm.forecast.core.config.inference import (
-    OpenAIConfig,
-    ProviderConfig,
-)
-from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
-from xrtm.forecast.providers.inference.decision import JevProvider, LLMDecisionProvider
-from xrtm.forecast.providers.inference.factory import ModelFactory
+r"""Decision routing helpers (escalation between decision providers)."""
 
-__all__ = [
-    "InferenceProvider",
-    "ModelResponse",
-    "ProviderConfig",
-    "OpenAIConfig",
-    "ModelFactory",
-    "LLMDecisionProvider",
-    "JevProvider",
-]
+from xrtm.forecast.kit.decisions.escalation import EscalationRouter
+
+__all__ = ["EscalationRouter"]

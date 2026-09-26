@@ -20,9 +20,14 @@ Defines the ``InferenceProvider`` protocol for LLM backends and the
 All concrete providers must implement these interfaces.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, AsyncIterable, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, AsyncIterable, Dict, List, Optional, Sequence
+
+if TYPE_CHECKING:
+    from xrtm.forecast.core.schemas.decision import DecisionOption, DecisionResult
 
 
 class ModelResponse:
@@ -144,4 +149,37 @@ class HumanProvider(ABC):
         pass
 
 
-__all__ = ["InferenceProvider", "ModelResponse", "HumanProvider"]
+class DecisionProvider(ABC):
+    r"""
+    Abstract Base Class for typed decision providers.
+
+    Decision providers answer a bounded choice problem: given a state and a
+    list of options, they return a probability distribution (or at least a
+    confidence) over those options. System-One models (e.g. TypeSafe Jev) and
+    JSON-mode LLM wrappers both implement this interface, which lets routers
+    mix them without caring about the backend.
+    r"""
+
+    @abstractmethod
+    async def decide(
+        self,
+        state: str,
+        options: Sequence["DecisionOption"],
+        context: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> "DecisionResult":
+        r"""
+        Choose one option for the given state.
+
+        Args:
+            state (`str`): The situation or question to decide on.
+            options (`Sequence[DecisionOption]`): Selectable options.
+            context (`Dict[str, Any]`, *optional*): Extra structured context.
+
+        Returns:
+            `DecisionResult`: The chosen option, confidence, and probabilities.
+        r"""
+        pass
+
+
+__all__ = ["InferenceProvider", "ModelResponse", "HumanProvider", "DecisionProvider"]
