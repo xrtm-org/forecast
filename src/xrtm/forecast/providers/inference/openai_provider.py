@@ -17,7 +17,8 @@ r"""OpenAI inference provider.
 
 Concrete implementation of ``InferenceProvider`` for the OpenAI
 API, supporting chat completions, streaming, function calling,
-and structured output with JSON mode.
+structured output with JSON mode, and reasoning-capable models
+(``reasoning_content`` handling plus a ``thinking`` mode toggle).
 """
 
 import asyncio
@@ -28,6 +29,7 @@ from openai import AsyncOpenAI, OpenAI
 
 from xrtm.forecast.core.cache import InferenceCache
 from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.exceptions import EmptyContentError, ProviderError
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 logger = logging.getLogger(__name__)
@@ -74,12 +76,84 @@ class OpenAIProvider(InferenceProvider):
             return [{"role": "user", "content": messages}]
         return messages
 
+    def _build_request_kwargs(
+        self,
+        kwargs: Dict[str, Any],
+        response_format: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        r"""Merge generation kwargs with provider-level thinking and response-format options."""
+        request_kwargs = dict(kwargs)
+        if response_format is not None:
+            request_kwargs["response_format"] = response_format
+        if self.config.thinking in ("enabled", "disabled"):
+            extra_body = dict(request_kwargs.get("extra_body") or {})
+            extra_body.setdefault("thinking", {"type": self.config.thinking})
+            request_kwargs["extra_body"] = extra_body
+        return request_kwargs
+
+    @staticmethod
+    def _extract_usage(response: Any) -> Dict[str, int]:
+        r"""Normalize token usage, including cached prompt and reasoning tokens.
+
+        Handles the OpenAI ``prompt_tokens_details.cached_tokens`` shape and the
+        DeepSeek ``prompt_cache_hit_tokens`` shape, plus reasoning-token fields.
+        """
+        usage: Dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        raw_usage = getattr(response, "usage", None)
+        if not raw_usage:
+            return usage
+
+        usage["prompt_tokens"] = int(getattr(raw_usage, "prompt_tokens", 0) or 0)
+        usage["completion_tokens"] = int(getattr(raw_usage, "completion_tokens", 0) or 0)
+        usage["total_tokens"] = int(getattr(raw_usage, "total_tokens", 0) or 0)
+
+        prompt_details = getattr(raw_usage, "prompt_tokens_details", None)
+        cached = getattr(prompt_details, "cached_tokens", None) if prompt_details is not None else None
+        if cached is None:
+            cached = getattr(raw_usage, "prompt_cache_hit_tokens", None)
+        if cached is not None:
+            usage["cached_prompt_tokens"] = int(cached or 0)
+
+        completion_details = getattr(raw_usage, "completion_tokens_details", None)
+        reasoning = (
+            getattr(completion_details, "reasoning_tokens", None) if completion_details is not None else None
+        )
+        if reasoning is None:
+            reasoning = getattr(raw_usage, "reasoning_tokens", None)
+        if reasoning is not None:
+            usage["reasoning_tokens"] = int(reasoning or 0)
+
+        return usage
+
+    @staticmethod
+    def _extract_message_payload(choice: Any) -> tuple[str, Dict[str, Any]]:
+        r"""Return ``(text, metadata)`` for a choice, raising on empty content.
+
+        Reasoning models may fill ``reasoning_content`` while leaving ``content``
+        empty; that must never silently degrade into a parse-failure fallback.
+        """
+        text = choice.message.content or ""
+        reasoning = getattr(choice.message, "reasoning_content", None)
+        metadata: Dict[str, Any] = {}
+        if reasoning:
+            metadata["reasoning_content"] = reasoning
+        if not text:
+            finish_reason = getattr(choice, "finish_reason", None)
+            raise EmptyContentError(
+                "OpenAI-compatible provider returned empty content "
+                f"(finish_reason={finish_reason!r}, reasoning_chars={len(reasoning or '')}). "
+                "Reasoning models may have spent the output budget on reasoning_content: "
+                "disable thinking mode or raise max_tokens."
+            )
+        return text, metadata
+
     async def generate_content_async(
         self,
         prompt: Any,
         output_logprobs: bool = False,
         tools: Optional[List[Any]] = None,
         max_tool_turns: int = 5,
+        response_format: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> ModelResponse:
         r"""
@@ -94,11 +168,16 @@ class OpenAIProvider(InferenceProvider):
                 Optional list of tools for function calling.
             max_tool_turns (`int`, *optional*, defaults to `5`):
                 Maximum number of tool-execution turns to prevent infinite loops.
+            response_format (`Dict[str, Any]`, *optional*):
+                OpenAI-compatible structured-output request (e.g. ``{"type": "json_object"}``).
             **kwargs:
                 Additional generation parameters.
 
         Returns:
             `ModelResponse`: The standardized model response.
+
+        Raises:
+            EmptyContentError: When the provider returns no text content.
         r"""
         # Cast to Any to satisfy strict mypy checks on the Union definition
         messages = cast(Any, self._normalize_messages(prompt or kwargs.get("messages")))
@@ -120,7 +199,9 @@ class OpenAIProvider(InferenceProvider):
                         }
                     )
 
-        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, kwargs)
+        request_kwargs = self._build_request_kwargs(kwargs, response_format)
+
+        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, request_kwargs)
         if cache_key and self.cache:
             cached = self.cache.get(cache_key)
             if cached is not None:
@@ -141,7 +222,7 @@ class OpenAIProvider(InferenceProvider):
                         tools=cast(Any, openai_tools),
                         logprobs=output_logprobs,
                         top_logprobs=5 if output_logprobs else None,
-                        **kwargs,
+                        **request_kwargs,
                     )
                     break
                 except Exception as exc:
@@ -160,27 +241,20 @@ class OpenAIProvider(InferenceProvider):
                 messages.extend(tool_outputs)
                 continue
 
-            text = choice.message.content or ""
+            text, metadata = self._extract_message_payload(choice)
+
             normalized_logprobs = None
             if output_logprobs and choice.logprobs and choice.logprobs.content:
                 normalized_logprobs = []
                 for lp in choice.logprobs.content:
                     normalized_logprobs.append({"token": lp.token, "logprob": lp.logprob})
 
-            usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-            if response.usage:
-                usage = {
-                    "prompt_tokens": response.usage.prompt_tokens,
-                    "completion_tokens": response.usage.completion_tokens,
-                    "total_tokens": response.usage.total_tokens,
-                }
+            usage = self._extract_usage(response)
 
             if cache_key and self.cache:
                 self.cache.set(cache_key, text, {"model": self.model_id})
 
-            return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs)
-
-        from xrtm.forecast.core.exceptions import ProviderError
+            return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs, metadata=metadata)
 
         raise ProviderError(f"OpenAI generation failed: Max tool turns ({max_tool_turns}) exceeded.")
 
@@ -229,7 +303,12 @@ class OpenAIProvider(InferenceProvider):
         return results
 
     def generate_content(
-        self, prompt: Any, output_logprobs: bool = False, tools: Optional[List[Any]] = None, **kwargs: Any
+        self,
+        prompt: Any,
+        output_logprobs: bool = False,
+        tools: Optional[List[Any]] = None,
+        response_format: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
     ) -> ModelResponse:
         r"""
         Synchronously generates content from OpenAI.
@@ -241,14 +320,21 @@ class OpenAIProvider(InferenceProvider):
                 Whether to return log probabilities.
             tools (`List[Any]`, *optional*):
                 Optional list of tools for function calling.
+            response_format (`Dict[str, Any]`, *optional*):
+                OpenAI-compatible structured-output request.
             **kwargs:
                 Additional generation parameters.
 
         Returns:
             `ModelResponse`: The standardized model response.
+
+        Raises:
+            EmptyContentError: When the provider returns no text content.
         r"""
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
-        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, kwargs)
+        request_kwargs = self._build_request_kwargs(kwargs, response_format)
+
+        cache_key = self._cache_key_for_request(messages, tools, output_logprobs, request_kwargs)
         if cache_key and self.cache:
             cached = self.cache.get(cache_key)
             if cached is not None:
@@ -257,23 +343,16 @@ class OpenAIProvider(InferenceProvider):
         response = self.sync_client.chat.completions.create(
             model=self.model_id,
             messages=cast(Any, messages),
-            **kwargs,
+            **request_kwargs,
         )
 
         choice = response.choices[0]
-        usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-        if response.usage:
-            usage = {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens,
-            }
-
-        text = choice.message.content or ""
+        text, metadata = self._extract_message_payload(choice)
+        usage = self._extract_usage(response)
         if cache_key and self.cache:
             self.cache.set(cache_key, text, {"model": self.model_id})
 
-        return ModelResponse(text=text, raw=response, usage=usage)
+        return ModelResponse(text=text, raw=response, usage=usage, metadata=metadata)
 
     def _cache_key_for_request(
         self,
@@ -319,8 +398,6 @@ class OpenAIProvider(InferenceProvider):
                     except RuntimeError as exc:
                         logger.debug(f"[OPENAI] Streaming iterator close deferred: {exc}")
             return
-
-        from xrtm.forecast.core.exceptions import ProviderError
 
         raise ProviderError("OpenAI streaming response is not iterable.")
 
