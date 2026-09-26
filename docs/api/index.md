@@ -19,6 +19,7 @@ Welcome to the `xrtm-forecast` API reference.
 - **[Sentinel Protocol](sentinel.md)**: dynamic forecasting and polling drivers.
 - **[Inference Cache](cache.md)**: SQLite-based response caching.
 - **[Policies](policies.md)**: currency-aware pricing, budgets, and off-peak scheduling.
+- **[Baselines](baselines.md)**: market-implied, base-rate, and constant reference forecasts.
 - **[Resilience Protocol](resilience.md)**: production-grade retry middleware.
 - **[Tools](tools.md)**: external capability integrations (Wayback, etc.).
 - **[Epistemic Security](security.md)**: adversarial resilience and source trust scoring.

@@ -25,6 +25,7 @@ from typing import Any
 
 _NAMESPACE_EXPORTS: dict[str, str] = {
     "agents": "xrtm.forecast.kit.agents",
+    "baselines": "xrtm.forecast.kit.baselines",
     "skills": "xrtm.forecast.kit.skills",
     "topologies": "xrtm.forecast.kit.topologies",
 }
