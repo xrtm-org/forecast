@@ -13,14 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-r"""
-Metadata for the xrtm-forecast package.
-"""
-
-__all__ = ["__version__", "__author__", "__contact__", "__license__", "__copyright__"]
-
-__version__ = "0.10.1"
-__author__ = "XRTM Team"
-__contact__ = "moy@xrtm.org"
-__license__ = "Apache-2.0"
-__copyright__ = "Copyright 2026 XRTM Team"
+r"""In-process fact memory (FactStore) for agents."""

@@ -1,49 +1,28 @@
-# Optimization API
+# Calibration & Prompt Optimization
 
-The Optimization module provides tools for automatic probability calibration and "DSPy-style" prompt engineering to minimize Brier Score.
+> **Relocated in 0.9–0.10.** The in-engine Platt/Beta scalers and the DSPy-style
+> prompt compiler were removed. Scoring and calibration now live in `xrtm-eval`,
+> and prompts are configured through `PromptTemplate`.
 
-## Core: Calibration Engines
+## Scoring (xrtm-eval)
 
-### PlattScaler
-The original Platt Scaling implementation using Logistic Regression.
+Brier score, expected calibration error, and reliability decomposition ship in
+`xrtm-eval`:
 
-::: forecast.core.eval.calibration.PlattScaler
+::: xrtm.eval.kit.eval.metrics.BrierScoreEvaluator
+    options:
+      show_root_heading: true
+
+::: xrtm.eval.kit.eval.metrics.ExpectedCalibrationErrorEvaluator
+    options:
+      show_root_heading: true
+
+## Prompt configuration
+
+::: xrtm.forecast.core.schemas.prompt.PromptTemplate
     options:
       show_root_heading: true
       show_source: true
 
-### BetaScaler
-An advanced calibrator superior for handling asymmetric overconfidence ("S-curves").
-
-::: forecast.core.eval.calibration.BetaScaler
-    options:
-      show_root_heading: true
-      show_source: true
-
----
-
-## Kit: Prompt Optimization
-
-### PromptTemplate
-A versioned, structured prompt object that enables iterative optimization.
-
-::: forecast.kit.agents.prompting.PromptTemplate
-    options:
-      show_root_heading: true
-      show_source: true
-
-### CompiledAgent
-An LLM agent that uses a `PromptTemplate`, allowing for external compilation.
-
-::: forecast.kit.agents.prompting.CompiledAgent
-    options:
-      show_root_heading: true
-      show_source: true
-
-### BrierOptimizer
-The "Teleprompter" that tunes instructions to reduce forecasting errors.
-
-::: forecast.kit.optimization.compiler.BrierOptimizer
-    options:
-      show_root_heading: true
-      show_source: true
+Pass a template to the analyst: `ForecastingAnalyst(model=..., prompt_template=template)`.
+The template id is recorded in `ForecastOutput.provenance.prompt_id`.

@@ -2,8 +2,8 @@
 
 ## Overview
 
-Traditional forecasting engines produce a **static snapshot** — a single probability
-at one moment in time. But real-world events evolve continuously.
+Traditional forecasting engines produce a **static snapshot** — a single
+probability at one moment in time. Real-world events evolve continuously.
 
 The **Sentinel Protocol** provides the architecture for **Dynamic Forecasting**:
 tracking how a forecast's confidence changes as new information arrives.
@@ -11,44 +11,43 @@ tracking how a forecast's confidence changes as new information arrives.
 ## Core Concepts
 
 ### Trajectories vs Snapshots
+
 | Static Forecasting | Dynamic Forecasting |
 |--------------------|---------------------|
 | Single probability P(t) | Time-series [P(t₁), P(t₂), ...] |
 | Run once, done | Continuous updates |
-| Expensive re-runs | Delta updates (~500 tokens) |
+| Expensive re-runs | Delta updates (small evidence prompts) |
 
 ### The Delta Function
-Instead of re-running the full research execution graph for every update, we use
-**Bayesian Updating**:
 
-1. Agent receives: `previous_reasoning + new_evidence`
-2. Agent outputs: `updated_confidence + reasoning_delta`
-3. Cost: ~500 tokens (vs. 10,000+ for full re-run)
+Instead of re-running the full research execution graph for every update, a
+dynamic forecaster can update on deltas:
 
-## Drivers
+1. Provide: `previous_reasoning + new_evidence`
+2. Receive: `updated_confidence + reasoning_delta`
+3. Cost: a fraction of a full research re-run
 
-The Sentinel Protocol uses a **Driver** abstraction for flexibility:
+## Producing Trajectories in 0.10
 
-| Driver | Latency | Complexity | Use Case |
-|--------|---------|------------|----------|
-| `PollingDriver` | Minutes | Zero infra | Research, laptops |
-| `StreamDriver` | Seconds | Redis/Kafka | Enterprise scale |
-| `ProcessSentinel` | Sub-second | Complex | Crisis monitoring |
-
-## Example
+> **Changed in 0.9–0.10.** The bundled `PollingDriver` / `StreamDriver` /
+> `ProcessSentinel` drivers were removed from the engine. Build trajectories
+> from repeated forecasts instead:
 
 ```python
-from xrtm.forecast.kit.sentinel import PollingDriver, TriggerRules
+from xrtm.forecast.kit.batch import forecast_many
 
-driver = PollingDriver(model=llm, poll_interval=3600)
-await driver.register_watch(
-    question,
-    TriggerRules(interval_seconds=3600, max_updates=24)
-)
-
-# Run for 24 hours
-await driver.run(max_cycles=24)
-
-trajectory = await driver.get_trajectory(question.id)
-print(f"Final confidence: {trajectory.final_confidence}")
+# Run a batch now, persist each ForecastOutput, and repeat on your schedule
+result = await forecast_many(analyst, questions, concurrency=5, ledger=ledger)
+for output in result.outputs:
+    store(output)  # your trajectory storage
 ```
+
+Off-peak scheduling and cost accounting for those runs are engine policies —
+see [Policies](../api/policies.md).
+
+## Schemas
+
+`ForecastTrajectory` and `TimeSeriesPoint` (see the
+[Sentinel API reference](../api/sentinel.md)) provide the storage shape for a
+probability series; the analyst's `provenance` and `usage` fields make each
+point auditable.

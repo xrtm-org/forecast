@@ -1,39 +1,49 @@
-# Calibration & Reliability (v0.3.1)
+# Calibration & Reliability
 
-Calibration is the process of ensuring that an agent's probabilistic forecasts match real-world outcomes. If an agent says "I am 70% confident," that event should happen exactly 70% of the time.
+Calibration is the process of ensuring that probabilistic forecasts match
+real-world outcomes. If a forecaster says "I am 70% confident", that event
+should happen approximately 70% of the time.
 
-## The Problem: LLM Over/Under-confidence
+## Why it matters
 
-Large Language Models (LLM) are notorious for being over-confident or inconsistently biased in their raw probability estimates. Without calibration, these probabilities are "unreliable" for institutional decision-making.
+Large language models are frequently over-confident or inconsistently biased in
+their raw probability estimates. Scoring and calibration live in **xrtm-eval**
+(the in-engine scalers were removed in 0.9–0.10):
 
-## The Solution: Platt Scaling
+- `BrierScoreEvaluator` — Brier score with Murphy decomposition
+- `ExpectedCalibrationErrorEvaluator` — ECE via reliability binning
+- `LogScoreEvaluator` — negative log-likelihood
+- `summarize_binary_forecasts()` — Brier + ECE + calibration curve in one call
 
-`xrtm-forecast` implements **Platt Scaling** (via the `PlattScaler` class) to correct these biases. 
+```python
+from xrtm.eval import BrierScoreEvaluator, summarize_binary_forecasts
 
-### How it Works
-Platt Scaling fits a logistic regression model to the agent's raw probability outputs ($P_{raw}$) against the actual binary outcomes ($y$). 
-
-$$ P(y=1 | P_{raw}) = \frac{1}{1 + \exp(A \cdot P_{raw} + B)} $$
-
-The parameters $A$ and $B$ are learned from historical data (calibration set), allowing the system to "stretch" or "compress" the LLM's confidence into a mathematically rigorous probability.
+score = BrierScoreEvaluator().score(probability=0.7, ground_truth="yes")
+summary = summarize_binary_forecasts([(0.7, "yes"), (0.3, "no"), (0.9, "yes")])
+print(summary["brier_score"], summary["ece"])
+```
 
 ## Brier Score Decomposition
 
-To audit the quality of a forecaster, we use the **Brier Score**, which we decompose into three components:
+To audit the quality of a forecaster, the Brier Score is decomposed into three
+components:
 
-1. **Reliability**: How close the predicted probabilities are to the true frequency of outcomes. (Lower is better).
-2. **Resolution**: How much the predictions differ from the base rate (average frequency). (Higher is better).
+1. **Reliability**: How close predicted probabilities are to the true outcome
+   frequency (lower is better).
+2. **Resolution**: How much predictions differ from the base rate (higher is
+   better).
 3. **Uncertainty**: The inherent difficulty of the events being predicted.
 
 $$ \text{Brier Score} = \text{Reliability} - \text{Resolution} + \text{Uncertainty} $$
 
-## The Researcher's Workbench
+## Reliability bins
 
-### 1. The Evaluator Protocol
-We decouple metric calculation from the runner. Any class implementing `Evaluator` can be injected into the `BacktestRunner`.
+`ReliabilityBin` (xrtm-eval) exposes mean prediction, mean ground truth, and
+count so you can plot ECE diagrams in the tooling of your choice.
+`EvaluationReport` exports to JSON and Pandas for notebook analysis.
 
-### 2. Reliability Bins
-We calculate raw statistical Reliability Bins (Mean Prediction, Mean Ground Truth, Count) to allow users to plot ECE diagrams in their tool of choice (matplotlib, seaborn, etc.).
+## Operational signal
 
-### 3. Data Portability
-The `EvaluationReport` natively supports export to JSON and Pandas for immediate analysis in Jupyter notebooks.
+Every `ForecastOutput` records `parse_status` and typed `usage`, and the
+analyst's `provenance.prompt_id` lets you compare calibration across prompt
+versions — see [Telemetry](../api/telemetry.md).

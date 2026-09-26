@@ -1,34 +1,35 @@
 # Evaluation API
 
-Tools for benchmarking and validating agent performance.
+Scoring lives in **xrtm-eval**; backtesting lives in **xrtm-train**.
 
-::: forecast.core.eval.definitions.Evaluator
+## Scoring (xrtm-eval)
+
+::: xrtm.eval.core.eval.definitions.Evaluator
     options:
       show_root_heading: true
 
-::: forecast.kit.eval.runner.BacktestRunner
+::: xrtm.eval.core.eval.definitions.EvaluationReport
     options:
       show_root_heading: true
 
-::: forecast.kit.eval.runner.BacktestInstance
+::: xrtm.eval.core.eval.definitions.ReliabilityBin
     options:
       show_root_heading: true
 
-::: forecast.core.eval.definitions.EvaluationReport
-    options:
-      show_root_heading: true
-      members:
-        - to_json
-        - to_pandas
-
-::: forecast.core.eval.definitions.ReliabilityBin
+::: xrtm.eval.kit.eval.metrics.BrierScoreEvaluator
     options:
       show_root_heading: true
 
-::: forecast.kit.eval.metrics.BrierScoreEvaluator
+::: xrtm.eval.kit.eval.metrics.ExpectedCalibrationErrorEvaluator
     options:
       show_root_heading: true
 
-::: forecast.kit.eval.metrics.ExpectedCalibrationErrorEvaluator
+## Backtesting (xrtm-train)
+
+::: xrtm.train.simulation.runner.BacktestRunner
+    options:
+      show_root_heading: true
+
+::: xrtm.train.simulation.runner.BacktestInstance
     options:
       show_root_heading: true

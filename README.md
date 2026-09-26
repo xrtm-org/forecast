@@ -1,4 +1,4 @@
-# xrtm-forecast v0.10.0
+# xrtm-forecast v0.10.1
 
 [![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 

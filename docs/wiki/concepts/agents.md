@@ -20,7 +20,7 @@ from xrtm.forecast.kit.agents import LLMAgent
 from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 provider = OpenAIProvider(api_key="...")
-agent = LLMAgent(model=provider, name="Alice", role="Researcher")
+agent = LLMAgent(model=provider, name="Researcher")
 ```
 
 ## Lifecycle
@@ -33,7 +33,7 @@ agent = LLMAgent(model=provider, name="Alice", role="Researcher")
 To maintain a lean engine, we distinguish between structural abstractions and specialist personas:
 
 1.  **Abstractions (The "Shapes")**: Mechanical building blocks like `LLMAgent` (reasoning), `ToolAgent` (execution), and `GraphAgent` (recursion).
-2.  **Specialists (The "Roles")**: Pre-assembled kits like `ForecastingAnalyst` (Bayesian reasoning) or `FactCheckerAgent` (NLI verification).
+2.  **Specialists (The "Roles")**: Pre-assembled kits like `ForecastingAnalyst` (Bayesian reasoning); build further specialists by equipping `LLMAgent` with skills (e.g. `WebSearchSkill`) or decision providers.
 
 ## Agents as Stages
 While an Agent is an object, it is often consumed as a Stage in an Orchestrator execution graph.

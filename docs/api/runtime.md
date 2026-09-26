@@ -11,7 +11,7 @@ The `AsyncRuntime` is the institutional abstraction for all `asyncio` operations
 
 ## Reference
 
-::: forecast.core.runtime.AsyncRuntime
+::: xrtm.forecast.core.runtime.AsyncRuntime
     options:
       show_root_heading: true
       show_source: true

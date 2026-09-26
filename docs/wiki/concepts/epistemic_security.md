@@ -2,62 +2,52 @@
 
 ## The Threat Model
 
-In the age of AI-generated content, a forecasting engine faces a new threat:
-**News Injection Attacks**.
+AI-generated content enables **news injection attacks**: a malicious actor can
+flood an agent's context with convincing fake articles. An undefended agent
+will believe them and make catastrophic decisions.
 
-A malicious actor can generate thousands of convincing fake articles about
-"Company X Fraud" and inject them into an agent's context. An undefended
-agent will believe this and make catastrophic decisions.
+## Current Defense Layers (0.10)
 
-## Defense Layers
+> **Removed in 0.9–0.10.** The `AdversarialInjector`, `GullibilityReport`, and
+> `EpistemicEvaluator` tooling was removed. Robustness now comes from engine
+> primitives:
 
-### 1. Source Verification (Passive Defense)
-Every news item receives a `TrustScore` based on:
-- Domain reputation and age
-- Cross-reference with trusted outlets
-- Historical accuracy of the source
+### 1. Structured verification
 
-```python
-# Low-trust sources are suppressed
-if news_item.trust_score < 0.3:
-    context["warnings"].append("Unverified source")
-```
-
-### 2. Adversarial Testing (Active Defense)
-The `AdversarialInjector` stress-tests agents by deliberately feeding them
-fake news in a sandbox environment.
+Use a `DecisionProvider` (e.g. `JevProvider`) with `EscalationRouter` to verify
+claims or escalate uncertain ones to a stronger model:
 
 ```python
-from xrtm.eval.kit.eval.resilience import AdversarialInjector
+from xrtm.forecast.core.schemas.decision import DecisionOption
+from xrtm.forecast.kit.decisions import EscalationRouter
 
-injector = AdversarialInjector()
-fake = injector.generate_attack("ACME Corp", "bearish")
-
-# Measure how much the agent's confidence shifts
-report = injector.measure_resilience(
-    initial_confidence=0.8,
-    post_injection_confidence=agent_output.confidence
+router = EscalationRouter(primary=jev, fallback=llm, confidence_threshold=0.7)
+verdict = await router.decide(
+    "Claim: 'Company X committed fraud' — is it supported by the provided sources?",
+    [DecisionOption(name="supported"), DecisionOption(name="unsupported")],
 )
-
-if report.resilience_score < 0.5:
-    raise SecurityWarning("Agent is too gullible!")
+if verdict.decision != "supported" or verdict.confidence < 0.6:
+    context["warnings"].append("Unverified claim")
 ```
+
+### 2. Source metadata
+
+`WebSearchSkill` returns structured `sources`, `results_count`, and
+`search_time_ms`, stored under `metadata.raw_data["web_search"]` — so you can
+audit which sources informed a forecast.
+
+### 3. Parse integrity
+
+`ForecastOutput.parse_status` marks malformed model output explicitly
+(`invalid_json`, `empty_content`, `schema_error`) instead of silently degrading
+into a fallback probability.
+
+### 4. Temporal integrity
+
+`snapshot_time` (metadata) and `MarketSnapshot` enforce zero-leakage
+boundaries; search results must respect the snapshot window in backtests.
 
 ## Metrics
 
-| Metric | Good | Bad |
-|--------|------|-----|
-| `resilience_score` | > 0.7 | < 0.3 |
-| `delta` (confidence shift) | < 0.2 | > 0.5 |
-
-## Configuration
-
-```python
-# Paranoia levels
-config = EpistemicConfig(
-    paranoia_level="high",  # For trading
-    # paranoia_level="low",  # For research
-    min_trust_score=0.5,
-    require_cross_reference=True
-)
-```
+Track calibration and verification quality with `xrtm-eval` (Brier/ECE) and the
+`confidence` distribution of your decision providers.
