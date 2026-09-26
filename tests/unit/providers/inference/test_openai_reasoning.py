@@ -125,3 +125,62 @@ async def test_reasoning_content_is_exposed_in_metadata_when_content_present():
     provider, _ = build_provider(completion(content="final", reasoning="chain of thought"))
     result = await provider.generate_content_async("hi")
     assert result.metadata["reasoning_content"] == "chain of thought"
+
+
+class SequencedAsyncCompletions:
+    def __init__(self, responses: list) -> None:
+        self.responses = list(responses)
+        self.calls: list[dict] = []
+
+    async def create(self, **kwargs: Any) -> Any:
+        self.calls.append(kwargs)
+        return self.responses.pop(0)
+
+
+@pytest.mark.asyncio
+async def test_empty_content_retry_doubles_max_tokens():
+    first = completion(content="", reasoning="long thought", finish_reason="length")
+    second = completion(content="final answer")
+    provider = OpenAIProvider(OpenAIConfig(model_id="deepseek-flash", api_key="fake"))
+    completions = SequencedAsyncCompletions([first, second])
+    provider.client = SimpleNamespace(  # type: ignore[assignment]
+        chat=SimpleNamespace(completions=completions)
+    )
+
+    result = await provider.generate_content_async("hi", max_tokens=1000)
+
+    assert result.text == "final answer"
+    assert completions.calls[0]["max_tokens"] == 1000
+    assert completions.calls[1]["max_tokens"] == 2000
+
+
+@pytest.mark.asyncio
+async def test_cache_skips_sampled_requests_unless_enabled(tmp_path, monkeypatch):
+    from xrtm.forecast.core.cache import InferenceCache
+
+    monkeypatch.setenv("FORECAST_CACHE_ENABLED", "true")
+    cache = InferenceCache(db_path=str(tmp_path / "cache.db"))
+    provider = OpenAIProvider(OpenAIConfig(model_id="deepseek-flash", api_key="fake"), cache=cache)
+    completions = FakeAsyncCompletions(completion())
+    provider.client = SimpleNamespace(  # type: ignore[assignment]
+        chat=SimpleNamespace(completions=completions)
+    )
+
+    await provider.generate_content_async("hi", temperature=0.7)
+    await provider.generate_content_async("hi", temperature=0.7)
+    assert len(completions.calls) == 2  # sampled requests are not cached
+
+    await provider.generate_content_async("hi", temperature=0)
+    await provider.generate_content_async("hi", temperature=0)
+    assert len(completions.calls) == 3  # deterministic requests are cached
+    cache.close()
+
+
+def test_rate_limiter_disabled_when_rpm_zero():
+    provider = OpenAIProvider(OpenAIConfig(model_id="deepseek-flash", api_key="fake", rpm=0))
+    assert provider.rate_limiter is None
+
+
+def test_rate_limiter_uses_configured_rpm():
+    provider = OpenAIProvider(OpenAIConfig(model_id="deepseek-flash", api_key="fake", rpm=120))
+    assert provider.rate_limiter is not None

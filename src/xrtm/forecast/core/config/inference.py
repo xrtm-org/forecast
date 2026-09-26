@@ -62,6 +62,34 @@ class OpenAIConfig(ProviderConfig):
     base_url: str = "https://api.openai.com/v1"
     max_retries: int = Field(default=2, ge=0, description="Maximum retry attempts for transient API errors")
     backoff_base: float = Field(default=2.0, gt=1.0, description="Base for exponential backoff in seconds")
+    retry_on_empty_content: bool = Field(
+        default=True,
+        description="Retry once with a larger max_tokens when a reasoning model returns empty content.",
+    )
+    empty_content_multiplier: float = Field(
+        default=2.0,
+        ge=1.0,
+        le=4.0,
+        description="max_tokens multiplier applied to the empty-content retry.",
+    )
+    cache_ttl_seconds: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Optional TTL for cached responses. None keeps entries until LRU/size eviction.",
+    )
+    cache_non_deterministic: bool = Field(
+        default=False,
+        description="Cache responses even when temperature > 0. Off by default so sampling is not silently frozen.",
+    )
+    rate_limit_timeout_seconds: float = Field(
+        default=60.0,
+        gt=0,
+        description="How long a request waits for a rate-limit token before failing.",
+    )
+    redis_url: Optional[str] = Field(
+        default=None,
+        description="Optional Redis URL for cross-process rate limiting (in-memory fallback otherwise).",
+    )
     thinking: str = Field(
         default="auto",
         pattern="^(auto|enabled|disabled)$",
