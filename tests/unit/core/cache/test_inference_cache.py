@@ -159,3 +159,21 @@ class TestInferenceCacheEviction:
         stats = cache.stats()
         assert stats["total_size_bytes"] <= 100
         cache.close()
+
+
+class TestInferenceCacheTTL:
+    r"""Test TTL expiry."""
+
+    def test_ttl_zero_expires_immediately(self, tmp_path):
+        r"""A zero TTL expires entries on read."""
+        cache = InferenceCache(db_path=str(tmp_path / "ttl.db"), ttl_seconds=0)
+        cache.set("k", "v")
+        assert cache.get("k") is None
+        cache.close()
+
+    def test_no_ttl_keeps_entries(self, tmp_path):
+        r"""Default caches keep entries until eviction."""
+        cache = InferenceCache(db_path=str(tmp_path / "ttl_none.db"))
+        cache.set("k2", "v2")
+        assert cache.get("k2") == "v2"
+        cache.close()

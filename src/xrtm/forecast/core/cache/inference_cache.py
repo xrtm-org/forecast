@@ -58,6 +58,9 @@ class InferenceCache:
             `FORECAST_CACHE_ENABLED` environment variable.
         max_size_bytes (`int`, *optional*, defaults to `1073741824`):
             Maximum cache size in bytes (default 1GB). LRU eviction when exceeded.
+        ttl_seconds (`int`, *optional*):
+            Optional time-to-live in seconds for cache entries. ``None`` disables
+            TTL expiry (entries remain until LRU/size eviction).
 
     Example:
         >>> cache = InferenceCache(db_path=".cache/test.db")
@@ -73,6 +76,7 @@ class InferenceCache:
         db_path: str = ".cache/inference.db",
         enabled: bool = True,
         max_size_bytes: int = 1024 * 1024 * 1024,  # 1GB
+        ttl_seconds: Optional[int] = None,
     ) -> None:
         # Environment variable override
         env_enabled = os.environ.get("FORECAST_CACHE_ENABLED", "").lower()
@@ -84,6 +88,7 @@ class InferenceCache:
         self.enabled = enabled
         self.db_path = Path(db_path)
         self.max_size_bytes = max_size_bytes
+        self.ttl_seconds = ttl_seconds
         self._conn: Optional[sqlite3.Connection] = None
 
         if self.enabled:
@@ -203,11 +208,17 @@ class InferenceCache:
         if not self.enabled or self._conn is None:
             return None
 
-        cursor = self._conn.execute("SELECT value FROM cache WHERE key = ?", (key,))
+        cursor = self._conn.execute("SELECT value, created_at FROM cache WHERE key = ?", (key,))
         row = cursor.fetchone()
 
         if row is None:
             logger.debug("Cache miss: %s", key[:16])
+            return None
+
+        if self.ttl_seconds is not None and (time.time() - float(row[1])) > self.ttl_seconds:
+            self._conn.execute("DELETE FROM cache WHERE key = ?", (key,))
+            self._conn.commit()
+            logger.debug("Cache entry expired: %s", key[:16])
             return None
 
         # Update last accessed time for LRU

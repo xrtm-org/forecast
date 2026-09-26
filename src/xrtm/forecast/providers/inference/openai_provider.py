@@ -19,17 +19,24 @@ Concrete implementation of ``InferenceProvider`` for the OpenAI
 API, supporting chat completions, streaming, function calling,
 structured output with JSON mode, and reasoning-capable models
 (``reasoning_content`` handling plus a ``thinking`` mode toggle).
+
+Reliability features: token-bucket rate limiting, jittered retries,
+empty-content retries with a larger output budget, and a
+deterministic-only response cache with optional TTL.
 """
 
 import asyncio
 import logging
+import random
 from typing import Any, AsyncGenerator, AsyncIterable, Dict, Iterable, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
 
 from xrtm.forecast.core.cache import InferenceCache
 from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.config.models import ModelSpec, get_model_spec
 from xrtm.forecast.core.exceptions import EmptyContentError, ProviderError
+from xrtm.forecast.core.utils.rate_limiter import TokenBucket
 from xrtm.forecast.providers.inference.base import InferenceProvider, ModelResponse
 
 logger = logging.getLogger(__name__)
@@ -57,6 +64,7 @@ class OpenAIProvider(InferenceProvider):
         r"""
         self.config = config
         self.model_id = config.model_id
+        self.spec: ModelSpec = get_model_spec(config.model_id)
         self.knowledge_cutoff = config.knowledge_cutoff
         self.api_key = config.api_key.get_secret_value() if config.api_key else None
         self.base_url = config.base_url
@@ -64,9 +72,26 @@ class OpenAIProvider(InferenceProvider):
         # Enable default cache if none provided
         if self.cache is None:
             try:
-                self.cache = InferenceCache()
+                self.cache = InferenceCache(ttl_seconds=config.cache_ttl_seconds)
             except Exception:
                 pass  # cache is optional
+
+        if config.thinking != "auto" and not self.spec.supports_thinking and config.model_id:
+            logger.warning(
+                "[OPENAI] thinking=%r requested for %s but the model registry does not advertise "
+                "thinking-mode support; sending it anyway.",
+                config.thinking,
+                config.model_id,
+            )
+
+        self.rate_limiter: Optional[TokenBucket] = None
+        if config.rpm and config.rpm > 0:
+            self.rate_limiter = TokenBucket(
+                redis_url=config.redis_url,
+                key=f"openai:{config.model_id}",
+                rate=float(config.rpm) / 60.0,
+                capacity=float(config.rpm),
+            )
 
         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
         self.sync_client = OpenAI(api_key=self.api_key, base_url=self.base_url, timeout=config.timeout)
@@ -90,6 +115,19 @@ class OpenAIProvider(InferenceProvider):
             extra_body.setdefault("thinking", {"type": self.config.thinking})
             request_kwargs["extra_body"] = extra_body
         return request_kwargs
+
+    def _retry_wait(self, attempt: int) -> float:
+        r"""Exponential backoff with equal jitter (50%-100% of the nominal delay)."""
+        nominal = self.config.backoff_base ** attempt
+        return nominal * (0.5 + random.random() / 2.0)
+
+    async def _acquire_rate_limit(self) -> None:
+        if self.rate_limiter is not None:
+            await self.rate_limiter.acquire(timeout=self.config.rate_limit_timeout_seconds)
+
+    def _acquire_rate_limit_sync(self) -> None:
+        if self.rate_limiter is not None:
+            self.rate_limiter.acquire_sync(timeout=self.config.rate_limit_timeout_seconds)
 
     @staticmethod
     def _extract_usage(response: Any) -> Dict[str, int]:
@@ -213,9 +251,9 @@ class OpenAIProvider(InferenceProvider):
 
             # Retry loop for transient API errors (timeouts, rate limits)
             max_retries = self.config.max_retries
-            backoff_base = self.config.backoff_base
             for attempt in range(max_retries + 1):
                 try:
+                    await self._acquire_rate_limit()
                     response = await self.client.chat.completions.create(
                         model=self.model_id,
                         messages=messages,
@@ -227,7 +265,7 @@ class OpenAIProvider(InferenceProvider):
                     break
                 except Exception as exc:
                     if attempt < max_retries:
-                        wait = backoff_base ** attempt
+                        wait = self._retry_wait(attempt)
                         logger.warning(f"[OPENAI] API error, retry {attempt+1}/{max_retries} in {wait:.1f}s: {exc}")
                         await asyncio.sleep(wait)
                     else:
@@ -241,7 +279,19 @@ class OpenAIProvider(InferenceProvider):
                 messages.extend(tool_outputs)
                 continue
 
-            text, metadata = self._extract_message_payload(choice)
+            try:
+                text, metadata = self._extract_message_payload(choice)
+            except EmptyContentError:
+                if (
+                    self.config.retry_on_empty_content
+                    and current_turn == 1
+                    and getattr(choice, "finish_reason", None) == "length"
+                ):
+                    request_kwargs = self._grow_max_tokens(request_kwargs)
+                    cache_key = None  # retried call is no longer cacheable under the original key
+                    logger.warning("[OPENAI] Empty content with finish_reason=length; retrying with larger max_tokens.")
+                    continue
+                raise
 
             normalized_logprobs = None
             if output_logprobs and choice.logprobs and choice.logprobs.content:
@@ -257,6 +307,16 @@ class OpenAIProvider(InferenceProvider):
             return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs, metadata=metadata)
 
         raise ProviderError(f"OpenAI generation failed: Max tool turns ({max_tool_turns}) exceeded.")
+
+    def _grow_max_tokens(self, request_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        r"""Return request kwargs with a larger ``max_tokens`` for an empty-content retry."""
+        updated = dict(request_kwargs)
+        current = updated.get("max_tokens")
+        if current:
+            updated["max_tokens"] = min(int(int(current) * self.config.empty_content_multiplier), 32768)
+        else:
+            updated["max_tokens"] = 4096
+        return updated
 
     async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[Dict[str, Any]]:
         r"""Executes tool calls and returns OpenAI-formatted tool results."""
@@ -340,6 +400,7 @@ class OpenAIProvider(InferenceProvider):
             if cached is not None:
                 return ModelResponse(text=cached, metadata={"cache_hit": True})
 
+        self._acquire_rate_limit_sync()
         response = self.sync_client.chat.completions.create(
             model=self.model_id,
             messages=cast(Any, messages),
@@ -347,7 +408,23 @@ class OpenAIProvider(InferenceProvider):
         )
 
         choice = response.choices[0]
-        text, metadata = self._extract_message_payload(choice)
+        try:
+            text, metadata = self._extract_message_payload(choice)
+        except EmptyContentError:
+            if self.config.retry_on_empty_content and getattr(choice, "finish_reason", None) == "length":
+                request_kwargs = self._grow_max_tokens(request_kwargs)
+                cache_key = None
+                logger.warning("[OPENAI] Empty content with finish_reason=length; retrying with larger max_tokens.")
+                response = self.sync_client.chat.completions.create(
+                    model=self.model_id,
+                    messages=cast(Any, messages),
+                    **request_kwargs,
+                )
+                choice = response.choices[0]
+                text, metadata = self._extract_message_payload(choice)
+            else:
+                raise
+
         usage = self._extract_usage(response)
         if cache_key and self.cache:
             self.cache.set(cache_key, text, {"model": self.model_id})
@@ -362,6 +439,10 @@ class OpenAIProvider(InferenceProvider):
         kwargs: Dict[str, Any],
     ) -> Optional[str]:
         if self.cache is None or tools or output_logprobs or kwargs.get("stream"):
+            return None
+        # Do not silently freeze sampled responses unless explicitly configured.
+        temperature = kwargs.get("temperature")
+        if temperature not in (None, 0, 0.0) and not self.config.cache_non_deterministic:
             return None
         try:
             return self.cache.compute_chat_key(self.model_id, messages, **kwargs)
