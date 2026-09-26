@@ -24,3 +24,15 @@ cached = CachedSearchTool(my_search_tool, ttl_seconds=86_400)
 results = cached.search("inflation expectations", max_results=5)
 print(cached.stats)  # hits/misses + underlying cache stats
 ```
+
+## Lexical retrieval
+
+`LexicalRetriever` indexes strings or dict documents with BM25 (zero
+dependencies) for archive search and dedup — no embedding model required:
+
+```python
+from xrtm.forecast.kit.skills.retrieval import LexicalRetriever
+
+retriever = LexicalRetriever(news_items, text_key="title")
+top = retriever.search("fed rate cut", k=5)
+```

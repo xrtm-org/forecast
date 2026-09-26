@@ -1,4 +1,4 @@
-# xrtm-forecast v0.11.0
+# xrtm-forecast v0.12.0
 
 [![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 
@@ -8,6 +8,11 @@
 **The Runtime Engine for XRTM.**
 
 `xrtm-forecast` provides the agents, providers, topologies, and orchestration to build AI forecasting systems. It's a composable framework — import the pieces you need and wire them together.
+
+## What's new in v0.12
+
+- **Baselines**: `MarketImpliedBaseline` (the honest benchmark for prediction markets), `BaseRateBaseline`, and `ConstantBaseline`.
+- **Lexical retrieval**: zero-dependency BM25 `LexicalRetriever` for archive search/dedup without embedding models.
 
 ## What's new in v0.11
 

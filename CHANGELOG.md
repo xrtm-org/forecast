@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-09-26
+
+### Added
+- Baselines (`kit/baselines.py`): `MarketImpliedBaseline` (market-implied probability — the honest benchmark for prediction markets), `BaseRateBaseline`, and `ConstantBaseline`.
+- Zero-dependency BM25 `LexicalRetriever` (`kit/skills/retrieval.py`) for archive search and dedup without embedding models.
+- `kit.baselines` namespace export; docs pages for baselines and retrieval.
+
 ## [0.11.0] - 2026-09-26
 
 ### Added

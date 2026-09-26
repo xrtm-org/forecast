@@ -66,6 +66,7 @@ nav:
       - Inference: api/inference.md
       - Inference Cache: api/cache.md
       - Policies (Cost & Budget): api/policies.md
+      - Baselines: api/baselines.md
       - Resilience Protocol: api/resilience.md
       - Tools: api/tools.md
       - Evaluation: api/evaluation.md
