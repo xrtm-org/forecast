@@ -43,7 +43,11 @@ class ProviderConfig(BaseModel):
         description="Optional training cutoff date for the model.",
     )
     rpm: int = 15
-    timeout: int = 30
+    timeout: int = Field(
+        default=120,
+        description="Request timeout in seconds. Reasoning models can spend minutes in "
+        "chain-of-thought before emitting content; the old 30s default was too low for them.",
+    )
     extra: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -58,3 +62,9 @@ class OpenAIConfig(ProviderConfig):
     base_url: str = "https://api.openai.com/v1"
     max_retries: int = Field(default=2, ge=0, description="Maximum retry attempts for transient API errors")
     backoff_base: float = Field(default=2.0, gt=1.0, description="Base for exponential backoff in seconds")
+    thinking: str = Field(
+        default="auto",
+        pattern="^(auto|enabled|disabled)$",
+        description="Reasoning/thinking mode for reasoning-capable models. 'auto' keeps the provider "
+        "default; 'enabled'/'disabled' send extra_body {'thinking': {'type': ...}} (DeepSeek-compatible).",
+    )

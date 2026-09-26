@@ -21,7 +21,7 @@ dependencies = [
     "openai>=1.0.0",
     "numpy>=1.24.0",
     "sqlalchemy>=2.0.0",
-    "xrtm-data>=0.2.7",
+    "xrtm-data>=0.4.0",
     "xrtm-eval>=0.2.7"
 ]
 

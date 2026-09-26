@@ -70,10 +70,33 @@ class GraphError(ForecastError):
     pass
 
 
+class EmptyContentError(ProviderError):
+    r"""
+    Raised when a provider returns no text content.
+
+    Reasoning models can consume the entire output budget in a hidden
+    ``reasoning_content`` channel and emit an empty final answer. Raising
+    explicitly prevents silent parse-failure fallbacks downstream.
+    r"""
+
+    pass
+
+
+class ForecastParseError(ForecastError):
+    r"""
+    Raised when an agent is configured with ``strict_parse`` and the model
+    response cannot be parsed into the expected structured schema.
+    r"""
+
+    pass
+
+
 __all__ = [
     "ForecastError",
     "ProviderError",
     "SkillError",
     "ConfigurationError",
     "GraphError",
+    "EmptyContentError",
+    "ForecastParseError",
 ]
