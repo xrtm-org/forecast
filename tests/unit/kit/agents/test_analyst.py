@@ -170,3 +170,86 @@ async def test_analyst_strict_parse_raises():
     agent = ForecastingAnalyst(model=GarbageProvider(), strict_parse=True)
     with pytest.raises(ForecastParseError):
         await agent.run("Will strict parsing raise?")
+
+
+class SignedGraphProvider(InferenceProvider):
+    r"""Provider returning a causal graph with a signed (inhibitory) edge."""
+
+    def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs):
+        return ModelResponse(
+            text=json.dumps(
+                {
+                    "probability": 0.6,
+                    "reasoning": "Signed graph.",
+                    "causal_nodes": [
+                        {"node_id": "n1", "event": "A", "probability": 0.6},
+                        {"node_id": "n2", "event": "B", "probability": 0.5},
+                    ],
+                    "causal_edges": [{"source": "n1", "target": "n2", "weight": -0.5}],
+                }
+            )
+        )
+
+    async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs):
+        return self.generate_content(prompt, output_logprobs, **kwargs)
+
+    async def stream(self, messages, **kwargs):
+        yield self.generate_content("")
+
+
+class BadGraphProvider(InferenceProvider):
+    r"""Provider whose causal graph references an unknown node."""
+
+    def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs):
+        return ModelResponse(
+            text=json.dumps(
+                {
+                    "probability": 0.6,
+                    "reasoning": "Broken graph.",
+                    "causal_nodes": [{"node_id": "n1", "event": "A", "probability": 0.6}],
+                    "causal_edges": [{"source": "n1", "target": "n9", "weight": 0.3}],
+                }
+            )
+        )
+
+    async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs):
+        return self.generate_content(prompt, output_logprobs, **kwargs)
+
+    async def stream(self, messages, **kwargs):
+        yield self.generate_content("")
+
+
+@pytest.mark.asyncio
+async def test_analyst_preserves_signed_edge_weights():
+    result = await ForecastingAnalyst(model=SignedGraphProvider()).run("Signed edges?")
+    assert result.logical_edges[0].weight == pytest.approx(-0.5)
+
+
+@pytest.mark.asyncio
+async def test_analyst_reports_graph_issues_without_failing():
+    result = await ForecastingAnalyst(model=BadGraphProvider()).run("Broken graph?")
+
+    assert result.parse_status == "ok"
+    assert result.metadata.raw_data["graph_issues"]
+    assert any("n9" in issue for issue in result.metadata.raw_data["graph_issues"])
+
+
+@pytest.mark.asyncio
+async def test_analyst_strict_dag_raises():
+    from xrtm.forecast.core.exceptions import GraphError
+
+    agent = ForecastingAnalyst(model=BadGraphProvider(), strict_dag=True)
+    with pytest.raises(GraphError):
+        await agent.run("Broken graph?")
+
+
+@pytest.mark.asyncio
+async def test_analyst_prompt_template_sets_prompt_id():
+    from xrtm.forecast.core.schemas.prompt import PromptTemplate
+
+    template = PromptTemplate(prompt_id="orb-v2", system_prompt="Custom persona.")
+    agent = ForecastingAnalyst(model=TelemetryProvider(), prompt_template=template)
+    result = await agent.run("Custom prompt?")
+
+    assert result.provenance is not None
+    assert result.provenance.prompt_id == "orb-v2"

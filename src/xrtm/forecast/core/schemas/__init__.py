@@ -16,6 +16,7 @@
 r"""Framework schemas — runtime state, forecast types, workflow blueprints, and decisions."""
 
 from xrtm.forecast.core.schemas.decision import DecisionOption, DecisionResult
+from xrtm.forecast.core.schemas.prompt import PromptTemplate
 from xrtm.forecast.core.schemas.workflow import (
     WORKFLOW_SCHEMA_VERSION,
     ArtifactPolicy,
@@ -37,6 +38,7 @@ __all__ = [
     "ConditionalRouteSpec",
     "DecisionOption",
     "DecisionResult",
+    "PromptTemplate",
     "EdgeSpec",
     "GraphSpec",
     "NodeSpec",

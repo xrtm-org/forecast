@@ -34,12 +34,23 @@ from xrtm.data.core.schemas.forecast import (
     TokenUsage,
 )
 
-from xrtm.forecast.core.exceptions import ForecastParseError
+from xrtm.forecast.core.exceptions import ForecastParseError, GraphError
+from xrtm.forecast.core.schemas.prompt import PromptTemplate
+from xrtm.forecast.core.utils.graph_validation import validate_causal_graph
 from xrtm.forecast.core.utils.parser import parse_json_markdown
 from xrtm.forecast.core.utils.schemas import json_object_response_format
 from xrtm.forecast.kit.agents.llm import LLMAgent
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_ANALYST_PROMPT_TEMPLATE = PromptTemplate(
+    prompt_id="analyst-default",
+    system_prompt=(
+        "Analyze the following event and provide a probabilistic forecast "
+        "according to xrtm Governance v1."
+    ),
+    notes="Reference analyst persona; fork or replace via ForecastingAnalyst(prompt_template=...).",
+)
 
 
 def _default_confidence_interval(probability: float = 0.5) -> Dict[str, float]:
@@ -54,10 +65,10 @@ def _default_confidence_interval(probability: float = 0.5) -> Dict[str, float]:
 
 
 def _sanitize_edge(edge_data: Dict[str, Any]) -> CausalEdge:
-    r"""Coerce edge weight to [0, 1] range, taking abs for negative weights."""
+    r"""Clamp edge weights to [-1, 1] while preserving direction (negative = inhibitory)."""
     data = dict(edge_data)
     if "weight" in data:
-        data["weight"] = max(0.0, min(1.0, abs(float(data["weight"]))))
+        data["weight"] = max(-1.0, min(1.0, float(data["weight"])))
     return CausalEdge(**data)
 
 
@@ -104,12 +115,15 @@ class ForecastingAnalyst(LLMAgent):
         name: Logical name for the agent.
         temperature: Temperature for LLM generation (default None — uses provider default).
         max_tokens: Max tokens for LLM generation (default None — uses provider default).
-        system_prompt: Optional custom system prompt. If None, uses the default.
-        few_shot_examples: Optional list of few-shot example strings injected into the prompt.
+        system_prompt: Optional custom system prompt (ignored when ``prompt_template`` is given).
+        few_shot_examples: Optional few-shot example strings (ignored when ``prompt_template`` is given).
+        prompt_template: Optional :class:`PromptTemplate` controlling persona and ``prompt_id``.
         structured_output: Request provider-enforced JSON output (``response_format``).
         prompt_id: Identifier recorded in the forecast provenance (prompt-template version).
         strict_parse: When True, raise :class:`ForecastParseError` instead of returning
             a flagged fallback forecast if parsing fails.
+        strict_dag: When True, raise :class:`GraphError` when the causal graph has
+            unknown edge endpoints or cycles.
 
     Note: This is a **Reference Implementation**. Domain experts are encouraged
     to fork and customize the persona, few-shot examples, and structural constraints
@@ -124,18 +138,26 @@ class ForecastingAnalyst(LLMAgent):
         max_tokens: Optional[int] = None,
         system_prompt: Optional[str] = None,
         few_shot_examples: Optional[List[str]] = None,
+        prompt_template: Optional[PromptTemplate] = None,
         structured_output: bool = False,
         prompt_id: str = "analyst-default",
         strict_parse: bool = False,
+        strict_dag: bool = False,
     ):
         super().__init__(model=model, name=name)
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.system_prompt = system_prompt
-        self.few_shot_examples = few_shot_examples or []
+        self.prompt_template = prompt_template or PromptTemplate(
+            prompt_id=prompt_id,
+            system_prompt=system_prompt or DEFAULT_ANALYST_PROMPT_TEMPLATE.system_prompt,
+            few_shot_examples=list(few_shot_examples or []),
+        )
+        self.system_prompt = self.prompt_template.system_prompt
+        self.few_shot_examples = list(self.prompt_template.few_shot_examples)
+        self.prompt_id = self.prompt_template.prompt_id
         self.structured_output = structured_output
-        self.prompt_id = prompt_id
         self.strict_parse = strict_parse
+        self.strict_dag = strict_dag
 
     async def run(self, input_data: Union[str, ForecastQuestion], **kwargs: Any) -> ForecastOutput:
         r"""
@@ -181,11 +203,7 @@ class ForecastingAnalyst(LLMAgent):
                 context = f"{context}\n\nSearch Findings:\n{skill_result}"
 
         # Build the system prompt
-        default_system = (
-            "Analyze the following event and provide a probabilistic forecast "
-            "according to xrtm Governance v1."
-        )
-        system_text = self.system_prompt or default_system
+        system_text = self.system_prompt or DEFAULT_ANALYST_PROMPT_TEMPLATE.system_prompt
 
         # Build few-shot section
         few_shot_text = ""
@@ -270,6 +288,13 @@ class ForecastingAnalyst(LLMAgent):
             nodes = [CausalNode(**n) for n in parsed_payload.get("causal_nodes", [])]
             edges = [_sanitize_edge(e) for e in parsed_payload.get("causal_edges", [])]
 
+        # --- Causal-graph validation ----------------------------------------
+        graph_issues = validate_causal_graph(nodes, edges)
+        if graph_issues and self.strict_dag:
+            raise GraphError(
+                f"Causal graph validation failed for prompt '{self.prompt_id}': " + "; ".join(graph_issues)
+            )
+
         # --- Telemetry ------------------------------------------------------
         raw_usage: Dict[str, Any] = getattr(response, "usage", None) or {}
         usage = TokenUsage(
@@ -300,6 +325,8 @@ class ForecastingAnalyst(LLMAgent):
 
         # Build raw_data with token usage (legacy surface) and optional search metadata
         raw_data: dict[str, Any] = {"token_usage": raw_usage}
+        if graph_issues:
+            raw_data["graph_issues"] = graph_issues
         if response_metadata.get("reasoning_content"):
             raw_data["reasoning_content"] = response_metadata["reasoning_content"]
         if search_metadata:
@@ -323,4 +350,4 @@ class ForecastingAnalyst(LLMAgent):
         )
 
 
-__all__ = ["ForecastingAnalyst"]
+__all__ = ["ForecastingAnalyst", "AnalystOutput", "DEFAULT_ANALYST_PROMPT_TEMPLATE"]
