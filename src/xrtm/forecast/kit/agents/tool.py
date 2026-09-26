@@ -45,7 +45,7 @@ class ToolAgent(Agent):
         super().__init__(name or fn.__name__)
         self.fn = fn
 
-    async def run(self, input_data: Any, **kwargs) -> Any:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         Executes the wrapped function with the provided input.
 

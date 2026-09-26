@@ -46,4 +46,4 @@ count so you can plot ECE diagrams in the tooling of your choice.
 
 Every `ForecastOutput` records `parse_status` and typed `usage`, and the
 analyst's `provenance.prompt_id` lets you compare calibration across prompt
-versions — see [Telemetry](../api/telemetry.md).
+versions — see [Telemetry](../../api/telemetry.md).

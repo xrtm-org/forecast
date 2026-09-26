@@ -6,23 +6,23 @@ This document tracks the reusable building blocks available in `xrtm-forecast`.
 
 These are the fundamental building blocks used to construct execution graphs and forecast runs.
 
-### 1. `LLMAgent` ([llm.py](../src/xrtm/forecast/kit/agents/llm.py))
+### 1. `LLMAgent`  (`src/xrtm/forecast/kit/agents/llm.py`)
 The bridge between an LLM and the forecasting runtime.
 - **Responsibility**: prompt management, output parsing, and context maintenance.
 - **Usage**: inherit from this to create specialists.
 
-### 2. `ToolAgent` ([tool.py](../src/xrtm/forecast/kit/agents/tool.py))
+### 2. `ToolAgent`  (`src/xrtm/forecast/kit/agents/tool.py`)
 Treats deterministic Python functions as first-class agents.
 - **Responsibility**: data transformation, mathematical calculations, or search execution.
 - **Usage**: use when a stage should run deterministic code inside the execution graph.
 
-### 3. `GraphAgent` ([graph.py](../src/xrtm/forecast/kit/agents/graph.py))
+### 3. `GraphAgent`  (`src/xrtm/forecast/kit/agents/graph.py`)
 A composite brick that treats an entire execution graph as a single agent.
 - **Responsibility**: hierarchical reasoning or nested task parallelization.
 
 ## Specialist roles (`src/xrtm/forecast/kit/agents/specialists/`)
 
-### 1. `ForecastingAnalyst` ([analyst.py](../src/xrtm/forecast/kit/agents/specialists/analyst.py))
+### 1. `ForecastingAnalyst`  (`src/xrtm/forecast/kit/agents/specialists/analyst.py`)
 Flagship analyst implementation using Bayesian-style probability estimation.
 Supports `prompt_template`, `structured_output`, `strict_parse`, and `strict_dag`.
 
@@ -32,11 +32,11 @@ Supports `prompt_template`, `structured_output`, `strict_parse`, and `strict_dag
 
 ## Decision roles (`src/xrtm/forecast/kit/decisions/`)
 
-### 1. `EscalationRouter` ([escalation.py](../src/xrtm/forecast/kit/decisions/escalation.py))
+### 1. `EscalationRouter`  (`src/xrtm/forecast/kit/decisions/escalation.py`)
 Routes typed decisions between a cheap System-One provider (e.g. Jev) and a
 stronger LLM fallback when confidence is low.
 
-### 2. Decision providers ([decision.py](../src/xrtm/forecast/providers/inference/decision.py))
+### 2. Decision providers  (`src/xrtm/forecast/providers/inference/decision.py`)
 `LLMDecisionProvider` (any JSON-capable provider) and `JevProvider`.
 
 ## Skill & tool registries

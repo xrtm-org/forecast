@@ -57,7 +57,7 @@ class Agent(abc.ABC):
         self._skills_lock = threading.Lock()
 
     @classmethod
-    def from_config(cls, model: Optional[Any] = None, name: Optional[str] = None, **kwargs) -> "Agent":
+    def from_config(cls, model: Optional[Any] = None, name: Optional[str] = None, **kwargs: Any) -> "Agent":
         r"""
         Factory method to create an agent instance.
 
@@ -136,7 +136,7 @@ class Agent(abc.ABC):
         logger.debug(f"Agent {self.name} connected to FactStore.")
 
     @abc.abstractmethod
-    async def run(self, input_data: Any, **kwargs) -> Any:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         The core execution logic of the agent.
 

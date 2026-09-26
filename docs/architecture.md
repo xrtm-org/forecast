@@ -13,7 +13,7 @@
 | 2 | `xrtm-eval` | Metrics, trust primitives | data |
 | 1 | `xrtm-data` | Schemas, snapshots | *(none)* |
 
-> See [.agent/rules/governance.md](../.agent/rules/governance.md) for detailed import rules.
+> See the [xrtm-org/governance](https://github.com/xrtm-org/governance) repository for detailed import rules.
 
 ## Terminology
 

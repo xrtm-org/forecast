@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any
+from typing import Any, Optional
 
 from xrtm.forecast.kit.skills.definitions import BaseSkill
 from xrtm.forecast.kit.tools.search import TavilySearchTool
@@ -48,7 +48,12 @@ class WebSearchSkill(BaseSkill):
     def __init__(self, search_tool: TavilySearchTool | None = None):
         self._search_tool = search_tool or TavilySearchTool()
 
-    async def execute(self, **kwargs: Any) -> dict[str, Any]:
+    async def execute(
+        self,
+        query: str = "",
+        max_results: Optional[int] = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
         r"""Execute a web search and return structured results.
 
         Args:
@@ -59,8 +64,6 @@ class WebSearchSkill(BaseSkill):
             Dict with keys: ``formatted`` (text for LLM prompts),
             ``query``, ``results_count``, ``sources``, ``search_time_ms``.
         """
-        query = kwargs.get("query", "")
-        max_results = kwargs.get("max_results")
         start = time.perf_counter()
         results = self._search_tool.search(query, max_results=max_results)
         elapsed_ms = round((time.perf_counter() - start) * 1000)

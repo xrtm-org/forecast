@@ -43,11 +43,11 @@ for output in result.outputs:
 ```
 
 Off-peak scheduling and cost accounting for those runs are engine policies —
-see [Policies](../api/policies.md).
+see [Policies](../../api/policies.md).
 
 ## Schemas
 
 `ForecastTrajectory` and `TimeSeriesPoint` (see the
-[Sentinel API reference](../api/sentinel.md)) provide the storage shape for a
+[Sentinel API reference](../../api/sentinel.md)) provide the storage shape for a
 probability series; the analyst's `provenance` and `usage` fields make each
 point auditable.

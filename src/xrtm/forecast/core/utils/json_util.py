@@ -61,6 +61,6 @@ def robust_clean(obj: Any) -> Any:
         return str(obj)
 
 
-def safe_json_dumps(obj: Any, **kwargs) -> str:
+def safe_json_dumps(obj: Any, **kwargs: Any) -> str:
     r"""Combines robust_clean and json.dumps."""
     return json.dumps(robust_clean(obj), **kwargs)
