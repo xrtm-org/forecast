@@ -1370,6 +1370,7 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "xrtm-train" },
 ]
 
 [package.metadata]
@@ -1392,8 +1393,24 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "xrtm-data", specifier = ">=0.4.0" },
     { name = "xrtm-eval", specifier = ">=0.3.1" },
+    { name = "xrtm-train", marker = "extra == 'dev'", specifier = ">=0.3.2" },
 ]
 provides-extras = ["dev"]
+
+[[package]]
+name = "xrtm-train"
+version = "0.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "xrtm-data" },
+    { name = "xrtm-eval" },
+    { name = "xrtm-forecast" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/c3/446721bc9fb767a04266fda7de5f9d47ae5897f464d4a601cfe56e2394e7/xrtm_train-0.3.2.tar.gz", hash = "sha256:13cbb0db4cfe2afb2610942ac6c142abaef1ac20f790e454a7b1a8efefc1e332", size = 22157, upload-time = "2026-09-26T17:02:27.417Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4a/6c/3cff18c3bce0620717d3da9809902f368af2beca9207b0e5e4ecdca2c098/xrtm_train-0.3.2-py3-none-any.whl", hash = "sha256:293b42e291596789e7178eef48c6d152582f1db988a243ed7dd67fa528b78dcf", size = 25296, upload-time = "2026-09-26T17:02:26.053Z" },
+]
 
 [[package]]
 name = "yarl"
