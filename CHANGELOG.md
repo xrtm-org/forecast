@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-09-26
+
+### Added
+- Reasoning-model support: `OpenAIConfig.thinking` (`auto`/`enabled`/`disabled`), `reasoning_content` handling, and `EmptyContentError` when a model returns no content, with an automatic larger-`max_tokens` retry for `finish_reason=length`.
+- Provider-enforced structured output: `response_format` plumbing plus `core.utils.schemas` helpers (`json_object_response_format`, `json_schema_response_format`).
+- Runtime telemetry on `ForecastOutput` (xrtm-data 0.4.0): `TokenUsage`, `ForecastProvenance`, and explicit `parse_status` (`ok`, `empty_content`, `invalid_json`, `schema_error`).
+- Model capability registry (`core.config.models`) with DeepSeek presets and a conservative fallback.
+- Typed decisions: `DecisionProvider`, `LLMDecisionProvider`, `JevProvider`, and `EscalationRouter`.
+- Cost/budget/scheduling policies (`core.policies`): currency-aware `PriceTable` (with `DEEPSEEK_CNY_PRICES`), `CostLedger`, `BudgetPolicy`, `SchedulePolicy`.
+- Batch forecasting (`kit.batch.forecast_many`) with bounded concurrency and budget enforcement.
+- Prompt templates (`PromptTemplate`), signed causal edge weights, and causal-graph validation (`validate_causal_graph`).
+- Token-bucket rate limiting (optional Redis), jittered retries, cache TTL, and deterministic-only caching by default.
+- Analyst options: `structured_output`, `prompt_id`, `strict_parse`, `strict_dag`.
+
+### Changed
+- Default request timeout 30s -> 120s (reasoning models routinely exceed 30s).
+- `ForecastingAnalyst` raises `ForecastParseError` in strict mode instead of returning an unflagged fallback.
+
+### Dependencies
+- Requires `xrtm-data>=0.4.0`; aligned with Forecast Object v1.2 (`metadata.telemetry`).
+
+## [0.9.0] - 2026-07-26
+
+### Added
+- `OpenAIConfig` accepts `max_retries` and `backoff_base` for configurable retry behavior (#61).
+- `MockProvider` supports an optional `seed` parameter for reproducible but varied outputs (#63).
+- `WebSearchSkill.execute()` returns a structured dict with query, results_count, sources, and search_time_ms (#62).
+- `ForecastingAnalyst` accepts `temperature` and `max_tokens` (#60), plus `system_prompt` and `few_shot_examples` (#59).
+
+### Fixed
+- Pre-existing mypy issues on Python 3.12 CI (numpy stub syntax, workflow_graph type annotation).
+
+## [0.8.0] - 2026-06-19
+
+### Added
+- `MockProvider`: hash-derived, deterministic provider for zero-cost CI smoke testing.
+
+### Docs
+- README badge position fix; generic provider references.
+
+## [0.7.0] - 2026-06-07
+
+### Changed
+- Release train with README refresh (see the GitHub release notes for the full change list).
+
 ## [0.6.11] - 2026-05-18
 
 ### Changed

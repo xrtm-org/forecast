@@ -1,5 +1,18 @@
 # xrtm-forecast Roadmap
 
+## Recent Milestones
+
+| Version | Highlights |
+|---|---|
+| **v0.10.0** | Reasoning-model support, structured output + telemetry, typed decisions (LLM + Jev), cost/budget/scheduling policies, batch forecasting, causal-graph validation |
+| **v0.9.0** | Configurable retries, analyst prompt/temperature options, structured web-search metadata |
+| **v0.8.0** | MockProvider for zero-cost CI smoke testing |
+| **v0.7.0** | Release/README refresh |
+
+## Open Coordination Items
+
+- Python 3.13 support: requires aligned `requires-python` caps across `data`/`eval`/`train`/`forecast` (currently `<3.13`); ship as a coordinated stack release.
+
 **Philosophy**: We build the engine, not the car.
 **Goal**: To be the definitive "Institutional Grade" framework for generative forecasting.
 

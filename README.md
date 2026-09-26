@@ -1,4 +1,4 @@
-# xrtm-forecast v0.7.0
+# xrtm-forecast v0.10.0
 
 [![PyPI](https://img.shields.io/pypi/v/xrtm-forecast?style=flat-square)](https://pypi.org/project/xrtm-forecast/)
 
@@ -8,6 +8,14 @@
 **The Runtime Engine for XRTM.**
 
 `xrtm-forecast` provides the agents, providers, topologies, and orchestration to build AI forecasting systems. It's a composable framework — import the pieces you need and wire them together.
+
+## What's new in v0.10
+
+- **Reasoning-model ready**: thinking-mode toggle, `reasoning_content` handling, and explicit `EmptyContentError` (plus a larger-`max_tokens` retry) instead of silent parse failures.
+- **Structured output + telemetry**: provider-enforced JSON, `parse_status`, token usage (including cached/reasoning tokens), and model/prompt provenance on every forecast.
+- **Typed decisions**: `DecisionProvider` (LLM and TypeSafe Jev) with an escalation router for cheap System-One gating.
+- **Cost policies**: currency-aware pricing (DeepSeek CNY preset), cost ledgers, hard budgets, and off-peak scheduling.
+- **Reliability**: token-bucket rate limiting, jittered retries, cache TTL, and deterministic-only caching by default.
 
 ## Installation
 
