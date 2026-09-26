@@ -91,6 +91,15 @@ class ForecastParseError(ForecastError):
     pass
 
 
+class BudgetExceededError(ForecastError):
+    r"""
+    Raised when a cost policy blocks further inference because a configured
+    daily or total budget has been reached.
+    r"""
+
+    pass
+
+
 __all__ = [
     "ForecastError",
     "ProviderError",
@@ -99,4 +108,5 @@ __all__ = [
     "GraphError",
     "EmptyContentError",
     "ForecastParseError",
+    "BudgetExceededError",
 ]

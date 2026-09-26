@@ -65,6 +65,7 @@ nav:
       - Epistemic Security: api/security.md
       - Inference: api/inference.md
       - Inference Cache: api/cache.md
+      - Policies (Cost & Budget): api/policies.md
       - Resilience Protocol: api/resilience.md
       - Tools: api/tools.md
       - Evaluation: api/evaluation.md
