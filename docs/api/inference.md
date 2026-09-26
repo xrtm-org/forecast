@@ -10,9 +10,9 @@ pip install "xrtm-forecast[standard]"
 pip install "xrtm-forecast[vllm]"
 ```
 
-::: forecast.providers.inference.base.InferenceProvider
+::: xrtm.forecast.providers.inference.base.InferenceProvider
     options:
       show_root_heading: true
-::: forecast.providers.inference.base.ModelResponse
+::: xrtm.forecast.providers.inference.base.ModelResponse
     options:
       show_root_heading: true

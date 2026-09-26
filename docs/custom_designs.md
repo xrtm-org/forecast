@@ -45,7 +45,7 @@ final_state = await orchestrator.run(state, entry_node="research")
 
 ## 3. Real-world example
 
-See [custom_sentiment_workflow.py](examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py) for a runnable example that keeps the legacy directory name but demonstrates:
+See `examples/kit/pipelines/custom_sentiment_workflow/run_custom_sentiment_workflow.py` for a runnable example that keeps the legacy directory name but demonstrates:
 
 - custom Pydantic result schemas,
 - conditional branching between stages,

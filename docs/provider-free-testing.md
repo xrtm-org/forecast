@@ -169,7 +169,7 @@ This keeps follow-up review on the same released artifact workflow.
 
 ## Library Usage (Python API)
 
-For programmatic usage and complete API documentation, see the **[Python API Reference](../../xrtm/docs/python-api-reference.md)**.
+For programmatic usage and complete API documentation, see the **[Python API Reference](https://github.com/xrtm-org/xrtm/blob/main/docs/python-api-reference.md)**.
 
 ### Quick Library Example
 
@@ -191,7 +191,7 @@ async def main():
 asyncio.run(main())
 ```
 
-See the [Python API Reference](../../xrtm/docs/python-api-reference.md) for:
+See the [Python API Reference](https://github.com/xrtm-org/xrtm/blob/main/docs/python-api-reference.md) for:
 - Complete API surface documentation
 - Advanced usage patterns
 - Integration with the product shell
@@ -899,9 +899,9 @@ For production forecasts, switch to a real provider by changing one line of conf
 
 ## Related Documentation
 
-- **[Getting Started Guide](../../xrtm/docs/getting-started.md)**: CLI quickstart with provider-free examples
-- **[Operator Runbook](../../xrtm/docs/operator-runbook.md)**: Full CLI reference, monitoring, and performance testing
-- **[Examples](../examples/)**: Library examples showing agent topologies and features
+- **[Getting Started Guide](https://github.com/xrtm-org/xrtm/blob/main/docs/getting-started.md)**: CLI quickstart with provider-free examples
+- **[Operator Runbook](https://github.com/xrtm-org/xrtm/blob/main/docs/operator-runbook.md)**: Full CLI reference, monitoring, and performance testing
+- **[Examples](https://github.com/xrtm-org/forecast/tree/main/examples)**: Library examples showing agent topologies and features
 - **[Architecture](architecture.md)**: Core concepts and provider abstraction
 
 ---

@@ -4,11 +4,11 @@ The orchestration layer owns the runtime execution graph: nodes, edges, stage or
 
 Use this API when you mean runtime control flow. Use [Causal Interpretability](causal.md) when you mean the reasoning graph captured inside a forecast result.
 
-::: forecast.core.orchestrator.Orchestrator
+::: xrtm.forecast.core.orchestrator.Orchestrator
     options:
       show_root_heading: true
       show_source: true
 
-::: forecast.core.schemas.graph.BaseGraphState
+::: xrtm.forecast.core.schemas.graph.BaseGraphState
     options:
       show_root_heading: true

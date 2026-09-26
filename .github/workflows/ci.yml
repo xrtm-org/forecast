@@ -141,6 +141,10 @@ jobs:
         working-directory: forecast
         run: uv run mypy .
 
+      - name: Build Docs
+        working-directory: forecast
+        run: uv run mkdocs build
+
       - name: Run Tests (Pytest)
         working-directory: forecast
         run: uv run pytest tests/unit --cov=src --cov-report=xml --cov-fail-under=75

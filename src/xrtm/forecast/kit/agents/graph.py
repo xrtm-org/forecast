@@ -39,7 +39,7 @@ class GraphAgent(Agent):
         self.orchestrator = orchestrator
         self.entry_node = entry_node
 
-    async def run(self, input_data: Any, **kwargs) -> Any:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         Runs the internal orchestrator.
         Converts input_data into a BaseGraphState context.

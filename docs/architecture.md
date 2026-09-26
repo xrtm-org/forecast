@@ -13,7 +13,7 @@
 | 2 | `xrtm-eval` | Metrics, trust primitives | data |
 | 1 | `xrtm-data` | Schemas, snapshots | *(none)* |
 
-> See [.agent/rules/governance.md](../.agent/rules/governance.md) for detailed import rules.
+> See the [xrtm-org/governance](https://github.com/xrtm-org/governance) repository for detailed import rules.
 
 ## Terminology
 
@@ -41,51 +41,51 @@ To understand how to build with this library, imagine a Lego set:
 
 We organize the `agents/` directory to reflect this split. This ensures the engine remains "lean" while the library of experts can grow infinitely.
 
-### 1. Structural Abstractions (`src/forecast/kit/agents/*.py`)
+### 1. Structural Abstractions (`src/xrtm/forecast/kit/agents/*.py`)
 These are the Shapes. They define mechanical behavior, not business logic.
 - **`Agent`**: The base contract. Defines how an object interacts with an execution graph.
 - **`LLMAgent`**: The bridge to intelligence. Knows how to prompt, parse, and handle model context.
 - **`ToolAgent`**: The wrapper for deterministic code. Allows standard functions to live in the execution graph.
 - **`GraphAgent`**: The recursion brick. Allows an entire execution graph (often assembled by a pipeline helper) to be treated as a single agent.
 
-### 2. Specialist Implementations (`src/forecast/kit/agents/specialists/*.py`)
+### 2. Specialist Implementations (`src/xrtm/forecast/kit/agents/specialists/*.py`)
 These are the Roles. They are built by inheriting from the abstractions above.
 - **`ForecastingAnalyst`**: A pre-built persona that uses Bayesian reasoning to solve problems.
-- **`FactCheckerAgent`**: A dedicated agent for NLI-based claim verification (`src/forecast/kit/agents/fact_checker.py`).
-- **`RecursiveConsensus`**: A topology for peer review and loop-back (`src/forecast/kit/topologies/consensus.py`).
+- **Verification & routing**: `DecisionProvider` + `EscalationRouter` handle claim checks and cheap-vs-strong routing (`kit/decisions/`).
+- **`RecursiveConsensus`**: A topology for peer review and loop-back (`kit/topologies/consensus.py`).
 - **`Generic Agent + Skills`**: We prefer equipping standard agents with skills over creating rigid subclasses.
 
 ---
 
 ## System Layers
 
-### 1. The Orchestration Layer (`src/forecast/core/`)
+### 1. The Orchestration Layer (`src/xrtm/forecast/core/`)
 The `Orchestrator` is the state machine. It doesn't "think"—it just moves the `BaseGraphState` from one execution-graph node to the next based on your configuration.
 
-### 2. The Inference Layer (`src/forecast/providers/inference/`)
+### 2. The Inference Layer (`src/xrtm/forecast/providers/inference/`)
 Standardizes LLM communication. Whether you use Gemini, OpenAI, or a local model, the agent only sees the `InferenceProvider` interface.
 
-### 2a. The Async Runtime (`src/forecast/core/runtime.py`)
+### 2a. The Async Runtime (`src/xrtm/forecast/core/runtime.py`)
 To ensure "Institutional Grade" safety and performance, we do not use raw `asyncio`.
 - **`AsyncRuntime` Facade**: Wraps `legacy` asyncio.
 - **Orphan Prevention**: Enforces named tasks for telemetry.
 - **Time Travel**: Prepares the system for Chronos by wrapping `sleep()` calls.
 - **High Performance**: Automatically installs `uvloop` if available.
 
-### 3. The Skill Layer (`src/forecast/kit/skills/`)
+### 3. The Skill Layer (`src/xrtm/forecast/kit/skills/`)
 Contains the **Skill Registry**.
 
 ### Taxonomy: Skills vs. Tools
 To keep the system modular, we strictly distinguish between:
-*   The Tool (`src/forecast/providers/tools/`): An atomic, stateless function (e.g., `GoogleSearch.execute()`). It wraps a specific driver or API.
-*   The Skill (`src/forecast/kit/skills/`): A high-level behavior that *uses* tools (e.g., `SubjectInquirySkill`). It manages retries, error handling, and prompt logic.
+*   The Tool (`src/xrtm/forecast/core/tools/`, implementations in `kit/tools/`): An atomic, stateless function (e.g. `TavilySearchTool.execute()`). It wraps a specific driver or API.
+*   The Skill (`src/xrtm/forecast/kit/skills/`): A high-level behavior that *uses* tools (e.g. `WebSearchSkill`). It manages retries, error handling, and prompt logic.
 
 *Rule: Agents possess Skills. Skills control Tools.*
 
 ### 4. Protocols & Physics
 - **Chronos (Time)**: `TemporalContext` acts as the single source of truth for time. The `GuardianTool` wrapper enforces this by blocking non-PiT tools during backtests.
 - **Sentinel (Space)**: `ForecastTrajectory` captures the *evolution* of a probability over time, not just the final snapshot.
-- **Equilibrium (Calibration)**: The `PlattScaler` ensures that subjective confidence intervals match objective frequencies, curing LLM over-confidence.
+- **Equilibrium (Calibration)**: Scoring and calibration live in **xrtm-eval** (`BrierScoreEvaluator`, `ExpectedCalibrationErrorEvaluator`), which audit whether subjective confidence matches objective frequencies.
 
 ## Data Flow & Traceability
 
@@ -102,6 +102,10 @@ graph TD
     F --> G[Final Forecast]
 ```
 
+> Scoring/calibration evaluators (`BrierScoreEvaluator`,
+> `ExpectedCalibrationErrorEvaluator`) live in **xrtm-eval**; backtesting lives
+> in **xrtm-train**. See the [Evaluation API](api/evaluation.md).
+
 - **Execution Trace**: which execution-graph stages were involved in this decision?
 - **Reasoning Trace**: what assumptions were made inside the forecast result? (`ForecastOutput.logical_trace` / `reasoning_trace`)
 
@@ -109,9 +113,9 @@ graph TD
 
 ## Directory Map
 
-- `src/forecast/core/`: the execution engine, interfaces, and runtime physics (Orchestrator, Runtime, Guardian).
-- `src/forecast/kit/`: the applied layer (agents, skills, topologies, and pipeline helpers).
-- `src/forecast/providers/`: The Hardware Layer (Inference, Memory, Tools).
+- `src/xrtm/forecast/core/`: the execution engine, interfaces, and runtime physics (Orchestrator, Runtime, Guardian).
+- `src/xrtm/forecast/kit/`: the applied layer (agents, skills, topologies, and pipeline helpers).
+- `src/xrtm/forecast/providers/`: The Hardware Layer (Inference, Decisions, Tools).
 
 ## Public API Boundaries
 
@@ -130,11 +134,8 @@ The following diagram shows the relationship between Core ABCs and their impleme
 ```mermaid
 classDiagram
     direction TB
-    
-    %% ═══════════════════════════════════════════
+
     %% CORE LAYER (Abstract Base Classes)
-    %% ═══════════════════════════════════════════
-    
     class InferenceProvider {
         <<abstract>>
         +generate_content_async()
@@ -142,14 +143,20 @@ classDiagram
         +stream()
         +knowledge_cutoff
     }
-    
+    class DecisionProvider {
+        <<abstract>>
+        +decide(state, options)
+    }
+    class HumanProvider {
+        <<abstract>>
+        +get_human_input(prompt)
+    }
     class FactStore {
         <<abstract>>
         +remember(fact)
         +query(subject)
         +forget(subject)
     }
-    
     class Tool {
         <<abstract>>
         +name
@@ -157,60 +164,42 @@ classDiagram
         +run()
         +pit_supported
     }
-    
-    class Evaluator {
-        <<abstract>>
-        +score()
-        +evaluate()
-    }
-    
     class Agent {
         <<abstract>>
         +run()
         +add_skill()
         +set_fact_store()
     }
-    
-    %% ═══════════════════════════════════════════
+
     %% PROVIDERS LAYER (Implementations)
-    %% ═══════════════════════════════════════════
-    
-    class GeminiProvider {
-        +model_id
-        +rate_limiter
-    }
     class OpenAIProvider {
         +model_id
         +base_url
+        +rate_limiter
     }
-    class HuggingFaceProvider {
+    class AnthropicProvider {
         +model_id
     }
-    
-    GeminiProvider --|> InferenceProvider
-    OpenAIProvider --|> InferenceProvider
-    HuggingFaceProvider --|> InferenceProvider
-    
-    class SQLiteFactStore {
-        +db_path
+    class MockProvider {
+        +seed
     }
-    class ChromaStore {
-        +collection
+    class LLMDecisionProvider {
+        +model
     }
-    
-    SQLiteFactStore --|> FactStore
-    ChromaStore --|> FactStore
-    
+    class JevProvider {
+        +answer_key
+    }
     class TavilySearchTool {
         +api_key
     }
-    
+    OpenAIProvider --|> InferenceProvider
+    AnthropicProvider --|> InferenceProvider
+    MockProvider --|> InferenceProvider
+    LLMDecisionProvider --|> DecisionProvider
+    JevProvider --|> LLMDecisionProvider
     TavilySearchTool --|> Tool
-    
-    %% ═══════════════════════════════════════════
-    %% KIT LAYER (Agents & Evaluators)
-    %% ═══════════════════════════════════════════
-    
+
+    %% KIT LAYER (Agents, Topologies, Decisions)
     class LLMAgent {
         +model
         +parse_output()
@@ -218,44 +207,33 @@ classDiagram
     class GraphAgent {
         +orchestrator
     }
-    
-    LLMAgent --|> Agent
-    GraphAgent --|> Agent
-    
-    class RedTeamAgent {
-        +intensity
-        +challenge()
-    }
     class ForecastingAnalyst {
-        +skills
+        +prompt_template
+        +structured_output
+        +strict_parse
     }
     class RoutingAgent {
         +fast_tier
         +smart_tier
     }
-    
-    RedTeamAgent --|> LLMAgent
+    class EscalationRouter {
+        +confidence_threshold
+    }
+    LLMAgent --|> Agent
+    GraphAgent --|> Agent
     ForecastingAnalyst --|> LLMAgent
     RoutingAgent --|> Agent
-    
-    class BrierScoreEvaluator {
-        +compute_decomposition()
-    }
-    class ECEEvaluator {
-        +num_bins
-    }
-    
-    BrierScoreEvaluator --|> Evaluator
-    ECEEvaluator --|> Evaluator
-    
-    %% ═══════════════════════════════════════════
+    EscalationRouter --|> DecisionProvider
+
     %% RELATIONSHIPS
-    %% ═══════════════════════════════════════════
-    
     Agent --> FactStore : uses
     LLMAgent --> InferenceProvider : uses
     ForecastingAnalyst --> Tool : uses
 ```
+
+> Scoring/calibration evaluators (`BrierScoreEvaluator`,
+> `ExpectedCalibrationErrorEvaluator`) live in **xrtm-eval**; backtesting lives
+> in **xrtm-train**. See the [Evaluation API](api/evaluation.md).
 
 ### Key Architectural Rules
 

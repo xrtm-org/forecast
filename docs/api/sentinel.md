@@ -1,25 +1,20 @@
 # Sentinel Protocol: Dynamic Forecasting
 
-The `sentinel` module provides the drivers and orchestration logic for **Dynamic Forecasting**—the ability for agents to continuously monitor news feeds and emit probability updates over time.
+The Sentinel protocol captures the *evolution* of a probability over time
+rather than a single snapshot.
 
-## Polling Driver
-
-The `PollingDriver` is the primary high-level interface for running background forecasting loops.
-
-### PollingDriver
-::: forecast.kit.sentinel.polling.PollingDriver
-    rendering:
-      show_root_heading: true
-      show_source: true
+> **Changed in 0.9–0.10.** The `PollingDriver` background loop was removed.
+> Run repeated forecasts with `forecast_many` (see [Policies](policies.md)) or
+> scheduled executions, and persist each `ForecastOutput` to build a trajectory.
 
 ## Schemas
 
 ### ForecastTrajectory
-::: forecast.core.schemas.forecast.ForecastTrajectory
+::: xrtm.forecast.core.schemas.forecast.ForecastTrajectory
     rendering:
       show_root_heading: true
 
 ### TimeSeriesPoint
-::: forecast.core.schemas.forecast.TimeSeriesPoint
+::: xrtm.forecast.core.schemas.forecast.TimeSeriesPoint
     rendering:
       show_root_heading: true

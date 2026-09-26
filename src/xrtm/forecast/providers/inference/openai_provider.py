@@ -482,7 +482,7 @@ class OpenAIProvider(InferenceProvider):
 
         raise ProviderError("OpenAI streaming response is not iterable.")
 
-    async def _stream_generator(self, messages: Any, **kwargs) -> AsyncIterable[Any]:
+    async def _stream_generator(self, messages: Any, **kwargs: Any) -> AsyncIterable[Any]:
         r"""Streaming implementation."""
         messages = self._normalize_messages(messages)
         stream = await self.client.chat.completions.create(

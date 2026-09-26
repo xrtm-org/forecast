@@ -122,7 +122,7 @@ class LLMAgent(Agent):
                 return default if default is not None else parsed
         return parsed
 
-    async def run(self, input_data: Any, **kwargs) -> Any:
+    async def run(self, input_data: Any, **kwargs: Any) -> Any:
         r"""
         Primary execution loop for the LLM agent.
 

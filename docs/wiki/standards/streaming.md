@@ -18,11 +18,15 @@ The yielded chunks must adhere to the following JSON structure (inspired by the 
 
 This standardization ensures that your UI/Frontend code never needs to handle "OpenAI format" vs "Gemini format" vs "HuggingFace format".
 
-## Local Streaming (Hugging Face)
-As of v0.1.5, the `HuggingFaceProvider` supports true asynchronous streaming.
+## Streaming Providers
 
-*   **Technology**: Uses `TextIteratorStreamer` in a background thread to generate tokens without blocking the asyncio event loop.
-*   **Performance**: Delivers "ChatGPT-like" typing effects even for local models running on CPU/MPS.
+Streaming is supported by the OpenAI-compatible providers (including
+`AnthropicProvider` and `MockProvider`) through `provider.stream(...)`.
+
+> **Removed in 0.9–0.10.** The dedicated `HuggingFaceProvider` (and its local
+> `TextIteratorStreamer` path) was removed. Point an OpenAI-compatible provider
+> at a local server (e.g. vLLM or Ollama's OpenAI-compatible endpoint) to stream
+> from local models.
 
 **Usage:**
 ```python

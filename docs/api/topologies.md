@@ -8,7 +8,7 @@ A topology is not the forecast reasoning graph. It is the assembly template that
 
 The `RecursiveConsensus` topology implements a peer-review loop where multiple agents must reach a specific threshold of agreement before a forecast is finalized.
 
-::: forecast.kit.topologies.consensus.RecursiveConsensus
+::: xrtm.forecast.kit.topologies.consensus.RecursiveConsensus
     options:
       show_root_heading: true
       show_source: true

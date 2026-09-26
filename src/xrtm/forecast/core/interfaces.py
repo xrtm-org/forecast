@@ -72,7 +72,7 @@ class InferenceProvider(ABC):
     knowledge_cutoff: Optional[datetime] = None
 
     @abstractmethod
-    async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs) -> Any:
+    async def generate_content_async(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> Any:
         r"""
         Asynchronously generates content from the LLM.
 
@@ -89,7 +89,7 @@ class InferenceProvider(ABC):
         r"""
         pass
 
-    async def run(self, prompt: str, **kwargs) -> "ModelResponse":
+    async def run(self, prompt: str, **kwargs: Any) -> "ModelResponse":
         r"""
         High-level ergonomic alias for `generate_content_async`.
 
@@ -113,14 +113,14 @@ class InferenceProvider(ABC):
         return True
 
     @abstractmethod
-    def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs) -> Any:
+    def generate_content(self, prompt: str, output_logprobs: bool = False, **kwargs: Any) -> Any:
         r"""
         Synchronously generates content from the LLM (for non-async environments).
         r"""
         pass
 
     @abstractmethod
-    def stream(self, messages: List[Dict[str, str]], **kwargs) -> AsyncIterable[Any]:
+    def stream(self, messages: List[Dict[str, str]], **kwargs: Any) -> AsyncIterable[Any]:
         r"""
         Opens a streaming connection to the LLM for token-by-token generation.
         r"""
