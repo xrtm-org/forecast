@@ -23,16 +23,63 @@ This module provides production-ready aggregator wrappers that implement
 import logging
 from typing import Any, List
 
-from xrtm.eval.core.eval.aggregation import (
-    inverse_variance_weighting,
-)
-
 from xrtm.forecast.core.schemas.forecast import ForecastOutput
 from xrtm.forecast.core.schemas.graph import BaseGraphState
 
 logger = logging.getLogger(__name__)
 
 __all__ = ["create_ivw_aggregator", "create_simple_aggregator"]
+
+
+def _to_float(value: Any, default: float = 0.0) -> float:
+    r"""Best-effort float conversion (``default`` on unusable input)."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _output_prediction(output: Any) -> float:
+    r"""Prediction from an analyst output (``confidence`` or ``probability``)."""
+    value = getattr(output, "confidence", None)
+    if value is None:
+        value = getattr(output, "probability", None)
+    return min(1.0, max(0.0, _to_float(value, 0.5)))
+
+
+def _output_variance(output: Any) -> float:
+    r"""Variance from an analyst output (``uncertainty``, else the 95% CI width)."""
+    value = getattr(output, "uncertainty", None)
+    if value is not None:
+        return max(0.0, _to_float(value))
+    interval = getattr(output, "confidence_interval", None)
+    low = getattr(interval, "low", None)
+    high = getattr(interval, "high", None)
+    if low is not None and high is not None:
+        # 95% interval: sd ≈ width / 3.92 → variance ≈ (width / 3.92)^2
+        return ((_to_float(high) - _to_float(low)) / 3.92) ** 2
+    return 0.0
+
+
+def inverse_variance_weighting(outputs: List[Any]) -> tuple[float, float]:
+    r"""Inverse-variance weighted mean and effective variance of *outputs*.
+
+    Local implementation so the forecast package does not depend on
+    ``xrtm-eval``: the previous cross-package import was both a layering
+    violation and a signature mismatch that crashed ``use_ivw=True``.
+    """
+    if not outputs:
+        return 0.5, 1.0
+    predictions = [_output_prediction(output) for output in outputs]
+    weights = []
+    for output in outputs:
+        variance = _output_variance(output)
+        weights.append(1.0 / variance if variance > 0 else 1.0)
+    total = sum(weights)
+    if total <= 0:
+        return sum(predictions) / len(predictions), 1.0
+    mean = sum(prediction * weight for prediction, weight in zip(predictions, weights)) / total
+    return mean, 1.0 / total
 
 
 def create_ivw_aggregator(results_key: str = "analyst_outputs"):

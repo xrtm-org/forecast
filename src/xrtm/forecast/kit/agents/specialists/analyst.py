@@ -72,6 +72,56 @@ def _sanitize_edge(edge_data: Dict[str, Any]) -> CausalEdge:
     return CausalEdge(**data)
 
 
+def _coerce_probability(value: Any, default: float = 0.5) -> float:
+    r"""Clamp a raw payload probability into [0, 1] (falling back to *default*)."""
+    try:
+        return min(1.0, max(0.0, float(value)))
+    except (TypeError, ValueError):
+        return default
+
+
+def _to_float(value: Any, default: float = 0.0) -> float:
+    r"""Best-effort float conversion (``default`` on unusable input)."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _coerce_confidence_interval(value: Any, probability: float) -> Dict[str, float]:
+    r"""Validate a raw confidence interval, else synthesize a bounded one."""
+    if isinstance(value, dict):
+        low = min(1.0, max(0.0, _to_float(value.get("low"))))
+        high = min(1.0, max(0.0, _to_float(value.get("high"))))
+        level = _to_float(value.get("level"), 0.9)
+        low, high = min(low, high), max(low, high)
+        if low <= probability <= high:
+            return {"low": low, "high": high, "level": level}
+    return _default_confidence_interval(probability)
+
+
+def _safe_causal_nodes(raw: Any) -> List[CausalNode]:
+    r"""Build causal nodes, skipping malformed entries instead of crashing."""
+    nodes: List[CausalNode] = []
+    for item in raw or []:
+        try:
+            nodes.append(CausalNode(**item))
+        except Exception:  # noqa: BLE001 - skip malformed node payloads
+            continue
+    return nodes
+
+
+def _safe_causal_edges(raw: Any) -> List[CausalEdge]:
+    r"""Build causal edges, skipping malformed entries instead of crashing."""
+    edges: List[CausalEdge] = []
+    for item in raw or []:
+        try:
+            edges.append(_sanitize_edge(item))
+        except Exception:  # noqa: BLE001 - skip malformed edge payloads
+            continue
+    return edges
+
+
 class AnalystOutput(BaseModel):
     r"""
     Internal schema for structured output from the Forecasting Analyst.
@@ -277,16 +327,16 @@ class ForecastingAnalyst(LLMAgent):
 
         if analyst_output is not None:
             probability = analyst_output.probability
-            confidence_interval = analyst_output.confidence_interval
+            confidence_interval = _coerce_confidence_interval(analyst_output.confidence_interval, probability)
             reasoning = analyst_output.reasoning
-            nodes = [CausalNode(**n) for n in analyst_output.causal_nodes]
-            edges = [_sanitize_edge(e) for e in analyst_output.causal_edges]
+            nodes = _safe_causal_nodes(analyst_output.causal_nodes)
+            edges = _safe_causal_edges(analyst_output.causal_edges)
         elif parsed_payload is not None:
-            probability = float(parsed_payload.get("probability", 0.5) or 0.5)
-            confidence_interval = parsed_payload.get("confidence_interval", _default_confidence_interval(probability))
+            probability = _coerce_probability(parsed_payload.get("probability", 0.5))
+            confidence_interval = _coerce_confidence_interval(parsed_payload.get("confidence_interval"), probability)
             reasoning = str(parsed_payload.get("reasoning", "Parsing failed fallback."))
-            nodes = [CausalNode(**n) for n in parsed_payload.get("causal_nodes", [])]
-            edges = [_sanitize_edge(e) for e in parsed_payload.get("causal_edges", [])]
+            nodes = _safe_causal_nodes(parsed_payload.get("causal_nodes"))
+            edges = _safe_causal_edges(parsed_payload.get("causal_edges"))
 
         # --- Causal-graph validation ----------------------------------------
         graph_issues = validate_causal_graph(nodes, edges)

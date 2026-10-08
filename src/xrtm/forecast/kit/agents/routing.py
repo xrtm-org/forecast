@@ -21,6 +21,7 @@ LLM-driven decisions.
 """
 
 import logging
+import os
 from typing import Any, Dict, Optional, Union
 
 from xrtm.forecast.providers.inference.base import InferenceProvider
@@ -63,7 +64,9 @@ class RoutingAgent(Agent):
         name: str = "Router",
     ):
         super().__init__(name=name)
-        self.router_model = router_model or ModelFactory.get_provider("openai:gpt-4o-mini")
+        # Resolved lazily: constructing a RoutingAgent must not require an
+        # OpenAI key when explicit tiers are supplied.
+        self.router_model = router_model
         self.fast_tier = fast_tier
         self.smart_tier = smart_tier
         self.routes = routes or {}
@@ -107,7 +110,11 @@ class RoutingAgent(Agent):
         r"""
 
         try:
-            decision_resp = await self.router_model.run(complexity_prompt)
+            router = self.router_model
+            if router is None:
+                router = ModelFactory.get_provider(os.environ.get("XRTM_ROUTER_MODEL", "openai:gpt-4o-mini"))
+                self.router_model = router
+            decision_resp = await router.run(complexity_prompt)
             decision = decision_resp.text.upper().strip()
         except Exception as e:
             logger.error(f"Routing decision failed: {e}. Falling back to SMART.")
