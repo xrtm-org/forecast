@@ -103,7 +103,10 @@ class TestCostLedgerAndBudget:
         budget = BudgetPolicy(ledger, daily_limit=5.0)
         assert budget.exceeded() is False
 
-        ledger.record_usage("deepseek-flash", USAGE, at=OFF_PEAK)
+        # Record at the current time: the daily budget window is "today", so a
+        # hardcoded timestamp stops counting (and the test starts failing) as
+        # soon as the clock moves past that date.
+        ledger.record_usage("deepseek-flash", USAGE, at=datetime.now(timezone.utc))
         assert budget.exceeded() is True
         assert budget.remaining() == pytest.approx(0.0)
         with pytest.raises(BudgetExceededError):
