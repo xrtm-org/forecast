@@ -73,7 +73,10 @@ class CachedSearchTool:
 
         self._misses += 1
         results = self.tool.search(query, max_results=max_results)
-        self.cache.set(key, json.dumps(results, default=str))
+        # Never cache empty results: a transient failure would otherwise be
+        # served as a cache hit for the whole TTL.
+        if results:
+            self.cache.set(key, json.dumps(results, default=str))
         return results
 
     def search_formatted(self, query: str, max_results: Optional[int] = None) -> str:
@@ -86,7 +89,8 @@ class CachedSearchTool:
 
         self._misses += 1
         formatted = self.tool.search_formatted(query, max_results=max_results)
-        self.cache.set(key, formatted)
+        if formatted and not formatted.startswith("No search results"):
+            self.cache.set(key, formatted)
         return formatted
 
     def _key(self, kind: str, query: str, max_results: Optional[int]) -> str:
