@@ -13,7 +13,10 @@ authors = [
     {name = "XRTM Team", email = "moy@xrtm.org"}
 ]
 dependencies = [
-    "pydantic>=2.0.0",
+    # Capped below 2.14: freezegun's global module patching (temporal sandboxing)
+    # makes pydantic 2.14 fail schema generation on FakeDatetime, which breaks
+    # every backtest run. Revisit when freezegun supports pydantic 2.14.
+    "pydantic>=2.0.0,<2.14",
     "pydantic-settings>=2.0.0",
     "aiohttp>=3.9.0",
     "rich>=13.0.0",
