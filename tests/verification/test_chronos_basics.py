@@ -22,9 +22,11 @@ from xrtm.forecast.core.schemas.graph import TemporalContext
 
 def test_temporal_context_real_time():
     """Verify that is_backtest=False uses real time."""
+    from datetime import timezone
+
     ctx = TemporalContext(reference_time=datetime(2020, 1, 1), is_backtest=False)
-    # now() should be close to actual now, not 2020
-    assert (datetime.now() - ctx.now()).total_seconds() < 1.0
+    # now() should be close to actual now (UTC-aware), not 2020
+    assert (datetime.now(timezone.utc) - ctx.now()).total_seconds() < 1.0
 
 
 def test_temporal_context_backtest_time():
