@@ -53,9 +53,12 @@ def test_openai_sync_cache_hits_only_for_cacheable_requests(tmp_path):
     assert second.metadata["cache_hit"] is True
     assert completions.call_count == 1
 
-    provider.generate_content("Hello", tools=[{"name": "lookup"}])
-    provider.generate_content("Hello", tools=[{"name": "lookup"}])
-    assert completions.call_count == 3
+    # Tools are unsupported on the sync path and must raise, not silently drop.
+    from xrtm.forecast.core.exceptions import ProviderError
+
+    with pytest.raises(ProviderError, match="tool calling"):
+        provider.generate_content("Hello", tools=[{"name": "lookup"}])
+    assert completions.call_count == 1
     cache.close()
 
 

@@ -11,8 +11,28 @@ from typing import Any, Callable
 from xrtm.forecast.core.config.graph import GraphConfig
 from xrtm.forecast.core.orchestrator import Orchestrator
 from xrtm.forecast.core.schemas.graph import BaseGraphState
-from xrtm.forecast.core.schemas.workflow import ConditionalRouteSpec, GraphSpec, NodeSpec, WorkflowBlueprint
+from xrtm.forecast.core.schemas.workflow import (
+    AGGREGATE_CANDIDATES_IMPLEMENTATION,
+    CANDIDATE_IMPLEMENTATIONS,
+    ConditionalRouteSpec,
+    GraphSpec,
+    NodeSpec,
+    WorkflowBlueprint,
+)
 from xrtm.forecast.kit.agents.base import Agent
+
+# Dotted implementations are import-and-call; restrict them to the reviewed
+# product node set so a blueprint cannot import arbitrary modules.
+ALLOWED_IMPLEMENTATIONS = frozenset(CANDIDATE_IMPLEMENTATIONS | {AGGREGATE_CANDIDATES_IMPLEMENTATION})
+
+
+def _runtime_provider(options: Any) -> Any:
+    r"""Provider name from workflow options (mapping or object, either is valid)."""
+    if options is None:
+        return None
+    if isinstance(options, dict):
+        return options.get("provider")
+    return getattr(options, "provider", None)
 
 
 class WorkflowGraphState(BaseGraphState):
@@ -232,7 +252,7 @@ def _orchestrator_node(adapter: NodeAdapter) -> Callable[[WorkflowGraphState, An
             "node": adapter.node_name,
             "kind": adapter.spec.kind,
             "implementation": adapter.spec.implementation,
-            "runtime": adapter.spec.runtime or state.context.get("options").provider if state.context.get("options") else None,
+            "runtime": adapter.spec.runtime or _runtime_provider(state.context.get("options")),
             "optional": adapter.spec.optional,
         }
         try:
@@ -265,6 +285,11 @@ def _resolve_target(*, node_name: str, spec: NodeSpec, node_callables: dict[str,
         return None
     if spec.implementation is None:
         raise ValueError(f"node {node_name} is missing an implementation")
+    if spec.implementation not in ALLOWED_IMPLEMENTATIONS:
+        raise ValueError(
+            f"node {node_name} implementation {spec.implementation!r} is not allowed; "
+            f"allowed implementations: {sorted(ALLOWED_IMPLEMENTATIONS)}"
+        )
     module_name, attr_name = spec.implementation.rsplit(".", 1)
     module = import_module(module_name)
     return getattr(module, attr_name)

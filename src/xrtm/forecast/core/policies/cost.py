@@ -37,6 +37,10 @@ from xrtm.forecast.core.exceptions import BudgetExceededError
 
 logger = logging.getLogger(__name__)
 
+# Cap on in-memory ledger records: totals and per-day buckets are accumulated
+# across every record ever seen, so memory stays bounded without losing sums.
+MAX_IN_MEMORY_RECORDS = 10_000
+
 __all__ = [
     "ModelPrice",
     "PriceTable",
@@ -177,6 +181,10 @@ class CostLedger:
         self.price_table = price_table
         self.path = Path(path) if path is not None else None
         self._records: list[Dict[str, Any]] = []
+        # Aggregates over ALL records ever seen (the in-memory list is bounded
+        # so a long-lived ledger cannot grow without limit).
+        self._total_all = 0.0
+        self._daily_totals: dict[str, float] = {}
         if self.path is not None and self.path.exists():
             self._load()
 
@@ -200,6 +208,11 @@ class CostLedger:
             "peak": self.price_table.multiplier(moment) > 1.0,
         }
         self._records.append(record)
+        self._total_all += cost
+        day = moment.date().isoformat()
+        self._daily_totals[day] = self._daily_totals.get(day, 0.0) + cost
+        if len(self._records) > MAX_IN_MEMORY_RECORDS:
+            self._records = self._records[-MAX_IN_MEMORY_RECORDS:]
         if self.path is not None:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.path, "a") as handle:
@@ -212,17 +225,17 @@ class CostLedger:
 
     @property
     def total(self) -> float:
-        r"""Total recorded cost in the table's currency."""
-        return sum(float(record.get("cost", 0.0)) for record in self._records)
+        r"""Total recorded cost in the table's currency (all records ever seen)."""
+        return self._total_all
 
     def daily_total(self, day: Optional[str] = None) -> float:
         r"""Total recorded cost for one UTC day (default: today)."""
         target = day or datetime.now(timezone.utc).date().isoformat()
-        return sum(float(record.get("cost", 0.0)) for record in self._records if record.get("timestamp", "")[:10] == target)
+        return self._daily_totals.get(target, 0.0)
 
     @property
     def records(self) -> list[Dict[str, Any]]:
-        r"""All recorded cost entries."""
+        r"""The most recent in-memory cost entries (bounded; see ``total``)."""
         return list(self._records)
 
     def _load(self) -> None:
@@ -234,9 +247,28 @@ class CostLedger:
                     if not line:
                         continue
                     try:
-                        self._records.append(json.loads(line))
+                        record = json.loads(line)
                     except json.JSONDecodeError:
                         logger.warning("Skipping malformed cost ledger line in %s", self.path)
+                        continue
+                    # Normalize naive timestamps to UTC so day bucketing and
+                    # comparisons are stable across writers.
+                    timestamp = str(record.get("timestamp", ""))
+                    day = timestamp[:10]
+                    try:
+                        parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                        if parsed.tzinfo is None:
+                            parsed = parsed.replace(tzinfo=timezone.utc)
+                            record["timestamp"] = parsed.isoformat()
+                        day = parsed.astimezone(timezone.utc).date().isoformat()
+                    except ValueError:
+                        pass
+                    cost = float(record.get("cost", 0.0) or 0.0)
+                    self._total_all += cost
+                    self._daily_totals[day] = self._daily_totals.get(day, 0.0) + cost
+                    self._records.append(record)
+            if len(self._records) > MAX_IN_MEMORY_RECORDS:
+                self._records = self._records[-MAX_IN_MEMORY_RECORDS:]
         except OSError:
             logger.warning("Could not load cost ledger from %s", self.path)
 
