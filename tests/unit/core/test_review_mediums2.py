@@ -108,3 +108,4 @@ def test_web_search_skill_runs_a_single_query():
 
     assert calls == {"search": 1, "formatted": 0}
     assert "https://example.test" in payload["formatted"]
+    assert "<untrusted-search-results>" in payload["formatted"]
