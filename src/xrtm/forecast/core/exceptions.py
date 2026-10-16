@@ -70,6 +70,16 @@ class GraphError(ForecastError):
     pass
 
 
+class GraphTimeoutError(GraphError):
+    r"""
+    Raised when a graph run exceeds the ``GraphConfig.timeout`` bound.
+
+    Without this, a hung tool or human gate could block a run forever.
+    r"""
+
+    pass
+
+
 class EmptyContentError(ProviderError):
     r"""
     Raised when a provider returns no text content.

@@ -127,7 +127,11 @@ class TokenBucket:
                     )
                     if allowed:
                         return
-                except Exception as e:
+                except (asyncio.TimeoutError, TimeoutError):
+                    # A deadline must never degrade into a full in-memory
+                    # bucket, which would admit requests past the limit.
+                    raise
+                except Exception as e:  # noqa: BLE001 - Redis failures fall back to in-memory
                     logger.error(f"[RATE-LIMITER] Redis error in acquire: {e}. Switching to In-Memory.")
                     self.use_redis = False
                     break
@@ -158,7 +162,9 @@ class TokenBucket:
                     ):
                         return
                     time.sleep(self._retry_delay(deadline))
-            except Exception as e:
+            except (asyncio.TimeoutError, TimeoutError):
+                raise
+            except Exception as e:  # noqa: BLE001 - Redis failures fall back to in-memory
                 logger.error(f"[RATE-LIMITER] Redis error in acquire_sync: {e}. Switching to In-Memory.")
                 self.use_redis = False
 

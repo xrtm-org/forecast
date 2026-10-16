@@ -26,6 +26,7 @@ import time
 from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 from xrtm.forecast.core.config.graph import GraphConfig
+from xrtm.forecast.core.exceptions import GraphTimeoutError
 from xrtm.forecast.core.interfaces import HumanProvider
 from xrtm.forecast.core.runtime import AsyncRuntime
 from xrtm.forecast.core.schemas.graph import BaseGraphState
@@ -165,6 +166,29 @@ class Orchestrator(Generic[StateT]):
         r"""
         self.parallel_groups[group_name] = node_names
 
+    def _run_deadline(self) -> Optional[float]:
+        r"""Monotonic deadline for this graph run (``None`` when no timeout)."""
+        timeout = getattr(self.config, "timeout", None)
+        if not timeout or float(timeout) <= 0:
+            return None
+        return time.monotonic() + float(timeout)
+
+    async def _await_with_deadline(self, awaitable: Any, deadline: Optional[float]) -> Any:
+        r"""Await *awaitable*, failing fast when the graph deadline passes.
+
+        ``GraphConfig.timeout`` documented a global bound that was never
+        enforced, so a hung tool or human gate could block a run forever.
+        """
+        if deadline is None:
+            return await awaitable
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise GraphTimeoutError("graph run exceeded its configured timeout")
+        try:
+            return await asyncio.wait_for(awaitable, timeout=remaining)
+        except asyncio.TimeoutError as exc:
+            raise GraphTimeoutError("graph run exceeded its configured timeout") from exc
+
     async def run(
         self,
         state: BaseGraphState,
@@ -176,6 +200,8 @@ class Orchestrator(Generic[StateT]):
         Orchestrates the execution of the graph stages starting from an entry point.
         """
         from xrtm.forecast.core.runtime import temporal_context_var
+
+        deadline = self._run_deadline()
 
         # Set the temporal context for this reasoning task
         token = temporal_context_var.set(state.temporal_context)
@@ -221,9 +247,9 @@ class Orchestrator(Generic[StateT]):
                             from freezegun import freeze_time
 
                             with freeze_time(state.temporal_context.reference_time):
-                                res = await node_func(state, report_progress)
+                                res = await self._await_with_deadline(node_func(state, report_progress), deadline)
                         else:
-                            res = await node_func(state, report_progress)
+                            res = await self._await_with_deadline(node_func(state, report_progress), deadline)
 
                         # Automatically capture node results
                         state.node_reports[active_node] = res
@@ -298,9 +324,13 @@ class Orchestrator(Generic[StateT]):
                             from freezegun import freeze_time
 
                             with freeze_time(state.temporal_context.reference_time):
-                                results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
+                                results = await self._await_with_deadline(
+                                    asyncio.gather(*wrapped_tasks, return_exceptions=True), deadline
+                                )
                         else:
-                            results = await asyncio.gather(*wrapped_tasks, return_exceptions=True)
+                            results = await self._await_with_deadline(
+                                asyncio.gather(*wrapped_tasks, return_exceptions=True), deadline
+                            )
 
                         for i, res in enumerate(results):
                             if isinstance(res, Exception):

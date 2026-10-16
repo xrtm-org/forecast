@@ -187,6 +187,14 @@ class InferenceCache:
         raise TypeError(f"Value of type {type(value).__name__} is not JSON serializable for cache keys")
 
     def get(self, key: str) -> Optional[str]:
+        r"""Retrieve a cached value; cache failures count as misses, never errors."""
+        try:
+            return self._get(key)
+        except Exception as exc:  # noqa: BLE001 - the cache must never break a call
+            logger.debug("Cache get failed for %s: %s", key[:16], exc)
+            return None
+
+    def _get(self, key: str) -> Optional[str]:
         r"""Retrieve cached response by key.
 
         Updates the last_accessed timestamp for LRU tracking.
@@ -232,6 +240,13 @@ class InferenceCache:
         return row[0]
 
     def set(self, key: str, value: str, metadata: Optional[Dict[str, Any]] = None) -> None:
+        r"""Store a value; cache failures are ignored (a miss next time)."""
+        try:
+            self._set(key, value, metadata)
+        except Exception as exc:  # noqa: BLE001 - the cache must never break a call
+            logger.debug("Cache set failed for %s: %s", key[:16], exc)
+
+    def _set(self, key: str, value: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         r"""Store a response in the cache.
 
         Performs LRU eviction if the cache exceeds max_size_bytes.
