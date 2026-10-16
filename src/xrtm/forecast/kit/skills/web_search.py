@@ -48,6 +48,21 @@ class WebSearchSkill(BaseSkill):
     def __init__(self, search_tool: TavilySearchTool | None = None):
         self._search_tool = search_tool or TavilySearchTool()
 
+    @staticmethod
+    def _format_results(results: list[dict[str, Any]]) -> str:
+        r"""Render results the way the search tools do, without a second query."""
+        if not results:
+            return "No search results found."
+        lines = []
+        for index, result in enumerate(results, 1):
+            lines.append(f"[{index}] {result.get('title', 'Untitled')}")
+            lines.append(f"    URL: {result.get('url', 'N/A')}")
+            content = result.get("content", "")
+            if content:
+                lines.append(f"    {content[:300]}")
+            lines.append("")
+        return "\n".join(lines)
+
     async def execute(
         self,
         query: str = "",
@@ -68,7 +83,9 @@ class WebSearchSkill(BaseSkill):
         results = self._search_tool.search(query, max_results=max_results)
         elapsed_ms = round((time.perf_counter() - start) * 1000)
         sources = [r.get("url", "") for r in results if r.get("url")]
-        formatted = self._search_tool.search_formatted(query, max_results=max_results)
+        # Format locally: calling the tool's search_formatted would run the
+        # query a second time (the skill runs once per forecast).
+        formatted = self._format_results(results)
         return {
             "formatted": formatted,
             "query": query,

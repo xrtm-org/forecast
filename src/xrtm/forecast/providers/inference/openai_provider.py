@@ -28,6 +28,7 @@ deterministic-only response cache with optional TTL.
 import asyncio
 import logging
 import random
+import time
 from typing import Any, AsyncGenerator, AsyncIterable, Dict, Iterable, List, Optional, cast
 
 from openai import AsyncOpenAI, OpenAI
@@ -264,7 +265,7 @@ class OpenAIProvider(InferenceProvider):
                     )
                     break
                 except Exception as exc:
-                    if attempt < max_retries:
+                    if attempt < max_retries and self._is_retryable(exc):
                         wait = self._retry_wait(attempt)
                         logger.warning(f"[OPENAI] API error, retry {attempt+1}/{max_retries} in {wait:.1f}s: {exc}")
                         await asyncio.sleep(wait)
@@ -318,14 +319,39 @@ class OpenAIProvider(InferenceProvider):
             updated["max_tokens"] = 4096
         return updated
 
+    @staticmethod
+    def _is_retryable(exc: Exception) -> bool:
+        r"""Only transient failures are retried.
+
+        Bad requests, auth errors and other 4xx responses will fail again, so
+        retrying them wastes budget and hides the real error.
+        """
+        status = getattr(exc, "status_code", None)
+        if isinstance(status, int):
+            return status in (408, 409, 429) or status >= 500
+        return True  # connection/timeout errors are transient
+
     async def _execute_tool_calls(self, tool_calls: List[Any], tools: List[Any]) -> List[Dict[str, Any]]:
         r"""Executes tool calls and returns OpenAI-formatted tool results."""
         results = []
         import json
 
         for call in tool_calls:
-            tool_name = call.function.name
-            args = json.loads(call.function.arguments)
+            tool_name = getattr(call.function, "name", "")
+            try:
+                args = json.loads(call.function.arguments or "{}")
+            except (TypeError, ValueError) as exc:
+                # Malformed arguments must not abort the whole turn.
+                logger.error(f"Malformed tool arguments for {tool_name}: {exc}")
+                results.append(
+                    {
+                        "tool_call_id": call.id,
+                        "role": "tool",
+                        "name": tool_name,
+                        "content": f"Error: malformed tool arguments: {exc}",
+                    }
+                )
+                continue
 
             # Find tool in the list
             target_tool = None
@@ -394,18 +420,42 @@ class OpenAIProvider(InferenceProvider):
         messages = self._normalize_messages(prompt or kwargs.get("messages"))
         request_kwargs = self._build_request_kwargs(kwargs, response_format)
 
+        if tools:
+            raise ProviderError(
+                "The synchronous generate_content() path does not support tool calling; "
+                "use generate_content_async() instead."
+            )
+
         cache_key = self._cache_key_for_request(messages, tools, output_logprobs, request_kwargs)
         if cache_key and self.cache:
             cached = self.cache.get(cache_key)
             if cached is not None:
                 return ModelResponse(text=cached, metadata={"cache_hit": True})
 
-        self._acquire_rate_limit_sync()
-        response = self.sync_client.chat.completions.create(
-            model=self.model_id,
-            messages=cast(Any, messages),
-            **request_kwargs,
-        )
+        response = None
+        for attempt in range(self.config.max_retries + 1):
+            try:
+                self._acquire_rate_limit_sync()
+                response = self.sync_client.chat.completions.create(
+                    model=self.model_id,
+                    messages=cast(Any, messages),
+                    logprobs=output_logprobs,
+                    top_logprobs=5 if output_logprobs else None,
+                    **request_kwargs,
+                )
+                break
+            except Exception as exc:
+                if attempt < self.config.max_retries and self._is_retryable(exc):
+                    wait = self._retry_wait(attempt)
+                    logger.warning(
+                        f"[OPENAI] API error (sync), retry {attempt+1}/{self.config.max_retries} in {wait:.1f}s: {exc}"
+                    )
+                    time.sleep(wait)
+                else:
+                    raise
+
+        if response is None:  # pragma: no cover - the loop either breaks or raises
+            raise ProviderError("OpenAI sync generation failed: no response")
 
         choice = response.choices[0]
         try:
@@ -415,9 +465,12 @@ class OpenAIProvider(InferenceProvider):
                 request_kwargs = self._grow_max_tokens(request_kwargs)
                 cache_key = None
                 logger.warning("[OPENAI] Empty content with finish_reason=length; retrying with larger max_tokens.")
+                self._acquire_rate_limit_sync()  # the retry is a real request too
                 response = self.sync_client.chat.completions.create(
                     model=self.model_id,
                     messages=cast(Any, messages),
+                    logprobs=output_logprobs,
+                    top_logprobs=5 if output_logprobs else None,
                     **request_kwargs,
                 )
                 choice = response.choices[0]
@@ -425,11 +478,15 @@ class OpenAIProvider(InferenceProvider):
             else:
                 raise
 
+        normalized_logprobs = None
+        if output_logprobs and getattr(choice, "logprobs", None) and choice.logprobs.content:
+            normalized_logprobs = [{"token": lp.token, "logprob": lp.logprob} for lp in choice.logprobs.content]
+
         usage = self._extract_usage(response)
         if cache_key and self.cache:
             self.cache.set(cache_key, text, {"model": self.model_id})
 
-        return ModelResponse(text=text, raw=response, usage=usage, metadata=metadata)
+        return ModelResponse(text=text, raw=response, usage=usage, logprobs=normalized_logprobs, metadata=metadata)
 
     def _cache_key_for_request(
         self,

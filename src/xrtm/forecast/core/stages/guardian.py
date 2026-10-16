@@ -15,6 +15,7 @@
 
 import logging
 import re
+from datetime import datetime, timezone
 from typing import Callable, List, Optional
 
 from xrtm.forecast.core.interfaces import InferenceProvider
@@ -84,7 +85,7 @@ class LeakageGuardian:
 
             # 1. Fast Regex Check (Pre-filter)
             # Look for any year >= ref_year + 1 or dates in general
-            if self._regex_pre_filter(text_to_scan, ref_time.year):
+            if self._regex_pre_filter(text_to_scan, ref_time):
                 # 2. Semantic LLM Check
                 redacted_content = await self._semantic_redaction(text_to_scan, ref_date_str)
                 if redacted_content != text_to_scan:
@@ -99,22 +100,28 @@ class LeakageGuardian:
 
         return None
 
-    def _regex_pre_filter(self, text: str, ref_year: int) -> bool:
+    def _regex_pre_filter(self, text: str, reference_time: datetime) -> bool:
         r"""
         Quick check to avoid LLM calls for obviously clean text.
 
         Args:
-            text (`str`): The content to scan for year patterns.
-            ref_year (`int`): The year limit. Anything greater is a potential leak.
+            text (`str`): The content to scan for date patterns.
+            reference_time (`datetime`): Anything after this moment is a potential leak.
 
         Returns:
             `bool`: `True` if high-risk temporal patterns are found.
         """
-        # Check for any year > ref_year (simplistic)
-        # In a real tool, we'd look for more patterns.
-        years = re.findall(r"\b20\d{2}\b", text)
-        for year_str in years:
-            if int(year_str) > ref_year:
+        # Exact ISO dates catch same-year future dates ("2026-12-31" seen from
+        # March), which the year-only heuristic below would miss.
+        for match in re.finditer(r"\b(20\d{2})-(\d{2})-(\d{2})\b", text):
+            try:
+                moment = datetime(int(match.group(1)), int(match.group(2)), int(match.group(3)), tzinfo=timezone.utc)
+            except ValueError:
+                continue
+            if moment > reference_time:
+                return True
+        for year_str in re.findall(r"\b20\d{2}\b", text):
+            if int(year_str) > reference_time.year:
                 return True
         return False
 

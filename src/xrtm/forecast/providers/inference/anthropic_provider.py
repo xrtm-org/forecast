@@ -19,7 +19,10 @@ Concrete implementation of ``InferenceProvider`` for the Anthropic
 API, using the OpenAI-compatible messages endpoint.
 """
 
+from typing import Any
+
 from xrtm.forecast.core.config.inference import OpenAIConfig
+from xrtm.forecast.core.exceptions import ProviderError
 from xrtm.forecast.providers.inference.openai_provider import OpenAIProvider
 
 
@@ -38,6 +41,16 @@ class AnthropicProvider(OpenAIProvider):
         if not config.base_url or config.base_url == "https://api.openai.com/v1":
             config = config.model_copy(update={"base_url": "https://api.anthropic.com/v1"})
         super().__init__(config, **kwargs)
+
+    def generate_content(self, prompt: Any, output_logprobs: bool = False, **kwargs: Any) -> Any:
+        if output_logprobs:
+            raise ProviderError("Anthropic's OpenAI-compatible endpoint does not support logprobs.")
+        return super().generate_content(prompt, output_logprobs=False, **kwargs)
+
+    async def generate_content_async(self, prompt: Any, output_logprobs: bool = False, **kwargs: Any) -> Any:
+        if output_logprobs:
+            raise ProviderError("Anthropic's OpenAI-compatible endpoint does not support logprobs.")
+        return await super().generate_content_async(prompt, output_logprobs=False, **kwargs)
 
 
 __all__ = ["AnthropicProvider"]

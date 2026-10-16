@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.2] - 2026-10-16
+
+### Fixed
+- `GraphConfig.timeout` is now enforced with a monotonic run deadline; hung tools or human gates raise `GraphTimeoutError` instead of blocking a run.
+- `TemporalContext.now()` returns UTC-aware time.
+- Rate limiter re-raises timeout/deadline errors instead of degrading into a full in-memory bucket.
+- Inference cache: sqlite failures degrade to misses/no-ops; cache keys include the endpoint (`base_url`).
+- Synchronous `generate_content` now passes `logprobs`, retries transient errors only, and raises for unsupported `tools`; its empty-content retry acquires a rate-limit token.
+- `forecast_many` keeps completed forecasts when pricing fails and serializes budget admission.
+- Leakage guardian detects same-year future dates.
+- Web-search skill runs one query per call (was two).
+- `CostLedger` memory is bounded and naive timestamps are normalized to UTC.
+
+## [0.13.1] - 2026-10-16
+
+### Fixed
+- IVW aggregator implemented locally (no xrtm-eval dependency; `use_ivw=True` no longer crashes).
+- `CachedSearchTool` never caches empty results.
+- Analyst fallback clamps probabilities/CIs and skips malformed causal nodes/edges.
+- `RoutingAgent` resolves its router lazily; `pydantic` capped below 2.14 (freezegun incompatibility).
+
+## [0.13.0] - 2026-10-08
+
+### Added
+- `kit/prompts.py`: `evidence_first_template()` — a reusable anti-anchoring prompt preset (paired A/B: 12× more independent estimates while keeping the reference value available).
+
+### Fixed
+- Make the daily budget test date-independent (CI time bomb).
+
 ## [0.12.0] - 2026-09-26
 
 ### Added

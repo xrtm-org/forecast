@@ -83,6 +83,9 @@ async def forecast_many(
     """
     questions = list(questions)
     semaphore = asyncio.Semaphore(max(1, concurrency))
+    # Serialize the budget admission check: without it, every in-flight task
+    # can pass the check before any of them has recorded spend.
+    admission = asyncio.Lock()
     resolved_model_id = model_id or _agent_model_id(agent)
     start_total = ledger.total if ledger is not None else 0.0
 
@@ -93,16 +96,21 @@ async def forecast_many(
     async def run_one(question: ForecastQuestion) -> Optional[ForecastOutput]:
         nonlocal skipped
         async with semaphore:
-            if budget is not None and budget.exceeded():
-                skipped += 1
-                return None
+            if budget is not None:
+                async with admission:
+                    if budget.exceeded():
+                        skipped += 1
+                        return None
             try:
                 output = await agent.run(question)
             except Exception as exc:  # noqa: BLE001 - surfaced in the batch result
                 errors.append(f"{question.id}: {exc}")
                 return None
             if ledger is not None:
-                ledger.record_output(resolved_model_id, output)
+                try:
+                    ledger.record_output(resolved_model_id, output)
+                except Exception as exc:  # noqa: BLE001 - pricing must never discard a forecast
+                    logger.warning("Ledger could not price output for %s: %s", question.id, exc)
             return output
 
     results = await asyncio.gather(*(run_one(question) for question in questions))

@@ -159,7 +159,8 @@ class RuntimeProfileSpec:
             "provider": self.provider,
             "base_url": self.base_url,
             "model": self.model,
-            "api_key": self.api_key,
+            # Never serialize the key into blueprint copy/export artifacts.
+            "api_key": "***" if self.api_key else None,
             "max_tokens": self.max_tokens,
         }
 

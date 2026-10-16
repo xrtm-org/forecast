@@ -42,16 +42,21 @@ async def test_guardian_skips_non_backtest():
 
 @pytest.mark.asyncio
 async def test_guardian_regex_prefilter():
+    from datetime import datetime, timezone
+
     provider = MockProvider()
     guardian = LeakageGuardian(provider)
+    reference = datetime(2024, 6, 1, tzinfo=timezone.utc)
 
-    # Text with no years > 2024
-    text = "The event happened in 2023 and 2024."
-    assert guardian._regex_pre_filter(text, 2024) is False
+    # No future dates relative to the reference
+    assert guardian._regex_pre_filter("The event happened in 2023 and 2024.", reference) is False
 
-    # Text with year > 2024
-    text = "In 2025, things changed."
-    assert guardian._regex_pre_filter(text, 2024) is True
+    # Year after the reference
+    assert guardian._regex_pre_filter("In 2025, things changed.", reference) is True
+
+    # Same-year future date (the miss this fix addresses)
+    assert guardian._regex_pre_filter("Scheduled for 2024-12-31.", reference) is True
+    assert guardian._regex_pre_filter("Happened 2024-03-01.", reference) is False
 
 
 @pytest.mark.asyncio
