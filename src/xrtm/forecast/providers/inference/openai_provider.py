@@ -445,7 +445,9 @@ class OpenAIProvider(InferenceProvider):
         if temperature not in (None, 0, 0.0) and not self.config.cache_non_deterministic:
             return None
         try:
-            return self.cache.compute_chat_key(self.model_id, messages, **kwargs)
+            # Include the endpoint: the same model id served by different base
+            # URLs (or providers) must not share cache entries.
+            return self.cache.compute_chat_key(f"{self.base_url}|{self.model_id}", messages, **kwargs)
         except (TypeError, ValueError) as e:
             logger.debug(f"[OPENAI] Request is not cacheable: {e}")
             return None

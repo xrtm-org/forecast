@@ -22,7 +22,7 @@ for temporal sandboxing during backtests.
 
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -43,7 +43,7 @@ class TemporalContext(BaseModel):
             # We trust that freezegun is active if the orchestrator did its job,
             # but for safety/clarity, we return reference_time in strict logic.
             return self.reference_time
-        return datetime.now()
+        return datetime.now(timezone.utc)
 
     @property
     def today_str(self) -> str:
