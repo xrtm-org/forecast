@@ -112,16 +112,18 @@ class LeakageGuardian:
             `bool`: `True` if high-risk temporal patterns are found.
         """
         # Exact ISO dates catch same-year future dates ("2026-12-31" seen from
-        # March), which the year-only heuristic below would miss.
+        # March), which the year-only heuristic below would miss. A naive
+        # reference_time (accepted by TemporalContext) is treated as UTC.
+        reference = reference_time if reference_time.tzinfo is not None else reference_time.replace(tzinfo=timezone.utc)
         for match in re.finditer(r"\b(20\d{2})-(\d{2})-(\d{2})\b", text):
             try:
                 moment = datetime(int(match.group(1)), int(match.group(2)), int(match.group(3)), tzinfo=timezone.utc)
             except ValueError:
                 continue
-            if moment > reference_time:
+            if moment > reference:
                 return True
         for year_str in re.findall(r"\b20\d{2}\b", text):
-            if int(year_str) > reference_time.year:
+            if int(year_str) > reference.year:
                 return True
         return False
 

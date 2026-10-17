@@ -90,6 +90,9 @@ class InferenceCache:
         self.max_size_bytes = max_size_bytes
         self.ttl_seconds = ttl_seconds
         self._conn: Optional[sqlite3.Connection] = None
+        # Cache failures degrade to misses; they are counted and surfaced in
+        # stats() so persistent corruption/lock contention is visible.
+        self._failures = 0
 
         if self.enabled:
             self._init_db()
@@ -191,7 +194,7 @@ class InferenceCache:
         try:
             return self._get(key)
         except Exception as exc:  # noqa: BLE001 - the cache must never break a call
-            logger.debug("Cache get failed for %s: %s", key[:16], exc)
+            self._note_failure("read", key, exc)
             return None
 
     def _get(self, key: str) -> Optional[str]:
@@ -244,7 +247,20 @@ class InferenceCache:
         try:
             self._set(key, value, metadata)
         except Exception as exc:  # noqa: BLE001 - the cache must never break a call
-            logger.debug("Cache set failed for %s: %s", key[:16], exc)
+            self._note_failure("write", key, exc)
+
+    def _note_failure(self, operation: str, key: str, exc: Exception) -> None:
+        r"""Count a degraded cache operation; warn loudly on the first one."""
+        self._failures += 1
+        if self._failures == 1:
+            logger.warning(
+                "Inference cache %s failed (further failures counted in stats()): %s: %s",
+                operation,
+                key[:16],
+                exc,
+            )
+        else:
+            logger.debug("Cache %s failed for %s: %s", operation, key[:16], exc)
 
     def _set(self, key: str, value: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         r"""Store a response in the cache.
@@ -347,10 +363,20 @@ class InferenceCache:
             True
         """
         if not self.enabled or self._conn is None:
-            return {"enabled": False}
+            return {"enabled": False, "failures": self._failures}
 
-        cursor = self._conn.execute("SELECT COUNT(*), SUM(size_bytes) FROM cache")
-        row = cursor.fetchone()
+        try:
+            cursor = self._conn.execute("SELECT COUNT(*), SUM(size_bytes) FROM cache")
+            row = cursor.fetchone()
+        except Exception as exc:  # noqa: BLE001 - stats must never break the caller
+            self._failures += 1
+            logger.warning("Cache stats query failed: %s", exc)
+            return {
+                "enabled": True,
+                "db_path": str(self.db_path),
+                "failures": self._failures,
+                "error": str(exc),
+            }
 
         return {
             "enabled": True,
@@ -358,6 +384,7 @@ class InferenceCache:
             "total_size_bytes": row[1] or 0,
             "db_path": str(self.db_path),
             "max_size_bytes": self.max_size_bytes,
+            "failures": self._failures,
         }
 
     def close(self) -> None:

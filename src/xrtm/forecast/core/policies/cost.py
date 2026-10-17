@@ -185,6 +185,7 @@ class CostLedger:
         # so a long-lived ledger cannot grow without limit).
         self._total_all = 0.0
         self._daily_totals: dict[str, float] = {}
+        self._unpriced_calls = 0
         if self.path is not None and self.path.exists():
             self._load()
 
@@ -223,6 +224,39 @@ class CostLedger:
         r"""Price an object carrying a ``usage`` attribute (e.g. ``ForecastOutput``)."""
         return self.record_usage(model_id, getattr(output, "usage", None) or {}, at=at)
 
+    def record_unpriced(self, model_id: str, usage: Any = None, error: str = "", at: Optional[datetime] = None) -> None:
+        r"""Append an explicitly-unpriced, zero-cost record.
+
+        Used when the price table cannot price a call: the spend is unknown,
+        so the record is flagged (``priced: False``) and
+        :class:`BudgetPolicy` fails closed instead of spending blind.
+        """
+        moment = (at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+        record = {
+            "timestamp": moment.isoformat(),
+            "model": model_id,
+            "currency": self.price_table.currency,
+            "cost": 0.0,
+            "priced": False,
+            "error": str(error)[:200],
+            "prompt_tokens": _usage_value(usage, "prompt_tokens"),
+            "completion_tokens": _usage_value(usage, "completion_tokens"),
+            "cached_prompt_tokens": _usage_value(usage, "cached_prompt_tokens"),
+        }
+        self._records.append(record)
+        if len(self._records) > MAX_IN_MEMORY_RECORDS:
+            self._records = self._records[-MAX_IN_MEMORY_RECORDS:]
+        self._unpriced_calls += 1
+        if self.path is not None:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.path, "a") as handle:
+                handle.write(json.dumps(record) + "\n")
+
+    @property
+    def unpriced_calls(self) -> int:
+        r"""Calls that could not be priced (budgets fail closed on these)."""
+        return self._unpriced_calls
+
     @property
     def total(self) -> float:
         r"""Total recorded cost in the table's currency (all records ever seen)."""
@@ -251,6 +285,11 @@ class CostLedger:
                     except json.JSONDecodeError:
                         logger.warning("Skipping malformed cost ledger line in %s", self.path)
                         continue
+                    if not isinstance(record, dict):
+                        logger.warning("Skipping non-object cost ledger line in %s", self.path)
+                        continue
+                    if record.get("priced") is False:
+                        self._unpriced_calls += 1
                     # Normalize naive timestamps to UTC so day bucketing and
                     # comparisons are stable across writers.
                     timestamp = str(record.get("timestamp", ""))
@@ -263,7 +302,11 @@ class CostLedger:
                         day = parsed.astimezone(timezone.utc).date().isoformat()
                     except ValueError:
                         pass
-                    cost = float(record.get("cost", 0.0) or 0.0)
+                    try:
+                        cost = float(record.get("cost", 0.0) or 0.0)
+                    except (TypeError, ValueError):
+                        logger.warning("Skipping non-numeric ledger cost in %s", self.path)
+                        cost = 0.0
                     self._total_all += cost
                     self._daily_totals[day] = self._daily_totals.get(day, 0.0) + cost
                     self._records.append(record)
@@ -293,7 +336,14 @@ class BudgetPolicy:
         self.total_limit = total_limit
 
     def exceeded(self) -> bool:
-        r"""True when any configured limit has been reached."""
+        r"""True when any configured limit has been reached.
+
+        Unpriced calls also count as exceeded: an unpriceable call means the
+        budget can no longer be enforced, and failing closed is safer than
+        spending blind.
+        """
+        if self.ledger.unpriced_calls:
+            return True
         if self.daily_limit is not None and self.ledger.daily_total() >= self.daily_limit:
             return True
         if self.total_limit is not None and self.ledger.total >= self.total_limit:

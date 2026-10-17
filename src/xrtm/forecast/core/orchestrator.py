@@ -173,21 +173,39 @@ class Orchestrator(Generic[StateT]):
             return None
         return time.monotonic() + float(timeout)
 
-    async def _await_with_deadline(self, awaitable: Any, deadline: Optional[float]) -> Any:
-        r"""Await *awaitable*, failing fast when the graph deadline passes.
+    def _remaining_budget(self, deadline: Optional[float]) -> Optional[float]:
+        r"""Remaining seconds until *deadline* on the real clock.
 
-        ``GraphConfig.timeout`` documented a global bound that was never
-        enforced, so a hung tool or human gate could block a run forever.
+        Must be called *outside* any freezegun sandbox: ``freeze_time`` patches
+        ``time.monotonic``, so an in-sandbox computation would compare the
+        frozen epoch against a real-clock deadline and expire instantly.
         """
         if deadline is None:
+            return None
+        return deadline - time.monotonic()
+
+    async def _await_with_timeout(self, awaitable: Any, remaining: Optional[float]) -> Any:
+        r"""Await *awaitable* under a precomputed *remaining* budget (seconds).
+
+        ``wait_for`` ticks on the real event loop because the sandbox is
+        entered with ``freeze_time(..., real_asyncio=True)``.
+        """
+        if remaining is None:
             return await awaitable
-        remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise GraphTimeoutError("graph run exceeded its configured timeout")
         try:
             return await asyncio.wait_for(awaitable, timeout=remaining)
         except asyncio.TimeoutError as exc:
             raise GraphTimeoutError("graph run exceeded its configured timeout") from exc
+
+    async def _await_with_deadline(self, awaitable: Any, deadline: Optional[float]) -> Any:
+        r"""Await *awaitable*, failing fast when the graph deadline passes.
+
+        ``GraphConfig.timeout`` documented a global bound that was never
+        enforced, so a hung tool or human gate could block a run forever.
+        """
+        return await self._await_with_timeout(awaitable, self._remaining_budget(deadline))
 
     async def run(
         self,
@@ -242,12 +260,16 @@ class Orchestrator(Generic[StateT]):
                     # Standard single node
                     node_func = self.nodes.get(active_node)
                     if node_func:
-                        # Temporal Sandboxing: Mock System Clock
+                        # Temporal Sandboxing: Mock System Clock. The deadline
+                        # budget is computed on the real clock and the sandbox
+                        # keeps the real asyncio clock, so either way a hung
+                        # node still times out (see _remaining_budget).
                         if state.temporal_context and state.temporal_context.is_backtest:
                             from freezegun import freeze_time
 
-                            with freeze_time(state.temporal_context.reference_time):
-                                res = await self._await_with_deadline(node_func(state, report_progress), deadline)
+                            remaining = self._remaining_budget(deadline)
+                            with freeze_time(state.temporal_context.reference_time, real_asyncio=True):
+                                res = await self._await_with_timeout(node_func(state, report_progress), remaining)
                         else:
                             res = await self._await_with_deadline(node_func(state, report_progress), deadline)
 
@@ -319,13 +341,15 @@ class Orchestrator(Generic[StateT]):
                             task_name = f"{active_node}:worker_{i}"
                             wrapped_tasks.append(AsyncRuntime.spawn(t_coro, name=task_name))
 
-                        # Temporal Sandboxing: Mock System Clock
+                        # Temporal Sandboxing: Mock System Clock (real asyncio
+                        # clock + real-clock deadline budget; see above).
                         if state.temporal_context and state.temporal_context.is_backtest:
                             from freezegun import freeze_time
 
-                            with freeze_time(state.temporal_context.reference_time):
-                                results = await self._await_with_deadline(
-                                    asyncio.gather(*wrapped_tasks, return_exceptions=True), deadline
+                            remaining = self._remaining_budget(deadline)
+                            with freeze_time(state.temporal_context.reference_time, real_asyncio=True):
+                                results = await self._await_with_timeout(
+                                    asyncio.gather(*wrapped_tasks, return_exceptions=True), remaining
                                 )
                         else:
                             results = await self._await_with_deadline(
