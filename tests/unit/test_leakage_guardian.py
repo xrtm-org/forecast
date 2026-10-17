@@ -59,6 +59,18 @@ async def test_guardian_regex_prefilter():
     assert guardian._regex_pre_filter("Happened 2024-03-01.", reference) is False
 
 
+def test_guardian_regex_prefilter_accepts_naive_reference_time():
+    from datetime import datetime
+
+    provider = MockProvider()
+    guardian = LeakageGuardian(provider)
+
+    # TemporalContext accepts naive datetimes; the ISO-date branch must not
+    # crash comparing aware and naive values.
+    assert guardian._regex_pre_filter("Scheduled for 2024-12-31.", datetime(2024, 6, 1)) is True
+    assert guardian._regex_pre_filter("Happened 2024-03-01.", datetime(2024, 6, 1)) is False
+
+
 @pytest.mark.asyncio
 async def test_guardian_redaction_flow():
     provider = MockProvider()

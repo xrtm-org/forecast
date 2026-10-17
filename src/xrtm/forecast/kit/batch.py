@@ -83,9 +83,13 @@ async def forecast_many(
     """
     questions = list(questions)
     semaphore = asyncio.Semaphore(max(1, concurrency))
-    # Serialize the budget admission check: without it, every in-flight task
-    # can pass the check before any of them has recorded spend.
+    # Budget admission: serialized, and each in-flight call reserves the
+    # largest observed per-call cost so far. The first wave (no observations
+    # yet) can still overshoot by up to `concurrency` calls; every wave after
+    # that is bounded by the observed cost.
     admission = asyncio.Lock()
+    observed_costs: List[float] = []
+    reserved_total = 0.0
     resolved_model_id = model_id or _agent_model_id(agent)
     start_total = ledger.total if ledger is not None else 0.0
 
@@ -94,23 +98,35 @@ async def forecast_many(
     skipped = 0
 
     async def run_one(question: ForecastQuestion) -> Optional[ForecastOutput]:
-        nonlocal skipped
+        nonlocal skipped, reserved_total
         async with semaphore:
+            reserved = 0.0
             if budget is not None:
                 async with admission:
-                    if budget.exceeded():
+                    estimate = max(observed_costs) if observed_costs else 0.0
+                    remaining = budget.remaining()
+                    if budget.exceeded() or (remaining is not None and remaining <= reserved_total + estimate):
                         skipped += 1
                         return None
+                    reserved = estimate
+                    reserved_total += reserved
             try:
                 output = await agent.run(question)
             except Exception as exc:  # noqa: BLE001 - surfaced in the batch result
                 errors.append(f"{question.id}: {exc}")
                 return None
+            finally:
+                if budget is not None:
+                    async with admission:
+                        reserved_total = max(0.0, reserved_total - reserved)
             if ledger is not None:
+                call_start = ledger.total
                 try:
                     ledger.record_output(resolved_model_id, output)
                 except Exception as exc:  # noqa: BLE001 - pricing must never discard a forecast
                     logger.warning("Ledger could not price output for %s: %s", question.id, exc)
+                    ledger.record_unpriced(resolved_model_id, getattr(output, "usage", None), str(exc))
+                observed_costs.append(max(0.0, ledger.total - call_start))
             return output
 
     results = await asyncio.gather(*(run_one(question) for question in questions))
