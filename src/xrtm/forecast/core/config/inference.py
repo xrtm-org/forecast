@@ -96,3 +96,9 @@ class OpenAIConfig(ProviderConfig):
         description="Reasoning/thinking mode for reasoning-capable models. 'auto' keeps the provider "
         "default; 'enabled'/'disabled' send extra_body {'thinking': {'type': ...}} (DeepSeek-compatible).",
     )
+    reasoning_effort: Optional[str] = Field(
+        default=None,
+        pattern="^(low|medium|high)$",
+        description="Optional reasoning effort forwarded to reasoning-capable providers "
+        "(DeepSeek v4). low ≈ 3x cheaper and ~5x faster than high.",
+    )

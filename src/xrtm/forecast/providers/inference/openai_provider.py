@@ -111,6 +111,8 @@ class OpenAIProvider(InferenceProvider):
         request_kwargs = dict(kwargs)
         if response_format is not None:
             request_kwargs["response_format"] = response_format
+        if self.config.reasoning_effort:
+            request_kwargs.setdefault("reasoning_effort", self.config.reasoning_effort)
         if self.config.thinking in ("enabled", "disabled"):
             extra_body = dict(request_kwargs.get("extra_body") or {})
             extra_body.setdefault("thinking", {"type": self.config.thinking})
