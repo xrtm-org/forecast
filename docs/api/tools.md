@@ -6,9 +6,21 @@ Tools are atomic, stateless capabilities that skills orchestrate.
     options:
       show_root_heading: true
 
+::: xrtm.forecast.kit.tools.search.DeepSeekSearchTool
+    options:
+      show_root_heading: true
+
 > **Changed in 0.9–0.10.** The bundled `WaybackTool` was removed. For web
 > research, pair `WebSearchSkill` with a tool implementing `search()` /
-> `search_formatted()` (Tavily, or a free DuckDuckGo adapter in your application).
+> `search_formatted()` (Tavily, DeepSeek's in-house Search API, or a free
+> DuckDuckGo adapter in your application).
+
+> **DeepSeek search (0.13.6).** `DeepSeekSearchTool` calls
+> `POST /v1/tools/search` and costs ¥5 per 1,000 **successful** requests
+> (billed only for non-empty results; free until 2026-11-01). It uses the same
+> `DEEPSEEK_API_KEY` as chat, and `WebSearchSkill()` selects it automatically
+> when no Tavily key is set. Reasoning-capable models can set
+> `OpenAIConfig.reasoning_effort="low"` to control output-token cost.
 
 See [Skills](skills.md) for the skill layer.
 
