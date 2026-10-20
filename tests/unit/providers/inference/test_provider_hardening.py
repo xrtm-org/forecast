@@ -145,3 +145,17 @@ async def test_openai_stream_cancellation_propagates_to_async_iterator():
         await task
 
     assert stream.cancelled is True
+
+
+def test_reasoning_effort_is_forwarded_and_overridable():
+    provider = OpenAIProvider(OpenAIConfig(model_id="m", api_key="k", reasoning_effort="low"))
+    kwargs = provider._build_request_kwargs({"temperature": 0.2}, None)
+    assert kwargs["reasoning_effort"] == "low"
+
+    # A per-call value wins over the provider default.
+    kwargs = provider._build_request_kwargs({"reasoning_effort": "high"}, None)
+    assert kwargs["reasoning_effort"] == "high"
+
+    # Unset means the parameter is not sent at all.
+    provider = OpenAIProvider(OpenAIConfig(model_id="m", api_key="k"))
+    assert "reasoning_effort" not in provider._build_request_kwargs({}, None)

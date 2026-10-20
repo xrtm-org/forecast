@@ -21,12 +21,13 @@ Uses Tavily Search API to give agents real-time web search capability.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import time
 from typing import Any, Optional
 
 from xrtm.forecast.kit.skills.definitions import BaseSkill
-from xrtm.forecast.kit.tools.search import TavilySearchTool
+from xrtm.forecast.kit.tools.search import DeepSeekSearchTool, TavilySearchTool
 
 _UNTRUSTED_TAG_RE = re.compile(r"</?untrusted-search-results[^>]*>", re.IGNORECASE)
 
@@ -34,10 +35,12 @@ logger = logging.getLogger(__name__)
 
 
 class WebSearchSkill(BaseSkill):
-    r"""Agent skill for web search via Tavily.
+    r"""Agent skill for web search via Tavily or DeepSeek.
 
     Equip a ``ForecastingAnalyst`` (or any agent) with this skill to
-    enable real-time web research during forecast generation.
+    enable real-time web research during forecast generation. With no explicit
+    tool, Tavily is preferred when ``TAVILY_API_KEY``/``TVLY_DEV_KEY`` is set,
+    then DeepSeek's in-house search when ``DEEPSEEK_API_KEY`` is set.
 
     Example:
         >>> analyst = ForecastingAnalyst(model=provider, name="researcher")
@@ -48,8 +51,18 @@ class WebSearchSkill(BaseSkill):
     name: str = "web_search"
     description: str = "Search the web for current information and news."
 
-    def __init__(self, search_tool: TavilySearchTool | None = None):
-        self._search_tool = search_tool or TavilySearchTool()
+    def __init__(self, search_tool: TavilySearchTool | DeepSeekSearchTool | None = None):
+        if search_tool is not None:
+            self._search_tool = search_tool
+            return
+        if os.environ.get("TAVILY_API_KEY") or os.environ.get("TVLY_DEV_KEY"):
+            self._search_tool = TavilySearchTool()
+        elif os.environ.get("DEEPSEEK_API_KEY"):
+            self._search_tool = DeepSeekSearchTool()
+        else:
+            # Keep the historical default; its first use raises a helpful
+            # message telling the user which key to set.
+            self._search_tool = TavilySearchTool()
 
     @staticmethod
     def _format_results(results: list[dict[str, Any]]) -> str:

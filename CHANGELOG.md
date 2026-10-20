@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.6] - 2026-10-20
+
+### Added
+- `OpenAIConfig.reasoning_effort` (`low|medium|high`) is forwarded to
+  reasoning-capable providers (DeepSeek v4), so consumers no longer need
+  provider wrappers to control reasoning cost.
+- `DeepSeekSearchTool`: DeepSeek's in-house Search API (¥5 / 1,000 successful
+  requests, free until 2026-11-01; structured summaries; retries 408/429/5xx).
+  `WebSearchSkill` picks Tavily when a Tavily key is set, else DeepSeek when
+  `DEEPSEEK_API_KEY` is present.
+
+## [0.13.5] - 2026-10-17
+
+### Fixed
+- Graph deadlines now work inside the freezegun backtest sandbox
+  (`real_asyncio=True` + a real-clock budget), so backtests no longer fail
+  instantly and genuinely hung nodes still time out.
+- `forecast_many` reserves the largest observed per-call cost per in-flight
+  call; unpriced calls fail budgets closed and are recorded.
+- `CostLedger` tolerates non-object/non-numeric ledger lines.
+- Leakage guardian accepts naive `reference_time`; inference-cache failures are
+  counted and surfaced in `stats()`.
+
+## [0.13.4] - 2026-10-16
+
+### Fixed
+- Web-search results are wrapped as untrusted data with delimiter sequences
+  stripped (prompt-injection hardening).
+
+## [0.13.3] - 2026-10-16
+
+### Fixed
+- Provider sync path: logprobs, transient-only retries, explicit `tools` error,
+  rate-limited empty-content retry; malformed tool arguments no longer abort a
+  turn.
+- `forecast_many` keeps forecasts when pricing fails.
+- Cost ledger bounded memory + UTC-normalized timestamps; guardian same-year
+  future dates; workflow-compiler allowlist + redaction; Anthropic logprobs
+  guard.
+
 ## [0.13.2] - 2026-10-16
 
 ### Fixed
