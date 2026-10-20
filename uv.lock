@@ -1345,7 +1345,7 @@ wheels = [
 
 [[package]]
 name = "xrtm-forecast"
-version = "0.13.5"
+version = "0.13.6"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
